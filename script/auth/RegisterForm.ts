@@ -1,0 +1,108 @@
+import {Form} from "@goui/component/form/Form.js";
+import {client, RegisterData} from "@goui/jmap/Client.js";
+import {Notifier} from "@goui/Notifier.js";
+import {t} from "@goui/Translate.js";
+import {fieldset} from "@goui/component/form/Fieldset.js";
+import {comp} from "@goui/component/Component.js";
+import {textfield} from "@goui/component/form/TextField.js";
+import {btn} from "@goui/component/Button.js";
+
+
+export class RegisterForm extends Form {
+
+	handler = async (form: Form) => {
+		const data = {action: "register" as RegisterData['action'], user: form.getValues()};
+		data.user.mail_reminders = true;
+
+		const response = await client.auth(data);
+
+		switch (response.status) {
+			case 201:
+				client.session = await response.json()
+				break;
+
+			default:
+
+				form.setInvalid(response.statusText);
+				break;
+		}
+
+	}
+
+	constructor() {
+		super();
+
+		this.cls = "vbox";
+
+		this.items.add(fieldset({},
+			comp({
+				tagName: "p",
+				html: t("Please enter your e-mail address to register")
+			}),
+
+			textfield({
+				label: t("Name"),
+				name: "displayName",
+				required: true
+			}),
+
+			textfield({
+				type: "email",
+				label: t("E-mail"),
+				name: "email",
+				required: true,
+				listeners: {
+					change: (field) => {
+						if (!field.isValid()) {
+							return;
+						}
+						const username = this.findField("username")!;
+						if (username.isEmpty()) {
+							username.value = field.value;
+						}
+
+					}
+				}
+			}),
+
+			textfield({
+				type: "text",
+				label: t("Username"),
+				name: "username",
+				required: true
+			}),
+
+			textfield({
+				required: true,
+				type: "password",
+				label: t("Password"),
+				name: "password"
+
+			}),
+
+			textfield({
+				itemId: "confirm",//item ID used instead of name so this field won't be submitted
+				type: "password",
+				label: t("Confirm password"),
+				required: true,
+				listeners: {
+					validate: (field) => {
+						const form = field.findAncestorByType(Form)!;
+						if (field.value != form.findField("password")!.value) {
+							field.setInvalid("The passwords don't match");
+						}
+					}
+				},
+			}),
+
+			btn({
+				style: {
+					width: "100%"
+				},
+				type: "submit",
+				text: t("Register")
+			})
+		))
+
+	}
+}

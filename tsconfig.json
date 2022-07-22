@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict" : true,
+    "target": "ES2017",
+    "sourceMap": true,
+    "lib": ["es2020", "dom"],
+    "moduleResolution": "node",
+    "module":"es2020",
+    "baseUrl": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+    "rootDir": "./script",
+    "paths": {
+      "@goui/*" : ["../goui/dist/*"]
+    }
+  }
+}
