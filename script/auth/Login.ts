@@ -198,6 +198,7 @@ export class Login extends Window {
 	async login(form: Form) {
 
 		try {
+			this.mask();
 			const response = await client.auth(form.getValues());
 
 			switch (response.status) {
@@ -220,6 +221,7 @@ export class Login extends Window {
 					Notifier.error(response.statusText);
 			}
 		} catch (e) {
+			this.unmask();
 			Notifier.error("Sorry, an unexpected error occurred: " + e);
 		}
 	}
