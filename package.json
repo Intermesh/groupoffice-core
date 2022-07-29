@@ -1,25 +1,17 @@
 {
   "type": "module",
   "devDependencies": {
-    "@types/chai": "^4.2.22",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.2",
-    "chai": "^4.3.4",
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^3.0.2",
     "tsc-alias": "^1.7.0",
     "typescript": "^4.7.4"
   },
   "scripts": {
     "test": "mocha",
-    "start": "npm-run-all build:clean start:parallel",
-    "start:parallel": "npm-run-all --parallel start:watch --print-label ",
-    "start:watch": "concurrently \"tsc -w\" \"tsc-alias -w -p tsconfig.alias.json\"",
-    "build": "npm-run-all build:clean build:ts --print-label",
-    "build:clean": "rimraf dist",
+
+    "start": "npm run build:clean & npm run start:parallel",
+    "start:parallel": "tsc -w & tsc-alias -w -p tsconfig.alias.json",
+
+    "build": "npm run build:clean && npm run build:ts",
+    "build:clean": "rm -rf dist/*",
     "build:ts": "tsc && tsc-alias -p tsconfig.alias.json"
-  },
-  "dependencies": {
-    "concurrently": "^7.3.0"
   }
 }
