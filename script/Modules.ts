@@ -3,17 +3,15 @@ import {client} from "@goui/jmap/Client.js";
 
 type RouterMethod = (...args: string[]) => Promise<any> | any;
 
-export interface ModuleConfig  {
+export type ModuleConfig = {
+	// [key:string]:unknown;
+
 	readonly package?: string;
 	readonly name?: string;
-	/**
-	 * The routes
-	 */
-	routes?: {
-		[key: string] : RouterMethod
-	}
 
-}
+	init: () => void;
+
+}  & any;
 
 // for using old components in GOUI
 declare global {
@@ -62,16 +60,15 @@ class Modules {
 
 	private mods:ModuleConfig[] = [];
 
-	public register(config:ModuleConfig) {
+	public register(config:Record<string, any>) {
 		this.mods.push(config);
 		this.registerInExtjs(config);
 
-		if(config.routes) {
-			for(let route in config.routes) {
-				go.Router.add(new RegExp(route), config.routes[route]);
-			}
+		if(config.init) {
+			config.init();
 		}
 	}
+
 
 	public addMainPanel(id: string, title: string, callback: () => Component|Promise<Component>) {
 
