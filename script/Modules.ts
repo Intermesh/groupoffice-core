@@ -1,12 +1,18 @@
 import {Component} from "@goui/component/Component.js";
 import {client} from "@goui/jmap/Client.js";
 
-interface ModuleConfig {
-	package: string,
-	name: string,
-	init?: (this:ModuleInit) => void
-	routes?: string[],
-	stores?: string[]
+type RouterMethod = (...args: string[]) => Promise<any> | any;
+
+export interface ModuleConfig  {
+	readonly package?: string;
+	readonly name?: string;
+	/**
+	 * The routes
+	 */
+	routes?: {
+		[key: string] : RouterMethod
+	}
+
 }
 
 // for using old components in GOUI
@@ -51,24 +57,6 @@ const GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
 
 });
 
-export class ModuleInit {
-	constructor(readonly config: ModuleConfig) {
-
-	}
-
-	public addMainPanel(title: string, callback: () => Component|Promise<Component>) {
-
-		const proto = Ext.extend(GouiMainPanel, {
-			id: this.config.package+"-"+this.config.name,
-			title: title,
-			callback: callback
-		})
-
-		go.Modules.addPanel(proto);
-	}
-
-}
-
 
 class Modules {
 
@@ -76,13 +64,28 @@ class Modules {
 
 	public register(config:ModuleConfig) {
 		this.mods.push(config);
-
-		if(config.init) {
-
-			config.init.call(new ModuleInit(config));
-		}
-
 		this.registerInExtjs(config);
+
+		if(config.routes) {
+			for(let route in config.routes) {
+				go.Router.add(new RegExp(route), config.routes[route]);
+			}
+		}
+	}
+
+	public addMainPanel(id: string, title: string, callback: () => Component|Promise<Component>) {
+
+		const proto = Ext.extend(GouiMainPanel, {
+			id: id,
+			title: title,
+			callback: callback
+		})
+
+		go.Modules.addPanel(proto);
+	}
+
+	public openMainPanel(id: string) {
+		GO.mainLayout.openModule(id);
 	}
 
 	private registerInExtjs(config:ModuleConfig) {
