@@ -6,12 +6,12 @@ type RouterMethod = (...args: string[]) => Promise<any> | any;
 export type ModuleConfig = {
 	// [key:string]:unknown;
 
-	readonly package?: string;
-	readonly name?: string;
+	package: string;
+	name: string;
 
-	init: () => void;
+	init?: () => void;
 
-}  & any;
+};
 
 // for using old components in GOUI
 declare global {
@@ -60,7 +60,7 @@ class Modules {
 
 	private mods:ModuleConfig[] = [];
 
-	public register(config:Record<string, any>) {
+	public register(config:ModuleConfig) {
 		this.mods.push(config);
 		this.registerInExtjs(config);
 
