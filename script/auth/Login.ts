@@ -221,8 +221,9 @@ export class Login extends Window {
 					Notifier.error(response.statusText);
 			}
 		} catch (e) {
-			this.unmask();
 			Notifier.error("Sorry, an unexpected error occurred: " + e);
+		} finally {
+			this.unmask();
 		}
 	}
 
