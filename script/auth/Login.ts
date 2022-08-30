@@ -83,7 +83,7 @@ export class Login extends Window {
 					label: t("Password"),
 					type: "password",
 					name: "password",
-					autocomplete: "password",
+					autocomplete: "current-password",
 					required: true
 				}),
 				btn({
