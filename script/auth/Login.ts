@@ -228,7 +228,13 @@ export class Login extends Window {
 	}
 
 	private async onLoginSuccess(response: any) {
-		client.session = await response.json();
+		const session = await response.json();
+
+		delete session.debug;
+		delete session.accounts;
+		delete session.state; // for extjs stuff
+
+		client.session = session;
 		Notifier.success(t("Logged in successfully"));
 		this.close();
 		this.fire("login");
