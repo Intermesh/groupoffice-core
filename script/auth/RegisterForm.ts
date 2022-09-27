@@ -6,6 +6,7 @@ import {fieldset} from "@goui/component/form/Fieldset.js";
 import {comp} from "@goui/component/Component.js";
 import {textfield} from "@goui/component/form/TextField.js";
 import {btn} from "@goui/component/Button.js";
+import {tbar} from "@goui/component/Toolbar.js";
 
 
 export class RegisterForm extends Form {
@@ -32,77 +33,91 @@ export class RegisterForm extends Form {
 	constructor() {
 		super();
 
-		this.cls = "vbox";
+		this.cls = "vbox fit";
 
-		this.items.add(fieldset({},
-			comp({
-				tagName: "p",
-				html: t("Please enter your e-mail address to register")
-			}),
+		this.items.add(
 
-			textfield({
-				label: t("Name"),
-				name: "displayName",
-				required: true
-			}),
+			fieldset({cls:  "scroll", flex: 1},
+				comp({
+					tagName: "p",
+					html: t("Please enter your e-mail address to register")
+				}),
 
-			textfield({
-				type: "email",
-				label: t("E-mail"),
-				name: "email",
-				required: true,
-				listeners: {
-					change: (field) => {
-						if (!field.isValid()) {
-							return;
-						}
-						const username = this.findField("username")!;
-						if (username.isEmpty()) {
-							username.value = field.value;
-						}
+				textfield({
+					label: t("Name"),
+					name: "displayName",
+					required: true
+				}),
 
-					}
-				}
-			}),
+				textfield({
+					type: "email",
+					label: t("E-mail"),
+					name: "email",
+					required: true,
+					listeners: {
+						change: (field) => {
+							if (!field.isValid()) {
+								return;
+							}
+							const username = this.findField("username")!;
+							if (username.isEmpty()) {
+								username.value = field.value;
+							}
 
-			textfield({
-				type: "text",
-				label: t("Username"),
-				name: "username",
-				required: true
-			}),
-
-			textfield({
-				required: true,
-				type: "password",
-				label: t("Password"),
-				name: "password"
-
-			}),
-
-			textfield({
-				itemId: "confirm",//item ID used instead of name so this field won't be submitted
-				type: "password",
-				label: t("Confirm password"),
-				required: true,
-				listeners: {
-					validate: (field) => {
-						const form = field.findAncestorByType(Form)!;
-						if (field.value != form.findField("password")!.value) {
-							field.setInvalid("The passwords don't match");
 						}
 					}
-				},
-			}),
+				}),
 
-			btn({
-				style: {
-					width: "100%"
-				},
-				type: "submit",
-				text: t("Register")
-			})
-		))
+				textfield({
+					type: "text",
+					label: t("Username"),
+					name: "username",
+					required: true
+				}),
+
+				textfield({
+					required: true,
+					type: "password",
+					label: t("Password"),
+					name: "password"
+
+				}),
+
+				textfield({
+					itemId: "confirm",//item ID used instead of name so this field won't be submitted
+					type: "password",
+					label: t("Confirm password"),
+					required: true,
+					listeners: {
+						validate: (field) => {
+							const form = field.findAncestorByType(Form)!;
+							if (field.value != form.findField("password")!.value) {
+								field.setInvalid("The passwords don't match");
+							}
+						}
+					},
+				}),
+
+
+			),
+
+			tbar( {},
+				btn({
+					type: "button",
+					text: t("Cancel"),
+					handler: () => {
+						this.fire("cancel", this);
+					}
+				}),
+				comp({
+					flex: 1
+				}),
+				btn({
+					type: "submit",
+					text: t("Register")
+				})
+			)
+		);
 
 	}
 }

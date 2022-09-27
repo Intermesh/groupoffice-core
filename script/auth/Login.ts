@@ -3,7 +3,7 @@ import {form, Form} from "@goui/component/form/Form.js";
 import {comp} from "@goui/component/Component.js";
 import {CardContainer, cards} from "@goui/component/CardContainer.js";
 import {t} from "@goui/Translate.js";
-import {client} from "@goui/jmap/Client.js";
+import {client, ForgottenData} from "@goui/jmap/Client.js";
 import {fieldset} from "@goui/component/form/Fieldset.js";
 import {textfield} from "@goui/component/form/TextField.js";
 import {tbar} from "@goui/component/Toolbar.js";
@@ -37,11 +37,13 @@ export class Login extends Window {
 
 	private cardContainer!: CardContainer;
 	private registerForm!: Form;
+	private forgotPasswordForm!: Form;
 
 	constructor() {
 		super();
 
 		this.width = 480;
+		this.height = window.innerHeight * 0.8;
 		this.title = t("Login");
 		this.cls = "login";
 		this.modal = true;
@@ -57,17 +59,14 @@ export class Login extends Window {
 		})
 
 		this.loginForm = form({
-				flex: "1 2 auto",
-				cls: "vbox",
+				cls: "vbox fit",
 				handler: (form: Form) => {
 					this.login(form);
 				}
 			},
 			fieldset({
-					flex: "1 2 auto",
-					style: {
-						overflow: "auto"
-					}
+					flex: "1",
+					cls:  "scroll"
 				},
 				comp({
 					tagName: "p",
@@ -94,9 +93,6 @@ export class Login extends Window {
 					text: t("Login")
 				}),
 
-				comp({
-					tagName: "hr"
-				}),
 
 				btn({
 					style: {
@@ -108,7 +104,18 @@ export class Login extends Window {
 					handler: () => {
 						this.showRegisterForm();
 					}
-				})
+				}),
+
+				comp({style: {display: "flex", justifyContent: "center"}},
+					btn({
+						cls: "small",
+						text: t("Forgot password?"),
+						type: "button",
+						handler: () => {
+							this.showForgotPassword();
+						}
+					})
+				),
 			)
 		);
 
@@ -168,9 +175,68 @@ export class Login extends Window {
 			)
 		);
 
-		this.cardContainer = cards({}, this.loginForm, this.otpForm);
+		this.cardContainer = cards({flex: 1}, this.loginForm, this.otpForm);
 
 		this.items.add(this.cardContainer);
+	}
+
+	private showForgotPassword() {
+
+		if (!this.forgotPasswordForm) {
+			this.forgotPasswordForm = form(
+				{
+					cls: "vbox fit",
+					handler: async (form) => {
+						this.loginForm.show();
+
+						const response = await client.auth(Object.assign({action: "forgotten"}, form.getValues() ) as ForgottenData);
+
+						Notifier.success(t("If an account was found, you should receive an e-mail with instructions shortly."));
+
+					}
+				},
+					fieldset({flex: 1} ,
+
+						comp({
+							tagName: "p",
+							text: t("Please enter your e-mail address to receive an e-mail to reset your password.")
+						}),
+
+						textfield({
+							name: "email",
+							type: "email",
+							label: t("E-mail"),
+							required: true
+						}),
+
+					),
+
+				tbar({},
+					btn({
+						type: "button",
+						text: t("Cancel"),
+						handler: () => {
+							this.forgotPasswordForm.reset();
+							this.loginForm.show();
+						}
+					}),
+					comp({
+						flex: 1
+					}),
+
+					btn({
+						type: "submit",
+						text: t("Send")
+					})
+				)
+				);
+
+
+			this.cardContainer.items.add(this.forgotPasswordForm);
+		}
+
+		this.forgotPasswordForm.show();
+		this.forgotPasswordForm.focus();
 	}
 
 	private showRegisterForm() {
@@ -183,6 +249,11 @@ export class Login extends Window {
 					Notifier.success(t("Registration and successful"));
 					this.fire("login");
 				}
+			});
+
+			this.registerForm.on("cancel", (form) => {
+				this.registerForm.reset();
+				this.loginForm.show();
 			});
 			this.cardContainer.items.add(this.registerForm);
 		}
