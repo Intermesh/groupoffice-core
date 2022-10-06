@@ -43,10 +43,11 @@ export class Login extends Window {
 		super();
 
 		this.width = 480;
-		this.height = window.innerHeight * 0.8;
+		this.height = 800;
 		this.title = t("Login");
 		this.cls = "login";
 		this.modal = true;
+		this.resizable = true;
 
 
 		this.on("close", async window => {
