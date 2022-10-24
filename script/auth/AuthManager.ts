@@ -33,6 +33,7 @@ class AuthManager {
 			return client.isLoggedIn().then(user => {
 				if (!user) {
 					client.session = {};
+					this.requireLoginPromise = undefined;
 					return this.requireLogin();
 				} else {
 					return user;
