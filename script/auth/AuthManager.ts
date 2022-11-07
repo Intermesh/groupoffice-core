@@ -9,7 +9,7 @@ class AuthManager {
 
 		if (!this.requireLoginPromise) {
 			this.requireLoginPromise = new Promise<void>((resolve, reject) => {
-				if ("accessToken" in client.session) {
+				if (client.accessToken) {
 					resolve();
 				} else {
 					import("./Login.js").then((mods) => {
@@ -32,14 +32,12 @@ class AuthManager {
 		return this.requireLoginPromise.then(() => {
 			return client.isLoggedIn().then(user => {
 				if (!user) {
-					client.session = {};
 					this.requireLoginPromise = undefined;
 					return this.requireLogin();
 				} else {
 					return user;
 				}
 			}).catch(() => {
-				client.session = {};
 				return this.requireLogin();
 			});
 		})
