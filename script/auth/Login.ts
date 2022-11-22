@@ -153,7 +153,7 @@ export class Login extends Window {
 
 				textfield({
 					label: "Code",
-					name: "otpauthenticator_code",
+					name: "otp_code",
 					required: true,
 					autocomplete: "one-time-code"
 				})
