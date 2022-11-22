@@ -127,7 +127,7 @@ export class Login extends Window {
 					client.auth({
 						loginToken: this.loginToken,
 						authenticators: {
-							googleauthenticator: <{ code: string }>form.getValues()
+							otpauthenticator: <{ code: string }>form.getValues()
 						}
 					}).then(response => {
 						console.log(response);
@@ -142,7 +142,10 @@ export class Login extends Window {
 					})
 				}
 			},
-			fieldset({},
+			fieldset({
+					flex: "1",
+					cls:  "scroll"
+				},
 				comp({
 					tagName: "p",
 					html: t("Please provide the one time code from your device")
@@ -150,7 +153,7 @@ export class Login extends Window {
 
 				textfield({
 					label: "Code",
-					name: "googleauthenticator_code",
+					name: "otpauthenticator_code",
 					required: true,
 					autocomplete: "one-time-code"
 				})
