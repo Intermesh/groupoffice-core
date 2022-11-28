@@ -38,6 +38,7 @@ class AuthManager {
 					return user;
 				}
 			}).catch(() => {
+				this.requireLoginPromise = undefined;
 				return this.requireLogin();
 			});
 		})
