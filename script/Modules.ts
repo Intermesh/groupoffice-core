@@ -75,6 +75,9 @@ class Modules {
 
 	public addMainPanel(module:string, pkg:string, id: string, title: string, callback: () => Component|Promise<Component>) {
 
+		go.Translate.package = go.package = pkg;
+		go.Translate.module = go.module = module;
+
 		const proto = Ext.extend(GouiMainPanel, {
 			id: id,
 			title: title,
