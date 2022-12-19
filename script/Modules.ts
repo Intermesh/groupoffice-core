@@ -78,10 +78,11 @@ class Modules {
 		const proto = Ext.extend(GouiMainPanel, {
 			id: id,
 			title: title,
-			callback: callback,
-			package: pkg,
-			module: module
-		})
+			callback: callback
+		});
+
+		proto.package = pkg;
+		proto.module = module;
 
 		go.Modules.addPanel(proto);
 	}
