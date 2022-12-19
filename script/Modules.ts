@@ -64,18 +64,23 @@ class Modules {
 		this.mods.push(config);
 		this.registerInExtjs(config);
 
+		go.Translate.package = config.package;
+		go.Translate.module = config.name;
+
 		if(config.init) {
 			config.init();
 		}
 	}
 
 
-	public addMainPanel(id: string, title: string, callback: () => Component|Promise<Component>) {
+	public addMainPanel(module:string, pkg:string, id: string, title: string, callback: () => Component|Promise<Component>) {
 
 		const proto = Ext.extend(GouiMainPanel, {
 			id: id,
 			title: title,
-			callback: callback
+			callback: callback,
+			package: pkg,
+			module: module
 		})
 
 		go.Modules.addPanel(proto);
