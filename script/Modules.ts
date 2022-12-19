@@ -73,7 +73,7 @@ class Modules {
 	}
 
 
-	public addMainPanel(module:string, pkg:string, id: string, title: string, callback: () => Component|Promise<Component>) {
+	public addMainPanel(pkg:string, module:string, id: string, title: string, callback: () => Component|Promise<Component>) {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
