@@ -1,6 +1,5 @@
 import {Form} from "@goui/component/form/Form.js";
 import {client, RegisterData} from "@goui/jmap/Client.js";
-import {Notifier} from "@goui/Notifier.js";
 import {t} from "@goui/Translate.js";
 import {fieldset} from "@goui/component/form/Fieldset.js";
 import {comp} from "@goui/component/Component.js";
