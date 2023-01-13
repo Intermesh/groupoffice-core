@@ -1,10 +1,13 @@
 import {User} from "./User.js";
 import {client} from "@goui/jmap/Client.js";
+import {root} from "@goui/component/Root.js";
 
 /**
  * Authentication manager
  */
 class AuthManager {
+
+	private _requireLogin?: Promise<User>;
 
 	/**
 	 * Will continue if user is authenticated and present login dialog if not
@@ -13,14 +16,23 @@ class AuthManager {
 	 */
 	public async requireLogin(): Promise<User> {
 
-		const user = await client.isLoggedIn();
-
-		if (!user) {
-			await this.showLogin();
-			return this.requireLogin();
-		} else {
-			return user;
+		if(this._requireLogin) {
+			return this._requireLogin;
 		}
+
+		this._requireLogin = new Promise(async (resolve, reject) => {
+			root.mask();
+			let user = await client.isLoggedIn();
+			root.unmask();
+			while (!user) {
+				await this.showLogin();
+				user = await client.isLoggedIn();
+			}
+
+			resolve(user);
+		});
+
+		return this._requireLogin;
 	}
 	private showLogin() {
 		return new Promise<void>((resolve, reject) => {
