@@ -1,15 +1,17 @@
-import {Observable, ObservableListener} from "@goui/component/Observable.js";
-import {form, Form} from "@goui/component/form/Form.js";
-import {comp} from "@goui/component/Component.js";
-import {CardContainer, cards} from "@goui/component/CardContainer.js";
-import {t} from "@goui/Translate.js";
-import {client, ForgottenData} from "@goui/jmap/Client.js";
-import {fieldset} from "@goui/component/form/Fieldset.js";
-import {textfield} from "@goui/component/form/TextField.js";
-import {tbar} from "@goui/component/Toolbar.js";
-import {btn} from "@goui/component/Button.js";
-import {Notifier} from "@goui/Notifier.js";
-import {Window, WindowEventMap} from "@goui/component/Window.js";
+import {
+	btn,
+	CardContainer,
+	cards, client,
+	comp,
+	fieldset, ForgottenData, form,
+	Form, Notifier,
+	Observable,
+	ObservableListener, t,
+	tbar,
+	textfield,
+	WindowEventMap,
+	Window
+} from "@intermesh/goui";
 import {RegisterForm} from "./RegisterForm.js";
 
 
@@ -303,9 +305,7 @@ export class Login extends Window {
 	}
 
 	private async onLoginSuccess(response: any) {
-		const session = await response.json();
-
-		client.session = session;
+		client.session = await response.json();
 		Notifier.success(t("Logged in successfully"));
 		this.close();
 		this.fire("login");

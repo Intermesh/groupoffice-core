@@ -1,6 +1,6 @@
-import {Entity} from "@goui/jmap/EntityStore.js";
+import {DefaultEntity} from "@intermesh/goui";
 
-export interface User extends Entity {
+export interface User extends DefaultEntity {
 	username?: string,
 	displayName?: string,
 	profile?: any,

@@ -1,5 +1,4 @@
-import {Component} from "@goui/component/Component.js";
-import {client} from "@goui/jmap/Client.js";
+import {Component,client} from "@intermesh/goui";
 
 type RouterMethod = (...args: string[]) => Promise<any> | any;
 

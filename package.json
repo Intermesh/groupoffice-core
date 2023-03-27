@@ -1,17 +1,48 @@
 {
   "type": "module",
   "devDependencies": {
-    "tsc-alias": "^1.8.2",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "create-ts-index": "^1.14.0"
   },
   "scripts": {
-    "test": "mocha",
 
+    "test": "mocha",
     "start": "npm run build:clean & npm run start:parallel",
-    "start:parallel": "tsc -w & tsc-alias -w -p tsconfig.alias.json",
+    "start:parallel": "tsc -w",
 
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf dist/*",
-    "build:ts": "tsc && tsc-alias -p tsconfig.alias.json"
-  }
+    "build:ts": "tsc",
+
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@intermesh/goui": "file:../goui"
+  },
+  "author": "Intermesh",
+  "license": "LGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Intermesh/groupoffice-core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Intermesh/groupoffice-core.git"
+  },
+  "keywords": [
+    "Typescript",
+    "Framework",
+    "Group-Office"
+  ],
+  "homepage": "https://github.com/Intermesh/goui#readme",
+  "module": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "name": "@intermesh/groupoffice-core",
+  "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
+  "version": "1.0.0",
+  "main": "index.js"
 }

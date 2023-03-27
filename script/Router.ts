@@ -1,4 +1,4 @@
-import {Router as GouiRouter, RouterMethod} from "@goui/Router.js";
+import {Router as GouiRouter, RouterMethod} from "@intermesh/goui";
 
 /**
  * Router adapter class that uses the old router

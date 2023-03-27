@@ -5,14 +5,17 @@
     "sourceMap": true,
     "lib": ["es2020", "dom"],
     "moduleResolution": "node",
+    "esModuleInterop": true,
+    "isolatedModules": true, // important for tree shaking in esbuild
     "module":"es2020",
     "baseUrl": ".",
-    "declaration": true,
-    "declarationMap": true,
     "outDir": "./dist",
-    "rootDir": "./script",
-    "paths": {
-      "@goui/*" : ["../goui/dist/*"]
-    }
-  }
+    "declaration": true,
+    "declarationMap": true
+  },
+
+  "include": [
+    "./script"
+  ]
+
 }

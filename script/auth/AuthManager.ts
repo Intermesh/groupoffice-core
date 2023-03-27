@@ -1,6 +1,5 @@
 import {User} from "./User.js";
-import {client} from "@goui/jmap/Client.js";
-import {root} from "@goui/component/Root.js";
+import {client, root} from "@intermesh/goui";
 
 /**
  * Authentication manager
@@ -20,7 +19,7 @@ class AuthManager {
 			return this._requireLogin;
 		}
 
-		this._requireLogin = new Promise(async (resolve, reject) => {
+		this._requireLogin = new Promise(async (resolve) => {
 			root.mask();
 			let user = await client.isLoggedIn();
 			root.unmask();

@@ -1,11 +1,4 @@
-import {Form} from "@goui/component/form/Form.js";
-import {client, RegisterData} from "@goui/jmap/Client.js";
-import {t} from "@goui/Translate.js";
-import {fieldset} from "@goui/component/form/Fieldset.js";
-import {comp} from "@goui/component/Component.js";
-import {textfield} from "@goui/component/form/TextField.js";
-import {btn} from "@goui/component/Button.js";
-import {tbar} from "@goui/component/Toolbar.js";
+import {btn, client, comp, fieldset, Form, RegisterData, t, tbar, textfield} from "@intermesh/goui";
 
 
 export class RegisterForm extends Form {
