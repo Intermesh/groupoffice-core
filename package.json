@@ -2,17 +2,19 @@
   "type": "module",
   "devDependencies": {
     "typescript": "^4.9.4",
-    "create-ts-index": "^1.14.0"
+    "tsc-alias": "^1.8.2"
   },
   "scripts": {
 
     "test": "mocha",
     "start": "npm run build:clean & npm run start:parallel",
-    "start:parallel": "tsc -w",
+    "start:parallel": "tsc -w & tsc-alias -w -p tsconfig.alias.json",
+
 
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf dist/*",
-    "build:ts": "tsc",
+    "build:ts": "tsc && tsc-alias -p tsconfig.alias.json",
+
 
     "prepublishOnly": "npm run build"
   },

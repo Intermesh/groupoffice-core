@@ -11,7 +11,7 @@
     "declarationMap": true,
     "outDir": "./dist",
     "paths": {
-      "@goui/*" : ["../../goui/dist/*"]
+      "@intermesh/goui" : ["../../goui/dist/index.js"]
     }
   }
 }
