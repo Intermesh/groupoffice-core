@@ -1,9 +1,9 @@
 import {
 	btn,
 	CardContainer,
-	cards, client,
+	cards,
 	comp,
-	fieldset, ForgottenData, form,
+	fieldset,  form,
 	Form, Notifier,
 	Observable,
 	ObservableListener, t,
@@ -13,6 +13,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {RegisterForm} from "./RegisterForm.js";
+import {client, ForgottenData} from "../jmap/index.js";
 
 
 export interface LoginEventMap<T extends Observable> extends WindowEventMap<T> {

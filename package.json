@@ -19,7 +19,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@intermesh/goui": "file:../goui"
+    "@intermesh/goui": "file:../goui",
+    "@microsoft/fetch-event-source": "^2.0.1"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",

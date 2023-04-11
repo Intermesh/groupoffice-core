@@ -1,4 +1,5 @@
-import {btn, client, comp, fieldset, Form, RegisterData, t, tbar, textfield} from "@intermesh/goui";
+import {btn, comp, fieldset, Form, t, tbar, textfield} from "@intermesh/goui";
+import {client, RegisterData} from "../jmap/index.js";
 
 
 export class RegisterForm extends Form {
