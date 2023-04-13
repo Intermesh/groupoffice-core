@@ -1,26 +1,21 @@
 {
   "type": "module",
   "devDependencies": {
-    "typescript": "^4.9.4",
-    "tsc-alias": "^1.8.2"
+    "tsc-alias": "^1.8.2",
+    "typescript": "^4.9.4"
   },
   "scripts": {
-
     "test": "mocha",
     "start": "npm run build:clean & npm run start:parallel",
     "start:parallel": "tsc -w & tsc-alias -w -p tsconfig.alias.json",
-
-
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf dist/*",
     "build:ts": "tsc && tsc-alias -p tsconfig.alias.json",
-
-
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@intermesh/goui": "file:../goui",
-    "@microsoft/fetch-event-source": "^2.0.1"
+    "@fortaine/fetch-event-source": "^3.0.6",
+    "@intermesh/goui": "file:../goui"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",

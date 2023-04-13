@@ -12,7 +12,7 @@
     "outDir": "./dist",
     "paths": {
       "@intermesh/goui" : ["../../goui/dist/index.js"],
-      "@microsoft/fetch-event-source" : ["./node_modules/@microsoft/fetch-event-source/lib/esm/fetch.js"],
+      "@fortaine/fetch-event-source" : ["./node_modules/@fortaine/fetch-event-source/lib/esm/fetch.js"],
     }
   }
 }

@@ -10,7 +10,7 @@ import {Timezone} from "@intermesh/goui";
 import {DefaultEntity} from "@intermesh/goui";
 import {FunctionUtil} from "@intermesh/goui";
 
-// import {fetchEventSource} from "@microsoft/fetch-event-source";
+import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 
 
@@ -89,7 +89,7 @@ export class Client<UserType extends User = User> extends Observable {
 	private _session: any;
 	private timeout?: number;
 
-	private debugParam = "XDEBUG_SESSION=1"
+	private debugParam = "";// "XDEBUG_SESSION=1"
 
 	private user: UserType | undefined;
 
@@ -461,7 +461,6 @@ export class Client<UserType extends User = User> extends Observable {
 
 			const ds = jmapds(entity);
 			ds.getState().then((state) => {
-				console.warn(state, entity);
 				if (state)
 					ds.updateFromServer();
 			});
@@ -485,68 +484,66 @@ export class Client<UserType extends User = User> extends Observable {
 	 * @returns {Boolean}
 	 */
 	public async sse (entities:string[]) {
-		// try {
-		//
-		// 	const session = await this.session;
-		//
-		// 	if (!session.eventSourceUrl) {
-		// 		console.debug("Server Sent Events (EventSource) is disabled on the server.");
-		// 		this.startPolling(entities);
-		// 		return false;
-		// 	}
-		//
-		// 	console.debug("Starting SSE");
-		//
-		// 	const url = this.uri + 'sse.php?accessToken=' + this.accessToken + '&types=' +		entities.join(',') + (this.debugParam ? '&'+this.debugParam : '');
-		//
-		// 	let retry = 0;
-		// 	await fetchEventSource(url,{
-		// 		headers: {
-		// 			Authorization: "Bearer " + this.accessToken
-		// 		},
-		// 		onopen: async (response) => {
-		//
-		// 			if(retry > 0) {
-		// 				//SSE will restart but we might be out of date
-		// 				this.updateAllDataSources(entities);
-		// 			}
-		// 			retry++;
-		//
-		// 		},
-		// 		onmessage: (msg) => {
-		//
-		// 			const data = JSON.parse(msg.data);
-		//
-		// 			for (let entity in data) {
-		// 				let ds = jmapds(entity);
-		//
-		// 				ds.getState().then(state => {
-		// 					console.warn(entity, state, data[entity]);
-		// 					if (!state || state == data[entity]) {
-		// 						//don't fetch updates if there's no state yet because it never was used in that case.
-		// 						return;
-		// 					}
-		//
-		// 					ds.updateFromServer();
-		// 				})
-		// 			}
-		// 		},
-		// 		onerror: (err) => {
-		// 			console.error(err);
-		//
-		// 		},
-		// 		onclose() {
-		// 			// if the server closes the connection unexpectedly, retry:
-		//
-		// 		},
-		//
-		// 	})
-		//
-		//
-		//
-		// } catch (e) {
-		// 	console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
-		// }
+		try {
+
+			const session = await this.session;
+
+			if (!session.eventSourceUrl) {
+				console.debug("Server Sent Events (EventSource) is disabled on the server.");
+				this.startPolling(entities);
+				return false;
+			}
+
+			console.debug("Starting SSE");
+
+			const url = this.uri + 'sse.php?types=' +		entities.join(',') + (this.debugParam ? '&'+this.debugParam : '');
+			const headers = this.buildHeaders();
+			delete headers['Content-Type'];
+
+
+			// Event source will stop when document is hidden. Other tab is selected. When coming back check all sources for
+			// updates
+			document.addEventListener('visibilitychange', () => {
+				if (!document.hidden) {
+					this.updateAllDataSources(entities);
+				}
+			});
+
+			// let retry = 0;
+			void fetchEventSource(url,{
+				headers: headers,
+				onmessage: (msg) => {
+
+					try {
+						console.warn(msg);
+						const data = JSON.parse(msg.data);
+
+						for (let entity in data) {
+							let ds = jmapds(entity);
+
+							ds.getState().then(state => {
+								// console.warn(entity, state, data[entity]);
+								if (!state || state == data[entity]) {
+									//don't fetch updates if there's no state yet because it never was used in that case.
+									return;
+								}
+
+								ds.updateFromServer();
+							})
+						}
+					}catch(e) {
+						console.warn(e);
+					}
+				},
+				onclose: () => {
+					// if the server closes the connection then retry.
+					this.sse(entities);
+				}
+			})
+
+		} catch (e) {
+			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
+		}
 	}
 }
 
