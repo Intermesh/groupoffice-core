@@ -1,8 +1,8 @@
 {
   "type": "module",
   "devDependencies": {
-    "tsc-alias": "^1.8.2",
-    "typescript": "^4.9.4"
+    "tsc-alias": "latest",
+    "typescript": "latest"
   },
   "scripts": {
     "test": "mocha",
@@ -14,7 +14,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@fortaine/fetch-event-source": "^3.0.6",
+    "@fortaine/fetch-event-source": "latest",
     "@intermesh/goui": "file:../goui"
   },
   "author": "Intermesh",
