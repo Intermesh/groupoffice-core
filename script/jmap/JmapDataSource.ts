@@ -99,6 +99,21 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 		}
 	}
 
+
+	/**
+	 * This function makes sure the store is up to date. Should not be necessary but we ran into problems where tasks
+	 * were out of date when viewed. This should always prevent that.
+	 * @return {Promise<self>}
+	 */
+	public async validateState() {
+		const r = await client.jmap((this.controllerRoute ?? this.id) + "/get", {
+				ids: []
+			});
+
+		await this.checkState(r.state, r);
+		return this;
+	}
+
 	protected internalGet(ids: string[]){
 		return client.jmap((this.controllerRoute ?? this.id) + '/get', {
 			ids: ids
