@@ -21,9 +21,9 @@ declare global {
 	var BaseHref: string;
 }
 
+let GouiMainPanel : any;
 
-
-if(window['GO']) {
+if(window.GO) {
 // this set's the GOUI client authenticated by using the group-office Extjs session data
 	GO.mainLayout.on("authenticated", () => {
 		client.uri = BaseHref + "api/";
@@ -44,7 +44,7 @@ if(window['GO']) {
 	 * @copyright Copyright Intermesh
 	 * @author Merijn Schering <mschering@intermesh.nl>
 	 */
-	const GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
+	 GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		callback: undefined,
 
