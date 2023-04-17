@@ -102,7 +102,7 @@ export class Login extends Window {
 					style: {
 						width: "100%"
 					},
-					cls: "raised",
+					cls: "filled",
 					type: "button",
 					text: t("Register"),
 					handler: () => {

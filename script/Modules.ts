@@ -22,88 +22,91 @@ declare global {
 }
 
 
-client.uri = BaseHref + "api/";
 
+if(window['GO']) {
 // this set's the GOUI client authenticated by using the group-office Extjs session data
-GO.mainLayout.on("authenticated", () =>  {
-	client.session = go.User.session;
+	GO.mainLayout.on("authenticated", () => {
+		client.uri = BaseHref + "api/";
+		client.session = go.User.session;
 
-	// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
-})
-
-/**
- * Copyright Intermesh
- *
- * This file is part of Group-Office. You should have received a copy of the
- * Group-Office license along with Group-Office. See the file /LICENSE.TXT
- *
- * If you have questions write an e-mail to info@intermesh.nl
- *
- * @copyright Copyright Intermesh
- * @author Merijn Schering <mschering@intermesh.nl>
- */
-const GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
-
-	callback: undefined,
-
-	initComponent: function () {
-
-		GouiMainPanel.superclass.initComponent.call(this);
-
-		this.on("afterrender", async () => {
-			const comp = await this.callback();
-			comp.render(this.body.dom);
-		}, this);
-	},
-
-});
+		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
+	})
 
 
-class Modules {
+	/**
+	 * Copyright Intermesh
+	 *
+	 * This file is part of Group-Office. You should have received a copy of the
+	 * Group-Office license along with Group-Office. See the file /LICENSE.TXT
+	 *
+	 * If you have questions write an e-mail to info@intermesh.nl
+	 *
+	 * @copyright Copyright Intermesh
+	 * @author Merijn Schering <mschering@intermesh.nl>
+	 */
+	const GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
 
-	private mods:ModuleConfig[] = [];
+		callback: undefined,
 
-	public register(config:ModuleConfig) {
-		this.mods.push(config);
-		this.registerInExtjs(config);
+		initComponent: function () {
 
-		go.Translate.package = config.package;
-		go.Translate.module = config.name;
+			GouiMainPanel.superclass.initComponent.call(this);
 
-		if(config.init) {
-			config.init();
-		}
-	}
+			this.on("afterrender", async () => {
+				const comp = await this.callback();
+				comp.render(this.body.dom);
+			}, this);
+		},
 
-
-	public addMainPanel(pkg:string, module:string, id: string, title: string, callback: () => Component|Promise<Component>) {
-
-		go.Translate.package = go.package = pkg;
-		go.Translate.module = go.module = module;
-
-		const proto = Ext.extend(GouiMainPanel, {
-			id: id,
-			title: title,
-			callback: callback
-		});
-
-		proto.package = pkg;
-		proto.module = module;
-
-		go.Modules.addPanel(proto);
-	}
-
-	public openMainPanel(id: string) {
-		GO.mainLayout.openModule(id);
-	}
-
-	private registerInExtjs(config:ModuleConfig) {
-		go.Modules.register(config.package, config.name, {
-
-		});
-	}
-
-
+	});
 }
+
+	class Modules {
+
+		private mods: ModuleConfig[] = [];
+
+		public register(config: ModuleConfig) {
+			this.mods.push(config);
+			this.registerInExtjs(config);
+
+			go.Translate.package = config.package;
+			go.Translate.module = config.name;
+
+			if (config.init) {
+				config.init();
+			}
+		}
+
+
+		public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
+
+			go.Translate.package = go.package = pkg;
+			go.Translate.module = go.module = module;
+
+			// @ts-ignore
+			const proto = Ext.extend(GouiMainPanel, {
+				id: id,
+				title: title,
+				callback: callback
+			});
+
+			proto.package = pkg;
+			proto.module = module;
+
+			go.Modules.addPanel(proto);
+		}
+
+		public openMainPanel(id: string) {
+			GO.mainLayout.openModule(id);
+		}
+
+		private registerInExtjs(config: ModuleConfig) {
+			go.Modules.register(config.package, config.name, {});
+		}
+
+
+	}
+
+
 
 export const modules = new Modules();
