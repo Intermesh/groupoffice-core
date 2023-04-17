@@ -1,7 +1,6 @@
 {
   "type": "module",
   "devDependencies": {
-    "tsc-alias": "latest",
     "typescript": "latest"
   },
   "scripts": {
@@ -10,12 +9,12 @@
     "start:parallel": "tsc -w & tsc-alias -w -p tsconfig.alias.json",
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf dist/*",
-    "build:ts": "tsc && tsc-alias -p tsconfig.alias.json",
+    "build:ts": "tsc",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
-    "@intermesh/goui": "file:../goui"
+    "@intermesh/goui": "latest"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
@@ -41,6 +40,6 @@
   },
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "index.js"
 }
