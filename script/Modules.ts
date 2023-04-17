@@ -83,6 +83,7 @@ if(window['GO']) {
 			go.Translate.package = go.package = pkg;
 			go.Translate.module = go.module = module;
 
+			// @todo, this ugly. core must play with Ext but can also be used out side of group-office like on the website
 			// @ts-ignore
 			const proto = Ext.extend(GouiMainPanel, {
 				id: id,
