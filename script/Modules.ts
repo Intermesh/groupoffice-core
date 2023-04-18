@@ -24,9 +24,9 @@ declare global {
 let GouiMainPanel : any;
 
 if(window.GO) {
+	client.uri = BaseHref + "api/";
 // this set's the GOUI client authenticated by using the group-office Extjs session data
 	GO.mainLayout.on("authenticated", () => {
-		client.uri = BaseHref + "api/";
 		client.session = go.User.session;
 
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
