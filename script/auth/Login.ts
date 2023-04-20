@@ -56,7 +56,7 @@ export class Login extends Window {
 		this.on("close", async window => {
 			if (!await client.isLoggedIn()) {
 				// closed without successful login
-				await Window.alert(t("Login required"), t("Login is required for this page. You will return to the previous page."));
+				await Window.alert(t("Login is required for this page. You will return to the previous page."), t("Login required"));
 
 				history.back();
 			}
