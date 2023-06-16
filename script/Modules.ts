@@ -48,6 +48,8 @@ if(window.GO) {
 
 		callback: undefined,
 
+		 cls: "go-module-panel goui-module-panel",
+
 		initComponent: function () {
 
 			GouiMainPanel.superclass.initComponent.call(this);
