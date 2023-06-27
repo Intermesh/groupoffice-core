@@ -5,11 +5,12 @@
   },
   "scripts": {
     "test": "mocha",
-    "start": "npm run build:clean & npm run start:parallel",
-    "start:parallel": "tsc -w & tsc-alias -w -p tsconfig.alias.json",
+    "start": "npm run build:clean & npx tsc -w",
+
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf dist/*",
-    "build:ts": "tsc",
+    "build:ts": "npx tsc",
+    
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

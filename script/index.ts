@@ -5,3 +5,4 @@ export * from './jmap/index.js';
 export * from './Modules.js';
 export * from './Router.js';
 export * from './Validators.js';
+export * from './permissions/index.js';
