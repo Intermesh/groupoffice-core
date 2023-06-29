@@ -50,10 +50,15 @@ class GroupTable extends Table<DataSourceStore> {
               memberStr += t(" and {count} more").replace('{count}', more);
             }
 
+            let user;
+            if(record.isUserGroupFor) {
+               user = await jmapds("User").single(record.isUserGroupFor);
+            }
+
             return comp({cls: "hbox"},
               avatar({
                 displayName: record.name,
-                backgroundImage: record.avatarId ? go.Jmap.downloadUrl(record.avatarId) : undefined
+                backgroundImage: user && user.avatarId ? go.Jmap.downloadUrl(user.avatarId) : undefined
               }),
               comp({flex: 1},
                 comp({text: record.name}),
