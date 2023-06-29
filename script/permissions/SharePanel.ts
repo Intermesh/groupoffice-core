@@ -177,8 +177,8 @@ export class SharePanel extends Field {
         searchbtn({
           listeners: {
             input: (sender, text) => {
-              // (this.noteGrid.store.queryParams.filter as FilterCondition).text = text;
-              // void this.noteGrid.store.load();
+              (this.groupTable.store.queryParams.filter as FilterCondition).text = text;
+              void this.groupTable.store.load();
             }
           }
         }),
@@ -189,6 +189,11 @@ export class SharePanel extends Field {
         this.groupTable
       )
     )
+  }
+
+
+  protected createLabel(): HTMLElement | void {
+
   }
 
   public setEntity(name:string, id:string) {
