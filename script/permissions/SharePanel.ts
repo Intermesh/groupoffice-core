@@ -11,6 +11,7 @@ import {
   Table, datasourcestore, column, DataSourceStore, checkbox, avatar, select, Field, store, small
 } from "@intermesh/goui";
 import {FilterCondition, jmapds} from "../jmap";
+import {entities} from "../Entities";
 
 class GroupTable extends Table<DataSourceStore> {
   value: any;
@@ -108,8 +109,16 @@ class GroupTable extends Table<DataSourceStore> {
     this.fitParent = true;
   }
 
-  setEntity(name:string, id:string) {
+  setEntity(name:string, id?:string) {
     this.store.queryParams.filter!.inAcl = {entity: name, id: id};
+
+    if(!id) {
+      // if ID is empty then load default ACKL
+      entities.get(name).then(entity => {
+        this.value = entity.defaultAcl;
+      });
+
+    }
   }
 }
 
@@ -196,7 +205,7 @@ export class SharePanel extends Field {
 
   }
 
-  public setEntity(name:string, id:string) {
+  public setEntity(name:string, id?:string) {
     this.groupTable.setEntity(name, id);
   }
 

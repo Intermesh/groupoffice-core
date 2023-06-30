@@ -1,5 +1,6 @@
-import {Component} from "@intermesh/goui";
-import {client} from "./jmap/index.js";
+import {BaseEntity, Component} from "@intermesh/goui";
+import {client, jmapds} from "./jmap/index.js";
+import {Entities} from "./Entities";
 
 type RouterMethod = (...args: string[]) => Promise<any> | any;
 
@@ -63,52 +64,74 @@ if(window.GO) {
 	});
 }
 
-	class Modules {
 
-		private mods: ModuleConfig[] = [];
+interface Module extends BaseEntity{
+	name: string,
+	package: string,
+	rights: string[],
+	settings?: Record<string, any>
+	userRights: Record<string, boolean>,
+	version: number,
+	entities: Record<string, Entities>
+}
 
-		public register(config: ModuleConfig) {
-			this.mods.push(config);
-			this.registerInExtjs(config);
 
-			go.Translate.package = config.package;
-			go.Translate.module = config.name;
+class Modules {
 
-			if (config.init) {
-				config.init();
-			}
+	private mods: ModuleConfig[] = [];
+	private modules?: Module[];
+
+	public register(config: ModuleConfig) {
+		this.mods.push(config);
+		this.registerInExtjs(config);
+
+		go.Translate.package = config.package;
+		go.Translate.module = config.name;
+
+		if (config.init) {
+			config.init();
 		}
-
-
-		public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
-
-			go.Translate.package = go.package = pkg;
-			go.Translate.module = go.module = module;
-
-			// @todo, this ugly. core must play with Ext but can also be used out side of group-office like on the website
-			// @ts-ignore
-			const proto = Ext.extend(GouiMainPanel, {
-				id: id,
-				title: title,
-				callback: callback
-			});
-
-			proto.package = pkg;
-			proto.module = module;
-
-			go.Modules.addPanel(proto);
-		}
-
-		public openMainPanel(id: string) {
-			GO.mainLayout.openModule(id);
-		}
-
-		private registerInExtjs(config: ModuleConfig) {
-			go.Modules.register(config.package, config.name, {});
-		}
-
-
 	}
+
+
+	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
+
+		go.Translate.package = go.package = pkg;
+		go.Translate.module = go.module = module;
+
+		// @todo, this ugly. core must play with Ext but can also be used out side of group-office like on the website
+		// @ts-ignore
+		const proto = Ext.extend(GouiMainPanel, {
+			id: id,
+			title: title,
+			callback: callback
+		});
+
+		proto.package = pkg;
+		proto.module = module;
+
+		go.Modules.addPanel(proto);
+	}
+
+	public openMainPanel(id: string) {
+		GO.mainLayout.openModule(id);
+	}
+
+	private registerInExtjs(config: ModuleConfig) {
+		go.Modules.register(config.package, config.name, {});
+	}
+
+
+	public async getAll() {
+		if(!this.modules) {
+			const mods = await jmapds<Module>("Module").get();
+			this.modules = mods.list;
+		}
+		return this.modules;
+	}
+
+
+}
 
 
 
