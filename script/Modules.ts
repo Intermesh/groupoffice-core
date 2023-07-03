@@ -1,6 +1,6 @@
 import {BaseEntity, Component} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
-import {Entities} from "./Entities";
+import {Entity} from "./Entities";
 
 type RouterMethod = (...args: string[]) => Promise<any> | any;
 
@@ -72,7 +72,7 @@ interface Module extends BaseEntity{
 	settings?: Record<string, any>
 	userRights: Record<string, boolean>,
 	version: number,
-	entities: Record<string, Entities>
+	entities: Record<string, Entity>
 }
 
 
