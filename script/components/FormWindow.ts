@@ -40,8 +40,8 @@ export abstract class FormWindow extends Window {
 		super();
 
 		this.cls = "vbox";
-		this.width = 500;
-		this.height = 400;
+		this.width = 600;
+		this.height = 600;
 
 		this.items.add(
 			this.form = datasourceform(
@@ -52,7 +52,23 @@ export abstract class FormWindow extends Window {
 					listeners: {
 						save: ()=> {
 							this.close();
+						},
+
+						invalid: (form) => {
+
+							const invalid = form.findFirstInvalid();
+
+							const tab = invalid.findAncestor(cmp => {
+								return cmp.el.classList.contains('card-container-item');
+							});
+							if(tab) {
+								tab.show();
+							}
+							invalid.focus();
 						}
+
+
+
 					}
 				},
 
