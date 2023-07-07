@@ -17,7 +17,7 @@ import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
 
 export abstract class FormWindow extends Window {
-	protected readonly form: DataSourceForm;
+	public readonly form: DataSourceForm;
 
 	protected currentId?: EntityID;
 	protected readonly cards: CardContainer;
@@ -50,7 +50,7 @@ export abstract class FormWindow extends Window {
 					cls: "vbox",
 					flex: 1,
 					listeners: {
-						submit: ()=> {
+						save: ()=> {
 							this.close();
 						}
 					}
