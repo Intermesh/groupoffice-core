@@ -3,15 +3,15 @@ import {
 	CardContainer,
 	cardmenu,
 	cards,
-	Component,
+	containerfield,
 	datasourceform,
 	DataSourceForm,
-	EntityID, Fieldset,
+	EntityID,
+	Fieldset,
 	fieldset,
 	t,
 	tbar,
-	Window,
-	containerfield
+	Window
 } from "@intermesh/goui";
 import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
