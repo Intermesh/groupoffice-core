@@ -58,13 +58,15 @@ export abstract class FormWindow extends Window {
 
 							const invalid = form.findFirstInvalid();
 
-							const tab = invalid.findAncestor(cmp => {
-								return cmp.el.classList.contains('card-container-item');
-							});
-							if(tab) {
-								tab.show();
+							if(invalid) {
+								const tab = invalid.findAncestor(cmp => {
+									return cmp.el.classList.contains('card-container-item');
+								});
+								if (tab) {
+									tab.show();
+								}
+								invalid.focus();
 							}
-							invalid.focus();
 						}
 
 
