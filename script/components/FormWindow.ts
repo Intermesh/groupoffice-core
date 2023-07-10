@@ -146,7 +146,18 @@ export abstract class FormWindow extends Window {
 
 	protected addCustomFields() {
 
+		this.on("render", () => {
+			if(this.hidden) {
+				this.on("show", () => this.renderCustomFields())
+			} else {
+				this.renderCustomFields();
+			}
+		})
+	}
+
+	private renderCustomFields() {
 		if (go.Entities.get(this.entityName).customFields) {
+
 			const fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityName);
 			fieldsets.forEach((fs: any) => {
 
@@ -169,6 +180,7 @@ export abstract class FormWindow extends Window {
 					this.generalTab.items.add(containerfield({name: "customFields"}, fs));
 				}
 			}, this);
+
 		}
 	}
 
