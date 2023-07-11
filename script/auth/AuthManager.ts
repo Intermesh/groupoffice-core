@@ -1,6 +1,7 @@
 import {User} from "./User.js";
 import {root} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
+import {Login} from "./Login";
 
 /**
  * Authentication manager
@@ -36,20 +37,18 @@ class AuthManager {
 	}
 	private showLogin() {
 		return new Promise<void>((resolve, reject) => {
-			import("./Login.js").then((mods) => {
+			const login = new Login();
+			login.show();
 
-				const login = new mods.Login();
-				login.show();
+			login.on('login', () => {
+				resolve();
+			});
 
-				login.on('login', () => {
-					resolve();
-				});
-
-				login.on('cancel', () => {
-					reject();
-				})
+			login.on('cancel', () => {
+				reject();
 			})
-		});
+		})
+
 	}
 }
 

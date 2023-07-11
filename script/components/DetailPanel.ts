@@ -66,11 +66,13 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	private get legacyDetailView() {
 		if(!this.detailView) {
-			const ro = new ResizeObserver(FunctionUtil.buffer(100,() =>{
-				this.detailView.doLayout();
-			}));
+			if("ResizeObserver" in window) {
+				const ro = new ResizeObserver(FunctionUtil.buffer(100, () => {
+					this.detailView.doLayout();
+				}));
 
-			ro.observe(this.el);
+				ro.observe(this.el);
+			}
 
 			this.detailView = new go.detail.Panel({
 				width: undefined,

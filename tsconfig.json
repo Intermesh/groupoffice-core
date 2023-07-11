@@ -3,11 +3,11 @@
     "strict" : true,
     "target": "ES2017",
     "sourceMap": true,
-    "lib": ["es2020", "dom"],
+    "lib": ["es2017", "dom"],
     "moduleResolution": "node",
     "esModuleInterop": true,
     "isolatedModules": true, // important for tree shaking in esbuild
-    "module":"es2020",
+    "module":"es2015",
     "baseUrl": ".",
     "outDir": "./dist",
     "declaration": true,
