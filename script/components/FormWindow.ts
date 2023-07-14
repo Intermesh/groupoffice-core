@@ -8,13 +8,34 @@ import {
 	DataSourceForm,
 	EntityID,
 	Fieldset,
-	fieldset,
+	fieldset, ObservableListenerOpts,
 	t,
 	tbar,
-	Window
+	Window, WindowEventMap
 } from "@intermesh/goui";
 import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
+
+
+/**
+ * @inheritDoc
+ */
+export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
+
+	/**
+	 * Fires when the window is shown and loaded with data. Also fires if the dialog is for creating new entities and
+	 * not loaded.
+	 *
+	 * @param window
+	 */
+	ready: (window: Type, currentId: string|undefined) => void
+}
+
+export interface FormWindow {
+	on<K extends keyof FormWindowEventMap<this>>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K], options?: ObservableListenerOpts): void;
+
+	fire<K extends keyof FormWindowEventMap<this>>(eventName: K, ...args: Parameters<FormWindowEventMap<any>[K]>): boolean
+}
 
 export abstract class FormWindow extends Window {
 	public readonly form: DataSourceForm;
@@ -68,9 +89,6 @@ export abstract class FormWindow extends Window {
 								invalid.focus();
 							}
 						}
-
-
-
 					}
 				},
 
@@ -94,6 +112,19 @@ export abstract class FormWindow extends Window {
 				)
 			)
 		)
+
+		// fire the ready event if not loading the form with data. If it's loading then the ready event will fire
+		// on the form load event.
+		this.on("show", () => {
+			setTimeout(() => {
+				if (!this.currentId) {
+					// focus form for new entities and not for existing ones.
+					this.form.focus();
+					this.fire("ready", this, this.currentId);
+				}
+			});
+		})
+
 	}
 
 
@@ -114,17 +145,10 @@ export abstract class FormWindow extends Window {
 		});
 		this.cards.items.add(this.sharePanel);
 
-		this.on("show", () => {
-			setTimeout(() => {
-				if(!this.currentId) {
-					this.sharePanel!.setEntity(this.entityName);
-				}
-			});
+		this.on("ready", () => {
+			this.sharePanel!.setEntity(this.entityName, this.currentId);
 		})
 
-		this.form.on("load", (form1, data) => {
-			this.sharePanel!.setEntity(this.entityName, data.id);
-		})
 	}
 
 	public async load(id: EntityID) {
@@ -132,8 +156,9 @@ export abstract class FormWindow extends Window {
 		this.mask();
 
 		try {
-			await this.form.load(id);
 			this.currentId = id;
+			await this.form.load(id);
+			this.fire("ready", this, this.currentId);
 		} catch (e) {
 			void Window.alert(t("Error"), e + "");
 		} finally {
@@ -154,6 +179,7 @@ export abstract class FormWindow extends Window {
 			}
 		})
 	}
+
 
 	private renderCustomFields() {
 		if (go.Entities.get(this.entityName).customFields) {
