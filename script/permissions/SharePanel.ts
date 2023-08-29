@@ -107,6 +107,8 @@ class GroupTable extends Table<DataSourceStore> {
       ]);
 
     this.fitParent = true;
+
+		this.cls = 'goui-share-panel';
   }
 
   setEntity(name:string, id?:string) {
