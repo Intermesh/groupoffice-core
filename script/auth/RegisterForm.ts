@@ -5,7 +5,7 @@ import {client, RegisterData} from "../jmap/index.js";
 export class RegisterForm extends Form {
 
 	handler = async (form: Form) => {
-		const data = {action: "register" as RegisterData['action'], user: form.getValues()};
+		const data = {action: "register" as RegisterData['action'], user: form.value};
 		data.user.mail_reminders = true;
 
 		const response = await client.auth(data);

@@ -130,7 +130,7 @@ export class Login extends Window {
 					client.auth({
 						loginToken: this.loginToken,
 						authenticators: {
-							otpauthenticator: <{ code: string }>form.getValues()
+							otpauthenticator: <{ code: string }>form.value
 						}
 					}).then(response => {
 						console.log(response);
@@ -196,7 +196,7 @@ export class Login extends Window {
 					handler: async (form) => {
 						this.loginForm.show();
 
-						const response = await client.auth(Object.assign({action: "forgotten"}, form.getValues() ) as ForgottenData);
+						const response = await client.auth(Object.assign({action: "forgotten"}, form.value ) as ForgottenData);
 
 						Notifier.success(t("If an account was found, you should receive an e-mail with instructions shortly."));
 
@@ -277,7 +277,7 @@ export class Login extends Window {
 
 		try {
 			this.mask();
-			const response = await client.auth(form.getValues());
+			const response = await client.auth(form.value);
 
 			switch (response.status) {
 				case 200:
