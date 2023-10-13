@@ -12,6 +12,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
+import {EntityID} from "../../../dist/goui/script";
 
 
 export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap<Type> {
@@ -118,12 +119,12 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		this.titleCmp.text = title;
 	}
 
-	public async load(id: string) {
+	public async load(id: EntityID) {
 
 		this.mask();
 
 		try {
-			this.entity = await jmapds<EntityType>(this.entityName).single(id);
+			this.entity = await jmapds<EntityType>(this.entityName).single(id.toString());
 
 			if(!this.entity) {
 				throw "notfound";
@@ -141,7 +142,8 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			this.toolbar.disabled = false;
 
 		} catch (e) {
-			void Window.alert(t("Error"), e + "");
+			console.error(e);
+			void Window.error(e + "");
 		} finally {
 			this.unmask();
 		}
@@ -150,7 +152,9 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	}
 
 	private legacyOnLoad() {
-		this.detailView.currentId = this.entity!.id;
-		this.detailView.internalLoad(this.entity);
+		if(this.detailView) {
+			this.detailView.currentId = this.entity!.id;
+			this.detailView.internalLoad(this.entity);
+		}
 	}
 }

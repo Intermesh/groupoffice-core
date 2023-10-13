@@ -12,6 +12,8 @@ export type ModuleConfig = {
 
 	init?: () => void;
 
+	entities?: string[]
+
 };
 
 // for using old components in GOUI
@@ -118,7 +120,9 @@ class Modules {
 	}
 
 	private registerInExtjs(config: ModuleConfig) {
-		go.Modules.register(config.package, config.name, {});
+		go.Modules.register(config.package, config.name, {
+			entities: config.entities
+		});
 	}
 
 
