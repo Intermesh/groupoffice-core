@@ -5,6 +5,7 @@ import {
 	ComponentEventMap,
 	DefaultEntity,
 	FunctionUtil,
+	EntityID,
 	ObservableListenerOpts,
 	t,
 	tbar,
@@ -12,7 +13,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
-import {EntityID} from "../../../dist/goui/script";
+// import {EntityID} from "../../../dist/goui/script";
 
 
 export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap<Type> {

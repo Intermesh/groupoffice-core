@@ -215,9 +215,9 @@ export class SharePanel extends Field {
     this.groupTable.store.load();
   }
 
-  protected internalSetValue(v: any, old: any) {
+  protected internalSetValue(v?:any) {
     this.groupTable.value = v;
-    return super.internalSetValue(v, old);
+    return super.internalSetValue(v);
   }
 }
 
