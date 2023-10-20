@@ -131,12 +131,20 @@ export abstract class FormWindow extends Window {
 	/**
 	 * Add a share panel to set permissions
 	 *
-	 * @protected
+	 * @params options if not provided the default is:
+	 * [
+	 * 	{value: "", name: ""},
+	 * 	{value: 10, name: t("Read")},
+	 * 	{value: 20, name: t("Create")},
+	 * 	{value: 30, name: t("Write")},
+	 * 	{value: 40, name: t("Delete")},
+	 * 	{value: 50, name: t("Manage")}
+	 * ]
 	 */
-
-	protected addSharePanel() {
+	protected addSharePanel(levels?:{ [key: string]: any }[]) {
 		this.sharePanel = sharepanel({
 			cls: "fit",
+			levels,
 			listeners: {
 				show: () => {
 					this.sharePanel!.load();

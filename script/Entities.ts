@@ -13,9 +13,8 @@ class Entities {
 	private entities?: Record<string, Entity>;
 	public async get(name:string) {
 		if(!this.entities) {
-			this.entities = {};
-
 			const mods = await modules.getAll();
+			this.entities = {};
 			mods.forEach(m => {
 				for(let name in m.entities) {
 					this.entities![name] = m.entities[name];
