@@ -54,8 +54,10 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			}
 		})
 
+		this.baseCls = "detail";
 		this.cls = "vbox";
 		this.width = 400;
+
 
 		this.style.position = "relative";
 

@@ -60,6 +60,7 @@ export abstract class FormWindow extends Window {
 	protected constructor(public entityName:string) {
 		super();
 
+		this.baseCls = "goui-window form-window";
 		this.cls = "vbox";
 		this.width = 600;
 		this.height = 600;
