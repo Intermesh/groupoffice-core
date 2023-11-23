@@ -1,8 +1,8 @@
 import {
 	btn,
-	CardContainer,
+	CardContainer, CardMenu,
 	cardmenu,
-	cards,
+	cards, comp, Component,
 	containerfield,
 	datasourceform,
 	DataSourceForm,
@@ -49,7 +49,8 @@ export abstract class FormWindow extends Window {
 	 *
 	 * @protected
 	 */
-	protected readonly generalTab: Fieldset;
+	protected readonly generalTab: Component;
+	private cardMenu: CardMenu;
 
 	/**
 	 * Constructor
@@ -93,11 +94,11 @@ export abstract class FormWindow extends Window {
 					}
 				},
 
-				cardmenu(),
+				this.cardMenu = cardmenu(),
 
 				this.cards = cards({flex: 1},
 
-					this.generalTab = fieldset({
+					this.generalTab = comp({
 							cls: "scroll fit",
 							title: t("General")
 						}
@@ -117,6 +118,9 @@ export abstract class FormWindow extends Window {
 		// fire the ready event if not loading the form with data. If it's loading then the ready event will fire
 		// on the form load event.
 		this.on("show", () => {
+
+			this.cardMenu.hidden = this.cards.items.count() < 2;
+
 			setTimeout(() => {
 				if (!this.currentId) {
 					// focus form for new entities and not for existing ones.
