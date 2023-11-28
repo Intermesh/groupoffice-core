@@ -43,6 +43,12 @@ export interface JmapQueryParams extends QueryParams {
 }
 
 
+export interface JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> extends AbstractDataSource<EntityType> {
+	patchFilter(ref: string, filter: FilterCondition | FilterOperator | undefined) : void;
+	setFilter(ref: string, filter: FilterCondition | FilterOperator | undefined) : void;
+	getFilter():FilterCondition | FilterOperator
+}
+
 /**
  * JMAP Data source
  *
