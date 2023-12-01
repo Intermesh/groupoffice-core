@@ -1,6 +1,5 @@
-import {AutocompleteEventMap, Component, ComponentEventMap, Config, createComponent} from "@intermesh/goui";
+import {Component, ComponentEventMap, Config, createComponent} from "@intermesh/goui";
 import {DetailPanel} from "./DetailPanel";
-import {UserDisplayCombo} from "./UserDisplayCombo";
 
 export class AddButton extends Component {
 	constructor() {
