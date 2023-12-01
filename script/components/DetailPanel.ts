@@ -13,6 +13,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
+import {router} from "../Router";
 // import {EntityID} from "../../../dist/goui/script";
 
 
@@ -22,6 +23,12 @@ export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = Defau
 	 */
 	load: (detailPanel: Type, entity: EntityType) => false | void
 
+	/**
+	 * Fires when the panel is reset
+	 *
+	 * @param detailPanel
+	 */
+	reset: (detailPanel: Type) => void
 
 }
 
@@ -47,23 +54,35 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	protected constructor(public entityName:string) {
 		super();
 
-		// reload on entity change
+		// reload or reset on entity update or destroy
 		jmapds(this.entityName).on("change", (ds, changes) => {
-			if(this.entity && changes.updated && changes.updated.indexOf(this.entity.id+"") > -1) {
-				this.load(this.entity.id);
+			if(this.entity) {
+				const id = this.entity.id + "";
+				if (changes.updated && changes.updated.indexOf(id) > -1) {
+					this.load(this.entity.id);
+				}
+
+				if (changes.destroyed && changes.destroyed.indexOf(id) > -1) {
+					this.reset();
+
+					// update router path
+					const rPath = router.getPath();
+					if(rPath.match("/" + id +"$")) {
+						router.setPath(rPath.substring(0, rPath.length - id.length - 1));
+					}
+				}
 			}
 		})
 
 		this.baseCls = "detail";
-		// this.cls = "vbox";
+
 		this.width = 400;
-
-
 		this.style.position = "relative";
+		this.disabled = true;
 
 		this.items.add(
 			this.createToolbar(),
-			this.scroller = comp({flex: 1, cls: "scroll vbox"})
+			this.scroller = comp({flex: 1, cls: "scroll vbox", hidden: true})
 		);
 
 	}
@@ -109,7 +128,6 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	private createToolbar() {
 		return this.toolbar = tbar({
-				disabled: true,
 				cls: "border-bottom"
 			},
 			this.titleCmp = comp({tagName: "h3"}),
@@ -124,6 +142,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	public async load(id: EntityID) {
 
+
 		this.mask();
 
 		try {
@@ -133,6 +152,8 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 				throw "notfound";
 			}
 
+			this.scroller.hidden = false;
+			this.disabled = false;
 			this.fire("load", this, this.entity);
 
 			// this.title = this.entity.name;
@@ -142,8 +163,6 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 			this.legacyOnLoad();
 
-			this.toolbar.disabled = false;
-
 		} catch (e) {
 			console.error(e);
 			void Window.error(e + "");
@@ -152,6 +171,20 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		}
 
 		return this;
+	}
+
+
+	public reset() {
+		this.entity = undefined;
+		this.title = "";
+
+		if(this.detailView) {
+			this.detailView.reset();
+		}
+		this.disabled = true;
+		this.scroller.hidden = true;
+
+		this.fire("reset", this);
 	}
 
 	private legacyOnLoad() {
