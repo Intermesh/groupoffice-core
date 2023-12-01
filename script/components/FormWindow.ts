@@ -119,9 +119,13 @@ export abstract class FormWindow extends Window {
 		// on the form load event.
 		this.on("show", () => {
 
-			this.cardMenu.hidden = this.cards.items.count() < 2;
 
+
+			// do a setTimeout so currentId is set if win.show().load() is called in that order.
 			setTimeout(() => {
+
+				this.cardMenu.hidden = this.cards.items.count() < 2;
+
 				if (!this.currentId) {
 					// focus form for new entities and not for existing ones.
 					this.form.focus();
@@ -212,7 +216,19 @@ export abstract class FormWindow extends Window {
 					fs.title = null;
 					fs.collapsible = false;
 
-					this.cards.items.add(containerfield({name: "customFields", cls: "scroll", title: fs.fieldSet.name}, fs));
+					this.cards.items.add(
+						containerfield({
+							name: "customFields",
+							cls: "scroll",
+							title: fs.fieldSet.name,
+							listeners: {
+								show: () => {
+									fs.doLayout();
+								}
+							}
+						}, fs
+						)
+					);
 				} else {
 					//in case formPanelLayout is set to column
 					fs.columnWidth = 1;

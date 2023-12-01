@@ -79,10 +79,11 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		this.width = 400;
 		this.style.position = "relative";
 		this.disabled = true;
+		this.cls = "vbox";
 
 		this.items.add(
 			this.createToolbar(),
-			this.scroller = comp({flex: 1, cls: "scroll vbox", hidden: true})
+			this.scroller = comp({flex: 1, cls: "scroll", hidden: true})
 		);
 
 	}
