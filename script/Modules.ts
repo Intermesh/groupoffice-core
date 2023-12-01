@@ -135,6 +135,17 @@ class Modules {
 	}
 
 
+	/**
+	 * Check if the current user has this module
+	 *
+	 * @param pkg
+	 * @param name
+	 */
+	public isAvailable(pkg:string, name:string) : boolean {
+		return go.Modules.isAvailable(pkg, name);
+	}
+
+
 }
 
 
