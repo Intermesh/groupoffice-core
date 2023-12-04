@@ -45,7 +45,7 @@ export interface DetailPanel<EntityType extends BaseEntity = DefaultEntity> exte
  * Used to show an entity when selected in the grid.
  */
 export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity> extends Component {
-	private titleCmp!: Component;
+	protected titleCmp?: Component;
 	protected entity?: EntityType;
 	protected readonly scroller: Component;
 	private detailView: any;
@@ -131,14 +131,16 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		return this.toolbar = tbar({
 				cls: "border-bottom"
 			},
-			this.titleCmp = comp({tagName: "h3"}),
 			'->'
 		);
 	}
 
 	set title(title: string) {
 		super.title = title;
-		this.titleCmp.text = title;
+
+		if(this.titleCmp) {
+			this.titleCmp.text = title;
+		}
 	}
 
 	public async load(id: EntityID) {
