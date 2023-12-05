@@ -143,6 +143,10 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		}
 	}
 
+	get title() {
+		return super.title;
+	}
+
 	public async load(id: EntityID) {
 
 
