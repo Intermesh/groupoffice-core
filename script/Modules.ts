@@ -4,6 +4,25 @@ import {Entity} from "./Entities";
 
 type RouterMethod = (...args: string[]) => Promise<any> | any;
 
+export interface EntityFilter {
+	name: string,
+	type: string,
+	title: string,
+	multiple: boolean
+}
+
+export interface EntityLink {
+	title?:string
+	iconCls: string,
+	linkWindow: (entity:string, entityId:string) => void,
+	linkDetail: () => void
+}
+export interface EntityConfig {
+	name: string;
+	links?:EntityLink[],
+	filters?:EntityFilter[]
+}
+
 export type ModuleConfig = {
 	// [key:string]:unknown;
 
@@ -12,7 +31,7 @@ export type ModuleConfig = {
 
 	init?: () => void;
 
-	entities?: string[]
+	entities?: (string|EntityConfig)[]
 
 };
 
