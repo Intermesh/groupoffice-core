@@ -73,7 +73,8 @@ export abstract class FormWindow extends Window {
 					cls: "vbox",
 					flex: 1,
 					listeners: {
-						save: ()=> {
+						save: (form, data)=> {
+							this.currentId = data.id;
 							this.close();
 						},
 
@@ -237,6 +238,37 @@ export abstract class FormWindow extends Window {
 			}, this);
 
 		}
+	}
+
+	/**
+	 * Adds a link between two entities on save.
+	 *
+	 * @param {string} entityName - The name of the target entity.
+	 * @param {string} entityId - The ID of the target entity.
+	 * @return {void}
+	 */
+
+	public addLinkOnSave(entityName:string, entityId:string) {
+
+		const unbindkey = this.form.on("save", (form1, data) => {
+			const link = {
+				"toId": entityId,
+				"toEntity": entityName,
+				"fromId": data.id,
+				"fromEntity": this.entityName
+			}
+
+			jmapds("Link").create(link).catch((e) => {
+				Window.error(e.message);
+			})
+		}, {once: true});
+
+		this.on("close", () => {
+			// set timeout because close will fire before the save listeners above are fired.
+			setTimeout(() => {
+				this.form.un("save", unbindkey);
+			})
+		})
 	}
 
 }
