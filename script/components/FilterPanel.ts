@@ -1,14 +1,26 @@
-import {Component, ComponentEventMap, Config, createComponent, Store} from "@intermesh/goui";
+import {comp, Component, ComponentEventMap, Config, createComponent, FunctionUtil, Store} from "@intermesh/goui";
 
 export class FilterPanel extends Component {
 	private goFilterPanel: any;
 	constructor(public readonly entityName:string, public readonly store:Store) {
 		super();
 
-		this.items.add(this.goFilterPanel = new go.filter.FilterPanel({
-			entity: entityName,
-			store: store
-		}))
+		this.items.add(
+			comp({},//somehow an extra comp is needed for the ext toolbar to resize properly
+					this.goFilterPanel = new go.filter.FilterPanel({
+					entity: entityName,
+					store: store
+				})
+			)
+			);
+
+		this.on("render", () => {
+			const ro = new ResizeObserver(FunctionUtil.buffer(100, () => {
+				this.goFilterPanel.setWidth(this.el.offsetWidth);
+			}));
+
+			ro.observe(this.el);
+		});
 	}
 }
 
