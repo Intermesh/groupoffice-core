@@ -1,17 +1,21 @@
 import {
 	btn,
-	CardContainer, CardMenu,
+	CardContainer,
+	CardMenu,
 	cardmenu,
-	cards, comp, Component,
+	cards,
+	comp,
+	Component,
 	containerfield,
 	datasourceform,
 	DataSourceForm,
 	EntityID,
-	Fieldset,
-	fieldset, ObservableListenerOpts,
+	Listener,
+	ObservableListenerOpts,
 	t,
 	tbar,
-	Window, WindowEventMap
+	Window,
+	WindowEventMap
 } from "@intermesh/goui";
 import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
@@ -32,8 +36,8 @@ export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
 }
 
 export interface FormWindow {
-	on<K extends keyof FormWindowEventMap<this>>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K], options?: ObservableListenerOpts): void;
-
+	on<K extends keyof FormWindowEventMap<this>, L extends Listener>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K], options?: ObservableListenerOpts): L;
+	un<K extends keyof FormWindowEventMap<this>>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K]): boolean
 	fire<K extends keyof FormWindowEventMap<this>>(eventName: K, ...args: Parameters<FormWindowEventMap<any>[K]>): boolean
 }
 

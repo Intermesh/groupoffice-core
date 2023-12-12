@@ -3,14 +3,17 @@ import {
 	CardContainer,
 	cards,
 	comp,
-	fieldset,  form,
-	Form, Notifier,
+	fieldset,
+	form,
+	Form,
+	Listener,
+	Notifier,
 	Observable,
-	ObservableListener, t,
+	t,
 	tbar,
 	textfield,
-	WindowEventMap,
-	Window
+	Window,
+	WindowEventMap
 } from "@intermesh/goui";
 import {RegisterForm} from "./RegisterForm.js";
 import {client, ForgottenData} from "../jmap/index.js";
@@ -21,12 +24,10 @@ export interface LoginEventMap<T extends Observable> extends WindowEventMap<T> {
 	login: () => void
 }
 
-export interface Login {
-	on<K extends keyof LoginEventMap<Login>>(eventName: K, listener: Partial<LoginEventMap<Login>>[K]): void;
-
-	fire<K extends keyof LoginEventMap<Login>>(eventName: K, ...args: Parameters<LoginEventMap<Login>[K]>): boolean;
-
-	set listeners(listeners: ObservableListener<LoginEventMap<this>>)
+export interface Login extends Window {
+	on<K extends keyof LoginEventMap<this>, L extends Listener>(eventName: K, listener: Partial<LoginEventMap<this>>[K]): L;
+	un<K extends keyof LoginEventMap<this>>(eventName: K, listener: Partial<LoginEventMap<this>>[K]): boolean
+	fire<K extends keyof LoginEventMap<this>>(eventName: K, ...args: Parameters<LoginEventMap<this>[K]>): boolean;
 }
 
 

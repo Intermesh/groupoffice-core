@@ -1,4 +1,4 @@
-import {AutocompleteEventMap, BaseEntity, ComboBox, Config, createComponent, t} from "@intermesh/goui";
+import {AutocompleteEventMap, BaseEntity, ComboBox, ComboBoxConfig, createComponent, t} from "@intermesh/goui";
 import {jmapds} from "../jmap";
 import {User} from "../auth";
 
@@ -17,4 +17,4 @@ export class UserDisplayCombo extends ComboBox {
 	}
 }
 
-export const userdisplaycombo = (config?: Config<UserDisplayCombo, AutocompleteEventMap<UserDisplayCombo>>) => createComponent(new UserDisplayCombo(), config);
+export const userdisplaycombo = (config?: ComboBoxConfig<UserDisplayCombo>) => createComponent(new UserDisplayCombo(), config);

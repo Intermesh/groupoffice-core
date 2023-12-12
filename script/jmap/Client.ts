@@ -4,11 +4,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {Observable, ObservableEventMap} from "@intermesh/goui";
-import {Format} from "@intermesh/goui";
-import {Timezone} from "@intermesh/goui";
-import {DefaultEntity} from "@intermesh/goui";
-import {FunctionUtil} from "@intermesh/goui";
+import {DefaultEntity, Format, FunctionUtil, Listener, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
@@ -44,8 +40,9 @@ interface ClientEventMap<Type extends Observable>  extends ObservableEventMap<Ty
 }
 
 export interface Client {
-	on<K extends keyof ClientEventMap<Client>>(eventName: K, listener: ClientEventMap<Client>[K]): void
-	fire<K extends keyof ClientEventMap<Client>>(eventName: K, ...args: Parameters<NonNullable<ClientEventMap<Client>[K]>>): boolean
+	on<K extends keyof ClientEventMap<this>, L extends Listener>(eventName: K, listener: Partial<ClientEventMap<this>>[K]): L
+	un<K extends keyof ClientEventMap<this>>(eventName: K, listener: Partial<ClientEventMap<this>>[K]): boolean
+	fire<K extends keyof ClientEventMap<Client>>(eventName: K, ...args: Parameters<NonNullable<ClientEventMap<any>[K]>>): boolean
 }
 
 

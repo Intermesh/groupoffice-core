@@ -4,18 +4,16 @@ import {
 	Component,
 	ComponentEventMap,
 	DefaultEntity,
-	FunctionUtil,
 	EntityID,
+	FunctionUtil,
+	Listener,
 	ObservableListenerOpts,
-	t,
 	tbar,
 	Toolbar,
 	Window
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
 import {router} from "../Router";
-// import {EntityID} from "../../../dist/goui/script";
-
 
 export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap<Type> {
 	/**
@@ -33,10 +31,9 @@ export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = Defau
 }
 
 export interface DetailPanel<EntityType extends BaseEntity = DefaultEntity> extends Component {
-	on<K extends keyof DetailPanelEventMap<this, EntityType>>(eventName: K, listener: Partial<DetailPanelEventMap<this, EntityType>>[K], options?: ObservableListenerOpts): void
-
+	on<K extends keyof DetailPanelEventMap<this, EntityType>, L extends Listener>(eventName: K, listener: Partial<DetailPanelEventMap<this, EntityType>>[K], options?: ObservableListenerOpts): L
+	un<K extends keyof DetailPanelEventMap<this>>(eventName: K, listener: Partial<DetailPanelEventMap<this>>[K]): boolean
 	fire<K extends keyof DetailPanelEventMap<this, EntityType>>(eventName: K, ...args: Parameters<DetailPanelEventMap<any, EntityType>[K]>): boolean
-
 }
 
 /**
