@@ -26,11 +26,23 @@ export interface EntityConfig {
 export type ModuleConfig = {
 	// [key:string]:unknown;
 
+	/**
+	 * Module package name
+	 */
 	package: string;
+	/**
+	 * Module name
+	 */
 	name: string;
 
+	/**
+	 * Init function. Is called when the main Group-Office page loads
+	 */
 	init?: () => void;
 
+	/**
+	 * Registered module entities
+	 */
 	entities?: (string|EntityConfig)[]
 
 };
@@ -54,18 +66,6 @@ if(window.GO) {
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
 	})
 
-
-	/**
-	 * Copyright Intermesh
-	 *
-	 * This file is part of Group-Office. You should have received a copy of the
-	 * Group-Office license along with Group-Office. See the file /LICENSE.TXT
-	 *
-	 * If you have questions write an e-mail to info@intermesh.nl
-	 *
-	 * @copyright Copyright Intermesh
-	 * @author Merijn Schering <mschering@intermesh.nl>
-	 */
 	 GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		callback: undefined,
@@ -102,6 +102,11 @@ class Modules {
 	private mods: ModuleConfig[] = [];
 	private modules?: Module[];
 
+	/**
+	 * Register a module so it's functionally is added to the GUI
+	 *
+	 * @param config
+	 */
 	public register(config: ModuleConfig) {
 		this.mods.push(config);
 		this.registerInExtjs(config);
@@ -115,6 +120,15 @@ class Modules {
 	}
 
 
+	/**
+	 * Add a main panel that is accessible through the main menu and tabs
+	 *
+	 * @param pkg
+	 * @param module
+	 * @param id
+	 * @param title
+	 * @param callback
+	 */
 	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
 
 		go.Translate.package = go.package = pkg;
@@ -134,6 +148,11 @@ class Modules {
 		go.Modules.addPanel(proto);
 	}
 
+	/**
+	 * Open a main panel
+	 *
+	 * @param id
+	 */
 	public openMainPanel(id: string) {
 		GO.mainLayout.openModule(id);
 	}
@@ -144,7 +163,9 @@ class Modules {
 		});
 	}
 
-
+	/**
+	 * Get all modules
+	 */
 	public async getAll() {
 		if(!this.modules) {
 			const mods = await jmapds<Module>("Module").get();
