@@ -17,4 +17,4 @@ export class UserDisplayCombo extends ComboBox {
 	}
 }
 
-export const userdisplaycombo = (config?: ComboBoxConfig<UserDisplayCombo>) => createComponent(new UserDisplayCombo(), config);
+export const userdisplaycombo = (config?: Omit<ComboBoxConfig<UserDisplayCombo>, "dataSource">) => createComponent(new UserDisplayCombo(), config);

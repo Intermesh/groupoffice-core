@@ -1,10 +1,25 @@
 import {Component, splitter, btn, t, router} from "@intermesh/goui";
 
+/**
+ * MainThreeColumnPanel class
+ *
+ * Base class for modules that use a typical 3 column layout:
+ *
+ * west: navigation
+ * center: main grid
+ * east: Show detail
+ */
 export abstract class MainThreeColumnPanel extends Component {
 	protected readonly center;
 	protected readonly west;
 	protected readonly east;
 
+	/**
+	 * Constructor
+	 *
+	 * @param idAndRoute Used for state saving and also as the route to the main panel
+	 * @protected
+	 */
 	protected constructor(idAndRoute:string) {
 		super("section");
 
@@ -46,6 +61,11 @@ export abstract class MainThreeColumnPanel extends Component {
 		);
 	}
 
+	/**
+	 * Button to show the west panel. Use in overrides.
+	 *
+	 * @protected
+	 */
 	protected showWestButton() {
 		return btn({
 			cls: "for-small-device",
@@ -57,6 +77,10 @@ export abstract class MainThreeColumnPanel extends Component {
 		})
 	}
 
+	/**
+	 * Button to show the center panel. Use in overrides.
+	 * @protected
+	 */
 	protected showCenterButton() {
 		return btn({
 			cls: "for-small-device",
@@ -69,12 +93,30 @@ export abstract class MainThreeColumnPanel extends Component {
 		})
 	}
 
-	protected abstract createWest():Component
-	protected abstract createEast():Component
-	protected abstract createCenter():Component
+	/**
+	 * Create west panel
+	 *
+	 * @protected
+	 */
+	protected abstract createWest(): Component
 
 	/**
-	 * Activate panel
+	 * Create east panel
+	 *
+	 * @protected
+	 */
+	protected abstract createEast(): Component
+
+	/**
+	 * Create center panel
+	 *
+	 * @protected
+	 */
+	protected abstract createCenter(): Component
+
+	/**
+	 * Activate the given panel
+	 *
 	 * @param active
 	 */
 	public activatePanel(active:Component) {
