@@ -46,7 +46,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	protected entity?: EntityType;
 	protected readonly scroller: Component;
 	private detailView: any;
-	protected toolbar!: Toolbar;
+	public readonly toolbar: Toolbar;
 
 	protected constructor(public entityName:string) {
 		super();
@@ -73,12 +73,11 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 		this.baseCls = "detail";
 
-		// this.style.position = "relative";
 		this.disabled = true;
 		this.cls = "vbox";
 
 		this.items.add(
-			this.createToolbar(),
+			this.toolbar = this.createToolbar(),
 			this.scroller = comp({flex: 1, cls: "scroll", hidden: true})
 		);
 
@@ -122,7 +121,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	}
 
 	private createToolbar() {
-		return this.toolbar = tbar({
+		return tbar({
 				cls: "border-bottom"
 			},
 			'->'
