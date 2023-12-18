@@ -15,7 +15,7 @@ export class FilterPanel extends Component {
 			);
 
 		this.on("render", () => {
-			const ro = new ResizeObserver(FunctionUtil.buffer(100, () => {
+			const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
 				this.goFilterPanel.setWidth(this.el.offsetWidth);
 			}));
 

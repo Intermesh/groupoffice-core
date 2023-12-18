@@ -85,7 +85,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	private get legacyDetailView() {
 		if(!this.detailView) {
-			const ro = new ResizeObserver(FunctionUtil.buffer(100, () => {
+			const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
 				this.detailView.doLayout();
 			}));
 

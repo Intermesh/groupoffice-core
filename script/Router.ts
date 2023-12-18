@@ -8,6 +8,11 @@ class Router extends GouiRouter {
 		go.Router.add(re, handler);
 		return this;
 	}
+
+	setPath(path: string) {
+		go.Router.setPath(path);
+	}
+
 	public start(): Promise<void> {
 		return Promise.resolve();
 	}

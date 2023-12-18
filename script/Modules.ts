@@ -1,4 +1,4 @@
-import {BaseEntity, Component} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities";
 
@@ -14,7 +14,7 @@ export interface EntityFilter {
 export interface EntityLink {
 	title?:string
 	iconCls: string,
-	linkWindow: (entity:string, entityId:string) => void,
+	linkWindow: (entity:string, entityId:EntityID) => void,
 	linkDetail: () => void
 }
 export interface EntityConfig {
