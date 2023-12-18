@@ -2,7 +2,6 @@ import {BaseEntity, Component, EntityID} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities";
 
-type RouterMethod = (...args: string[]) => Promise<any> | any;
 
 export interface EntityFilter {
 	name: string,
