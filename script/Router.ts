@@ -9,12 +9,18 @@ class Router extends GouiRouter {
 		return this;
 	}
 
-	setPath(path: string) {
+	public setPath(path: string) {
+		const oldPath = this.getPath();
 		go.Router.setPath(path);
+		this.fire("change", this.getPath(), oldPath);
 	}
 
 	public start(): Promise<void> {
 		return Promise.resolve();
+	}
+
+	public reload() {
+		go.Router.check();
 	}
 }
 
