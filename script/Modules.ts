@@ -6,6 +6,7 @@ import {Entity} from "./Entities";
 export interface EntityFilter {
 	name: string,
 	type: string,
+	typeConfig?: Record<string, any>,
 	title: string,
 	multiple: boolean
 }
