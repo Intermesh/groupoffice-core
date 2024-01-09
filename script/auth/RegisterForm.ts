@@ -30,7 +30,7 @@ export class RegisterForm extends Form {
 
 		this.items.add(
 
-			fieldset({cls:  "scroll", flex: 1},
+			fieldset({cls:  "flow scroll", flex: 1},
 				comp({
 					tagName: "p",
 					html: t("Please enter your e-mail address to register")

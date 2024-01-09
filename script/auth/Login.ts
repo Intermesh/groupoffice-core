@@ -71,7 +71,7 @@ export class Login extends Window {
 			},
 			fieldset({
 					flex: "1",
-					cls:  "scroll"
+					cls:  "flow scroll"
 				},
 				comp({
 					tagName: "p",
@@ -148,7 +148,7 @@ export class Login extends Window {
 			},
 			fieldset({
 					flex: "1",
-					cls:  "scroll"
+					cls:  "flow scroll"
 				},
 				comp({
 					tagName: "p",
