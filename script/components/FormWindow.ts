@@ -123,24 +123,46 @@ export abstract class FormWindow extends Window {
 		// fire the ready event if not loading the form with data. If it's loading then the ready event will fire
 		// on the form load event.
 		this.on("show", () => {
+			return this.onShow();
+		})
 
-
-
-			// do a setTimeout so currentId is set if win.show().load() is called in that order.
-			setTimeout(() => {
-
-				this.cardMenu.hidden = this.cards.items.count() < 2;
-
-				if (!this.currentId) {
-					// focus form for new entities and not for existing ones.
-					this.form.focus();
-					this.fire("ready", this, this.currentId);
-				}
-			});
+		this.on("beforeclose", () => {
+			return this.onBeforeClose();
 		})
 
 	}
 
+	private closeWithModifications = false;
+
+	protected onBeforeClose() {
+		if(this.closeWithModifications) {
+			return true;
+		}
+		if(this.form.isModified()) {
+			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
+				if(confirmed) {
+					this.closeWithModifications = true;
+					this.close();
+				}
+			});
+
+			return false;
+		}
+	}
+
+	protected onShow() {
+		// do a setTimeout so currentId is set if win.show().load() is called in that order.
+		setTimeout(() => {
+
+			this.cardMenu.hidden = this.cards.items.count() < 2;
+
+			if (!this.currentId) {
+				// focus form for new entities and not for existing ones.
+				this.form.focus();
+				this.fire("ready", this, this.currentId);
+			}
+		});
+	}
 
 	/**
 	 * Add a share panel to set permissions
