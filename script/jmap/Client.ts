@@ -130,15 +130,15 @@ export class Client<UserType extends User = User> extends Observable {
 			this.CSRFToken = session.CSRFToken;
 		}
 
-		this.fire("authenticated", this, session);
+		// this.fire("authenticated", this, session);
 	}
 
-	// /**
-	//  * this should be firing on set session() but in GO we first have to load custom fields and modules before this fires.
-	//  */
-	// public fireAuth() {
-	// 	this.fire("authenticated", this, this._session);
-	// }
+	/**
+	 * this should be firing on set session() but in GO we first have to load custom fields and modules before this fires.
+	 */
+	public fireAuth() {
+		this.fire("authenticated", this, this._session);
+	}
 
 	get session() {
 		if(this._session) {
