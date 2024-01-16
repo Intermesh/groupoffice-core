@@ -93,12 +93,14 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 	protected async internalCommit(params: SetRequest<EntityType>) : Promise<CommitResponse<EntityType>> {
 
 		try {
-			return client.jmap((this.controllerRoute ?? this.id) + "/set", params, this.useCallId());
+			return await client.jmap((this.controllerRoute ?? this.id) + "/set", params, this.useCallId());
 		} catch(error:any) {
+			//automatic retry when statemismatch occurs
 			if(error.type && error.type == 'stateMismatch') {
+				console.warn("statemismatch, we'll update and auto retry the JMAP set request");
 				await this.updateFromServer();
-
-				throw error;
+				params.ifInState = await this.getState();
+				return this.internalCommit(params);
 			}
 
 			throw error;
