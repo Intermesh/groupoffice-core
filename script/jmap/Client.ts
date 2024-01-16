@@ -101,6 +101,10 @@ export class Client<UserType extends User = User> extends Observable {
 	 */
 	private accessToken = "";
 	private delayedJmap: (...args: any[]) => void;
+	private SSEABortController?: AbortController;
+	private pollInterval?: number;
+	private SSEEventsRegistered: boolean = false;
+	private SSELastEntities?: string[];
 
 	constructor() {
 		super();
@@ -475,9 +479,20 @@ export class Client<UserType extends User = User> extends Observable {
 
 	public startPolling(entities:string[]) {
 		this.updateAllDataSources(entities);
-		setInterval(() => {
+		this.pollInterval =setInterval(() => {
 			this.updateAllDataSources(entities);
 		}, 60000);
+	}
+
+	public stopSSE() {
+		if(this.SSEABortController) {
+			this.SSEABortController.abort();
+		}
+
+		if(this.pollInterval) {
+			clearInterval(this.pollInterval);
+			this.pollInterval = undefined
+		}
 	}
 
 
@@ -488,8 +503,19 @@ export class Client<UserType extends User = User> extends Observable {
 	 *
 	 * @returns {Boolean}
 	 */
-	public async sse (entities:string[]) {
+	public async startSSE (entities:string[]) {
 		try {
+
+			this.SSELastEntities = entities;
+
+			if(!this.SSEEventsRegistered) {
+				this.registerSSEEvents();
+			}
+
+			if (!window.navigator.onLine){
+				console.log("SSE not stated because we're offline");
+				return false;
+			}
 
 			const session = await this.session;
 
@@ -514,9 +540,12 @@ export class Client<UserType extends User = User> extends Observable {
 				}
 			});
 
+			this.SSEABortController = new AbortController()
+
 			// let retry = 0;
 			void fetchEventSource(url,{
 				headers: headers,
+				signal: this.SSEABortController.signal,
 				onmessage: (msg) => {
 
 					try {
@@ -542,13 +571,27 @@ export class Client<UserType extends User = User> extends Observable {
 				},
 				onclose: () => {
 					// if the server closes the connection then retry.
-					this.sse(entities);
+					this.startSSE(entities);
 				}
 			})
 
 		} catch (e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
 		}
+	}
+
+	private registerSSEEvents() {
+		this.SSEEventsRegistered = true;
+
+		window.addEventListener('offline', () => {
+			console.log("Closing SSE because we're offline")
+			this.stopSSE();
+		});
+
+		window.addEventListener('online', () => {
+			console.log("Starting SSE because we're online")
+			this.startSSE(this.SSELastEntities!);
+		});
 	}
 }
 
