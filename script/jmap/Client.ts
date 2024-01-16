@@ -312,6 +312,7 @@ export class Client<UserType extends User = User> extends Observable {
 	private getDefaultHeaders() {
 
 		const headers: Record<string, string> = {
+			'X-GOUI': "1",
 			'Content-Type': 'application/json'
 		};
 
@@ -519,7 +520,7 @@ export class Client<UserType extends User = User> extends Observable {
 				onmessage: (msg) => {
 
 					try {
-						console.warn(msg);
+						// console.warn(msg);
 						const data = JSON.parse(msg.data);
 
 						for (let entity in data) {
