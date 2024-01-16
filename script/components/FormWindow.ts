@@ -79,6 +79,8 @@ export abstract class FormWindow extends Window {
 					listeners: {
 						save: (form, data)=> {
 							this.currentId = data.id;
+
+							this.closeWithModifications = true;
 							this.close();
 						},
 
