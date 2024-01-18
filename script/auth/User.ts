@@ -11,3 +11,13 @@ export interface User extends DefaultEntity {
 	avatarId?:string,
 	mail_reminders?: boolean
 }
+
+export interface Principal extends DefaultEntity {
+	id:string
+	name: string
+	email?: string
+	description?:string
+	timeZone?:string
+	avatarId?:string
+	type: string
+}

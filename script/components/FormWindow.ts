@@ -68,7 +68,6 @@ export abstract class FormWindow extends Window {
 		this.baseCls = "goui-window form-window";
 		this.cls = "vbox";
 		this.width = 460;
-		this.height = 640;
 
 		this.items.add(
 			this.form = datasourceform(

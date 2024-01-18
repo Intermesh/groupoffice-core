@@ -42,10 +42,10 @@ class GroupTable extends Table<DataSourceStore> {
 
 						const first = record.users.slice(0, 3);
 
-						const users = await jmapds("User").get(first);
+						const users = await jmapds("Principal").get(first);
 
 
-						let memberStr = users.list.map(u => u.displayName).join(", ");
+						let memberStr = users.list.map(u => u.name).join(", ");
 
 						const more = record.users.length - 3;
 
@@ -55,7 +55,7 @@ class GroupTable extends Table<DataSourceStore> {
 
 						let user;
 						if (record.isUserGroupFor) {
-							user = await jmapds("User").single(record.isUserGroupFor);
+							user = await jmapds("Principal").single(record.isUserGroupFor);
 						}
 
 						return comp({cls: "hbox"},
