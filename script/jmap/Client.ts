@@ -84,7 +84,6 @@ export class Client<UserType extends User = User> extends Observable {
 	private _requests: [method: string, params: any, callid: string][] = [];
 	private _requestData: any = {};
 	private _session: any;
-	private timeout?: number;
 
 	private debugParam = "";// "XDEBUG_SESSION=1"
 
@@ -400,6 +399,7 @@ export class Client<UserType extends User = User> extends Observable {
 	 *
 	 * @param method
 	 * @param params
+	 * @param callId
 	 */
 	public jmap(method: string, params: Object = {}, callId: string|undefined = undefined): Promise<any> {
 		if(callId === undefined) {
@@ -548,15 +548,18 @@ export class Client<UserType extends User = User> extends Observable {
 				signal: this.SSEABortController.signal,
 				onmessage: (msg) => {
 
+					if(msg.event == "ping") {
+						return;
+					}
+
 					try {
-						// console.warn(msg);
+
 						const data = JSON.parse(msg.data);
 
 						for (let entity in data) {
 							let ds = jmapds(entity);
 
 							ds.getState().then(state => {
-								// console.warn(entity, state, data[entity]);
 								if (!state || state == data[entity]) {
 									//don't fetch updates if there's no state yet because it never was used in that case.
 									return;
