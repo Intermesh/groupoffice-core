@@ -99,7 +99,7 @@ interface Module extends BaseEntity{
 
 class Modules {
 
-	private mods: ModuleConfig[] = [];
+	private mods: Record<string,Record<string, ModuleConfig>> = {};
 	private modules?: Module[];
 
 	/**
@@ -108,7 +108,17 @@ class Modules {
 	 * @param config
 	 */
 	public register(config: ModuleConfig) {
-		this.mods.push(config);
+
+		if(!this.mods[config.package]) {
+			this.mods[config.package] = {};
+		}
+
+		if(this.mods[config.package][config.name]) {
+			return; //already registered
+		}
+
+		this.mods[config.package][config.name] = config;
+
 		this.registerInExtjs(config);
 
 		go.Translate.package = config.package;
