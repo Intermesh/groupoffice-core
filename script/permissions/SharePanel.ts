@@ -10,7 +10,7 @@ import {
 	searchbtn,
 	Table, datasourcestore, column, DataSourceStore, checkbox, avatar, select, Field, store, small
 } from "@intermesh/goui";
-import {FilterCondition, jmapds} from "../jmap";
+import {client, FilterCondition, jmapds} from "../jmap";
 import {entities} from "../Entities";
 
 class GroupTable extends Table<DataSourceStore> {
@@ -61,7 +61,7 @@ class GroupTable extends Table<DataSourceStore> {
 						return comp({cls: "hbox"},
 							avatar({
 								displayName: record.name,
-								backgroundImage: user && user.avatarId ? go.Jmap.downloadUrl(user.avatarId) : undefined
+								backgroundImage: user && user.avatarId ? client.downloadUrl(user.avatarId) : undefined
 							}),
 							comp({flex: 1},
 								comp({text: record.name}),
