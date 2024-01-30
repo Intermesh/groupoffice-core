@@ -18,8 +18,10 @@
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
-    "@intermesh/goui": "latest"
+    "@intermesh/goui": "latest",
+    "chart.js": "^4.4.1"
   },
+
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
   "bugs": {
