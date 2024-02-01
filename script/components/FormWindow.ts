@@ -1,4 +1,6 @@
 import {
+	AbstractDataSource,
+	BaseEntity,
 	btn,
 	CardContainer,
 	CardMenu,
@@ -8,7 +10,7 @@ import {
 	Component,
 	containerfield,
 	datasourceform,
-	DataSourceForm,
+	DataSourceForm, DefaultEntity,
 	EntityID,
 	Listener,
 	ObservableListenerOpts,
@@ -35,14 +37,14 @@ export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
 	ready: (window: Type, currentId: string|undefined) => void
 }
 
-export interface FormWindow {
+export interface FormWindow<EntityType extends BaseEntity = DefaultEntity> {
 	on<K extends keyof FormWindowEventMap<this>, L extends Listener>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K], options?: ObservableListenerOpts): L;
 	un<K extends keyof FormWindowEventMap<this>>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K]): boolean
 	fire<K extends keyof FormWindowEventMap<this>>(eventName: K, ...args: Parameters<FormWindowEventMap<any>[K]>): boolean
 }
 
-export abstract class FormWindow extends Window {
-	public readonly form: DataSourceForm;
+export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> extends Window {
+	public readonly form;
 
 	protected currentId?: EntityID;
 	protected readonly cards: CardContainer;
@@ -69,14 +71,15 @@ export abstract class FormWindow extends Window {
 		this.cls = "vbox";
 		this.width = 460;
 
+
 		this.items.add(
-			this.form = datasourceform(
+			this.form = datasourceform<EntityType>(
 				{
 					dataSource: jmapds(this.entityName),
 					cls: "vbox",
 					flex: 1,
 					listeners: {
-						save: (form, data)=> {
+						save: (form, data) => {
 							this.currentId = data.id;
 
 							this.closeWithModifications = true;
@@ -87,7 +90,7 @@ export abstract class FormWindow extends Window {
 
 							const invalid = form.findFirstInvalid();
 
-							if(invalid) {
+							if (invalid) {
 								const tab = invalid.findAncestor(cmp => {
 									return cmp.el.classList.contains('card-container-item');
 								});
@@ -98,7 +101,8 @@ export abstract class FormWindow extends Window {
 							}
 						}
 					}
-				},
+				}
+				,
 
 				this.cardMenu = cardmenu(),
 

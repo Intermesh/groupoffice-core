@@ -1,21 +1,31 @@
 {
   "compilerOptions": {
-    "strict" : true,
+    "strict": true,
     "target": "ES2018",
     "sourceMap": true,
-    "lib": ["es2018", "dom"],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "isolatedModules": true, // important for tree shaking in esbuild
-    "module":"es2015",
+    "isolatedModules": true,
+    // important for tree shaking in esbuild
+    "module": "es2015",
     "baseUrl": ".",
     "outDir": "./dist",
     "declaration": true,
-    "declarationMap": true
-  },
+    "declarationMap": true,
 
+    "paths": {
+      "@intermesh/goui": [
+        "../dist/goui/script/index.d.ts",
+        "../dist/goui/script/index.js"
+      ]
+    }
+  },
   "include": [
     "./script"
-  ]
+  ],
 
 }

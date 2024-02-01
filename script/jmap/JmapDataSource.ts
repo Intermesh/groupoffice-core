@@ -8,12 +8,13 @@ import {client} from "./Client.js";
 import {
 	AbstractDataSource,
 	CommitResponse,
+	Config,
+	createComponent,
 	DefaultEntity,
 	QueryParams,
 	QueryResponse,
 	SetRequest
 } from "@intermesh/goui";
-import {Config, createComponent} from "@intermesh/goui";
 
 enum andOrNot {AND, OR, NOT}
 
@@ -147,8 +148,7 @@ const stores: Record<string, any> = {};
  */
 export const jmapds = <EntityType extends DefaultEntity = DefaultEntity>(storeId:string, config?: Config<JmapDataSource>) : JmapDataSource<EntityType> => {
 	if(!stores[storeId]) {
-		stores[storeId] = createComponent(new JmapDataSource(storeId), config);
-
+		stores[storeId] = createComponent(new JmapDataSource<EntityType>(storeId), config);
 	}
 	return stores[storeId];
 }
