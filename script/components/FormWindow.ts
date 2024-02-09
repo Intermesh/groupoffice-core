@@ -35,6 +35,8 @@ export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
 	 * @param window
 	 */
 	ready: (window: Type, currentId: string|undefined) => void
+
+	addlink: (window: Type, entityName: string, entityId: string) => void
 }
 
 export interface FormWindow<EntityType extends BaseEntity = DefaultEntity> {
@@ -300,6 +302,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 				this.form.un("save", unbindkey);
 			})
 		})
+
+		this.fire("addlink", this, entityName, entityId);
 	}
 
 }
