@@ -56,7 +56,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			if(this.entity) {
 				const id = this.entity.id + "";
 				if (changes.updated && changes.updated.indexOf(id) > -1) {
-					this.load(this.entity.id);
+					this.load(this.entity.id!);
 				}
 
 				if (changes.destroyed && changes.destroyed.indexOf(id) > -1) {
