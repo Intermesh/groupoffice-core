@@ -150,8 +150,10 @@ export class Client<UserType extends User = User> extends Observable {
 	 *
 	 * this.authenticate() as to be called first.
 	 */
-	get user() : UserType | undefined{
-		return this._user;
+	get user() : UserType {
+		// We assume a user is here but this is not always true. When not authenticated yet the user is undefined.
+		// But because it's annoying to have to do client.user!.id everywhere we pretend to always have user.
+		return this._user!;
 	}
 
 	/**
