@@ -211,7 +211,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 			await this.form.load(id);
 			this.fire("ready", this, this.currentId);
 		} catch (e) {
-			void Window.alert(t("Error"), e + "");
+			void Window.error(e + "");
 		} finally {
 			this.unmask();
 		}
