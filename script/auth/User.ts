@@ -5,11 +5,11 @@ export interface User extends DefaultEntity {
 	displayName?: string,
 	profile?: any,
 	email?: string,
-	dateFormat?:string,
-	timeFormat?:string,
-	timezone?:string,
+	dateFormat:string,
+	timeFormat:string,
+	timezone:string,
 	avatarId?:string,
-	mail_reminders?: boolean
+	mail_reminders: boolean
 }
 
 export interface Principal extends DefaultEntity {

@@ -22,15 +22,22 @@ class AuthManager {
 		}
 
 		this._requireLogin = new Promise(async (resolve) => {
+
 			root.mask();
-			let user = await client.isLoggedIn();
-			root.unmask();
-			while (!user) {
-				await this.showLogin();
-				user = await client.isLoggedIn();
+
+			await client.authenticate();
+
+			if(client.isLoggedIn()) {
+				resolve(client.user!);
 			}
 
-			resolve(user);
+			root.unmask();
+
+			while (!client.user) {
+				await this.showLogin();
+			}
+
+			resolve(client.user);
 		});
 
 		return this._requireLogin;

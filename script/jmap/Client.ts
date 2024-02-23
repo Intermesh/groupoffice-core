@@ -8,6 +8,7 @@ import {DefaultEntity, Format, FunctionUtil, Listener, Observable, ObservableEve
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
+import {User} from "../auth";
 
 
 export interface LoginData {
@@ -22,7 +23,6 @@ export interface LoginData {
 	}
 }
 
-type User = DefaultEntity;
 
 export interface RegisterData {
 	action: "register",
@@ -87,7 +87,7 @@ export class Client<UserType extends User = User> extends Observable {
 
 	private debugParam = "";// "XDEBUG_SESSION=1"
 
-	private user: UserType | undefined;
+	private _user: UserType | undefined;
 
 	public uri = "";
 
@@ -137,30 +137,65 @@ export class Client<UserType extends User = User> extends Observable {
 	}
 
 	/**
-	 * this should be firing on set session() but in GO we first have to load custom fields and modules before this fires.
+	 * The session object.
+	 *
+	 * this.authenticate() has to be called first.
 	 */
-	public fireAuth() {
-		this.fire("authenticated", this, this._session);
+	get session() {
+		return this._session;
 	}
 
-	get session() {
-		if(this._session) {
-			return Promise.resolve(this._session);
+	/**
+	 * Get the current user.
+	 *
+	 * this.authenticate() as to be called first.
+	 */
+	get user() : UserType | undefined{
+		return this._user;
+	}
+
+	/**
+	 * Validates the current session.
+	 *
+	 * this.session can be preset by a login dialog or other logic like in Group-Office.
+	 * If it's not set it will call the JMAP API to retrieve the session using the accessToken.
+	 */
+	public async authenticate() {
+
+		if(this._user) {
+			return true;
 		}
 
 		if(!this.accessToken) {
 			this.accessToken = sessionStorage.getItem("accessToken") || "";
 		}
 
-		return this.request().then(response => {
+		if(!this._session) {
+			this._session = await this.request().then(response => response.json());
+		}
 
-			return  response.json();
+		if(!this._session) {
+			return false;
+		}
 
-		}).then(session => {
-			this.session = session;
+		const ds = jmapds<UserType>("User");
+		this._user = await ds.single(this._session.userId);
 
-			return this._session;
-		});
+		if(!this._user) {
+			return false;
+		}
+
+		Format.dateFormat = this._user.dateFormat;
+		Format.timeFormat = this._user.timeFormat;
+		Format.timezone = this._user.timezone as Timezone;
+		Format.currency = this._user.currency;
+		Format.thousandsSeparator = this._user.thousandsSeparator;
+		Format.decimalSeparator = this._user.decimalSeparator;
+
+
+		this.fire("authenticated", this, this._session);
+
+		return true;
 	}
 
 	/**
@@ -170,17 +205,8 @@ export class Client<UserType extends User = User> extends Observable {
 		return this._lastCallId;
 	}
 
-	public async isLoggedIn(): Promise<User | false> {
-		if (this.user) {
-			return this.user;
-		} else {
-			try {
-				const user = await this.getUser();
-				return user || false;
-			} catch(e) {
-				return false;
-			}
-		}
+	public isLoggedIn(): boolean {
+		return !!this._user;
 	}
 
 	private async request(data?: Object) {
@@ -264,44 +290,6 @@ export class Client<UserType extends User = User> extends Observable {
 			headers: this.buildHeaders(),
 			body: JSON.stringify(data)
 		});
-	}
-
-	/**
-	 * Get the logged-in user.
-	 */
-	public async getUser() {
-		if (!this.user) {
-			try {
-				const session = await this.session;
-				if(!session) {
-					return undefined;
-				}
-
-				const ds = jmapds<UserType>("User");
-
-				this.user = await ds.single(session.userId);
-
-				if(this.user) {
-
-					Format.dateFormat = this.user.dateFormat;
-					Format.timeFormat = this.user.timeFormat;
-					Format.timezone = this.user.timezone as Timezone;
-					Format.currency = this.user.currency;
-					Format.thousandsSeparator = this.user.thousandsSeparator;
-					Format.decimalSeparator = this.user.decimalSeparator;
-
-					return this.user;
-				} else
-				{
-					return undefined;
-				}
-			} catch(reason) {
-				this.user = undefined;
-				return Promise.reject(reason);
-			}
-		}
-
-		return this.user;
 	}
 
 	public downloadUrl(blobId: string) {
@@ -598,4 +586,4 @@ export class Client<UserType extends User = User> extends Observable {
 	}
 }
 
-export const client = new Client();
+export const client = new Client<User>();
