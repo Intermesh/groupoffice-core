@@ -44,6 +44,6 @@
   },
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "index.js"
 }

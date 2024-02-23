@@ -316,7 +316,6 @@ export class Client<UserType extends User = User> extends Observable {
 	private getDefaultHeaders() {
 
 		const headers: Record<string, string> = {
-			'X-GOUI': "1",
 			'Content-Type': 'application/json'
 		};
 
