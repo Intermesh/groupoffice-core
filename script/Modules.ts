@@ -64,17 +64,19 @@ if(window.GO) {
 
 		callback: undefined,
 
-		 cls: "go-module-panel goui-module-panel",
-
-		initComponent: function () {
-
+		initComponent () {
+			this.cls = 'goui-module-panel';
 			GouiMainPanel.superclass.initComponent.call(this);
 
 			this.on("afterrender", async () => {
 				const comp = await this.callback();
-				comp.render(this.body.dom);
+				comp.render(this.el.dom);
 			}, this);
 		},
+
+		 setSize (w:number, h:number){
+			// dont
+		 }
 
 	});
 }
@@ -178,6 +180,9 @@ class Modules {
 		return this.modules;
 	}
 
+	public get(pkg:string, name:string) {
+		return go.Modules.get(pkg, name);
+	}
 
 	/**
 	 * Check if the current user has this module

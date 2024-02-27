@@ -15,7 +15,7 @@ import {
 	Listener,
 	ObservableListenerOpts,
 	t,
-	tbar,
+	tbar, Toolbar,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
@@ -51,6 +51,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	protected currentId?: EntityID;
 	protected readonly cards: CardContainer;
 	protected sharePanel?: SharePanel;
+	protected bbar: Toolbar
 
 	/**
 	 * The first tab
@@ -117,7 +118,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					)
 				),
 
-				tbar({cls: "border-top"},
+				this.bbar = tbar({cls: "border-top"},
 					"->",
 					btn({
 						type: "submit",

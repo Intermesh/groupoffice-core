@@ -1,0 +1,24 @@
+$density: 46%;
+$font-scale: 1.1;
+
+@import 'groupoffice.scss';
+
+.goui-window .header.goui-toolbar {
+	height: dp(40);
+	line-height:dp(40);
+	font-size: .8em;
+	.goui-button {
+		background-color:transparent;
+		width:dp(32);
+		height:dp(32);
+		padding: 0 dp(2);
+		margin:dp(3) 0;
+		&:hover{
+			background-color:$colorPrimary;
+		}
+	}
+}
+
+.vbox > .goui-toolbar .goui-button {
+	background-color:var(--bg-button);
+}
