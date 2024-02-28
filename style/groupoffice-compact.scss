@@ -19,6 +19,10 @@ $font-scale: 1.1;
 	}
 }
 
+.goui-form-field.check div.control {
+	padding: dp(8) 0 !important;
+}
+
 .vbox > .goui-toolbar .goui-button {
 	background-color:var(--bg-button);
 }
