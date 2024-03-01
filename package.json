@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
+    "@intermesh/goui": "latest",
     "chart.js": "^4.4.1"
   },
 
