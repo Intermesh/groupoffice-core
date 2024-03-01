@@ -25,15 +25,17 @@
 	--fg-selection: 		rgb(1, 4, 10); // selected text
 	--bg-selection: 		rgba(2, 119, 189, 0.16); // selected text
 //not in GO
+
 	--bg-pressed:		#{rgba(black, .12)};
 	--bg-hover:      	#{rgba(black, 0.04)}; // btn, menuitem, listitem, tablerow, treeitem
-	--fg-selected: 	white;
+	--fg-selected: 	var(--fg-text);
 	--bg-selected:   	#{rgba(black, .08)};
 	--bg-selected-inactive: #{rgba(black, .08)};
 
 	--bg-primary: #dae3f0;
 	--c-primary: 		#1652a1;
 	--c-secondary: 	 #00b0ad;
+	--c-tertiary: 		rgb(243,219,0);
 	--c-accent: 		#ff7200;
 
 	--fg-error: #721c24;
@@ -105,6 +107,7 @@
 	--bg-hover:      rgba(255,255,255, 0.04);
 	--bg-pressed:	#{rgba(#cccccc, .25)};
 	--bg-selected: #{rgba(white, .08)}; //#{rgba(140,90,240,0.8)};
+	--fg-selected: 	white;
 	--bg-selected-inactive: #4a4a60;
 
 	--bg-primary: #1652a1;
