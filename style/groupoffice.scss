@@ -29,4 +29,7 @@ $fontSize: sp(16);
 .goui-module-panel {
 	position:fixed;
 	inset:dp(64) 0 0;
+	.x-grid3 {
+		background-color: transparent; // for extjs filter panel in sidebar
+	}
 }

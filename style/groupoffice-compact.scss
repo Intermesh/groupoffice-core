@@ -24,5 +24,8 @@ $font-scale: 1.1;
 }
 
 .vbox > .goui-toolbar .goui-button {
-	background-color:var(--bg-button);
+	background-color:var(--bg-bright);
+}
+menu.goui-dropdown>li hr {
+	margin: dp(6);
 }

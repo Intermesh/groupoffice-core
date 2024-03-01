@@ -3,18 +3,22 @@
 	--fg-border:			rgba(68, 68, 68, 0.26); // outline
 	--fg-line:				#{rgba(black, 0.12)}; // outline-variant
 	--fg-divider:				#{rgba(black, 0.04)};
+	--fg-track: var(--fg-line);
 
 	--fg-text:           rgb(10, 10, 10); // on-surface
 	--fg-secondary-text: #{rgba(1, 4, 10, 0.56)}; // on-surface-variant
 
 	--bg-lowest: white;
-	--bg-low: #fafafa; // body
-	--bg-mid: #f1f1f1;
-	--bg-high: #efeff2; // sidebar
-	--bg-highest: #E2E2E2; // header
+	--bg-low: #f3f3fa; //#fafafa; // body
+	--bg-mid: #ededF4; //#f1f1f1;
+	--bg-high: #e8e7ee; //#efeff2; // sidebar
+	--bg-highest: #E2E2E9; //#E2E2E2; // header
 
-	--bg-layer: #f5f5f5;
+	--bg-layer: #{rgba(#ededF4,.84)}; // #f5f5f5;
 	--bg-input: white;
+
+	--bg-bright: var(--bg-input);
+	--bg-dim: #d9d9df;
 
 //not in GO
 	--bg-focus: 		rgba(2, 119, 189, 0.16); // focus button
@@ -24,7 +28,7 @@
 	--bg-pressed:		#{rgba(black, .12)};
 	--bg-hover:      	#{rgba(black, 0.04)}; // btn, menuitem, listitem, tablerow, treeitem
 	--fg-selected: 	white;
-	--bg-selected:   	#{rgba(30,18,70, 0.8)};
+	--bg-selected:   	#{rgba(black, .08)};
 	--bg-selected-inactive: #{rgba(black, .08)};
 
 	--bg-primary: #dae3f0;
@@ -58,14 +62,12 @@
 	--c-header-bg: 	var(--c-primary);
 
 	--bg-alt: 			#212121;
-	--fg-alt:				#f5f5f5;
-	--bg-button:	  #fbfafb;
+	--fg-alt:			#f5f5f5;
 
 	//compat
 	--fg-tick: 		var(--c-primary);
 	--bg-form: var(--bg-mid);
 	--fg-hint-text: var(--fg-secondary-text);
-	--fg-track: var(--fg-line);
 	--fg-icon: var(--c-primary);
 	--fg-textbox-line: var(--fg-text);
 	--fg-textfield-box:  rgba(255, 255, 255, 0.8);
@@ -76,20 +78,23 @@
 @mixin dark-theme {
 
 	--fg-border:			#1b1b1b;
-	--fg-line:				#{rgba(white, 0.3)};
-	--fg-divider:				#{rgba(white, 0.2)};
+	--fg-line:				#{rgba(white, 0.32)};
+	--fg-divider:				#{rgba(white, 0.18)};
 
-	--fg-text:           white;
-	--fg-secondary-text: rgba(255,255,255, 0.7);
+	--fg-text:           rgba(255,255,255, 0.89);
+	--fg-secondary-text: rgba(255,255,255, 0.64);
 
-	--bg-lowest: #1F1e1e;
-	--bg-low: #272727; // body
-	--bg-mid: #313035;
-	--bg-high: #343638; // sidebar
-	--bg-highest: #444648; // header
+	--bg-lowest: #0c0e13; //#1F1e1e;
+	--bg-low: #1a1c20; // #272727; // body
+	--bg-mid: #1e2025; //#313035;
+	--bg-high: #282a2f; //#343638; // sidebar
+	--bg-highest: #33353a; // #444648; // header
 
-	--bg-layer: 	#{rgba(#222,.84)}; //#303030;
-	--bg-input: 	#272727;
+	--bg-layer: 	#{rgba(#1e2025,.84)}; //#303030;
+	--bg-input: #111318; //	#272727; // bright
+
+	--bg-bright: var(--bg-highest);
+	--bg-dim: var(--bg-input);
 
 	//not in GO
 	--bg-focus: 		rgba(2, 119, 189, 0.16);
@@ -128,10 +133,9 @@
 	--hue-yellow: #F57F17;
 	--hue-bluegrey: #546E70;
 
-	--c-header-bg: #272727;
+	--c-header-bg: #111318; // #272727;
 	--fg-alt:			black;
 	--bg-alt: 			#888;
-	--bg-button:	  #4e4c53; // see _overrides compact
 	--fg-disabled:       rgba(255,255,255, 0.3);
 
 	// old deprecated
