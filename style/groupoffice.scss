@@ -1,6 +1,6 @@
 
 $resourcePath: "../../goui/resources/";
-@import '../../goui/style/util';
+@import '../node_modules/@intermesh/goui/style/util';
 
 $font-scale: 1 !default;
 $density: 54% !default;
@@ -12,28 +12,7 @@ $baseLineHeight: dp(20);
 $fontSize: sp(16);
 
 @import 'theme';
-@import '../../goui/style';
-
-html {
-	font-size: var(--density);
-	letter-spacing: normal;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	-ms-text-size-adjust: 100%;
-	-webkit-text-size-adjust: 100%;
-}
-@media (max-device-width:1200px) {
-	html {
-		font-size: var(--mobile-density);
-	}
-}
-body {
-	background-color: var(--c-header-bg);
-}
-
-body * {
-	box-sizing: border-box;
-}
+@import '../node_modules/@intermesh/goui/style/index';
 
 
 .goui-share-panel {
