@@ -34,7 +34,7 @@ $fontSize: sp(16);
 		background-color: transparent; // for extjs filter panel in sidebar
 	}
 }
-@media (orientation: landscape) {
+@media (orientation: landscape) and (max-width: $breakpointSmall) {
 	.goui-module-panel {
 		top : 0;
 	}
