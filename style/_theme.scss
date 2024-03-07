@@ -32,10 +32,10 @@
 	--bg-selected:   	#{rgba(black, .08)};
 	--bg-selected-inactive: #{rgba(black, .08)};
 
-	--bg-primary: #dae3f0;
-	--c-primary: 		#1652a1;
-	--c-secondary: 	 #00b0ad;
-	--c-tertiary: 		rgb(243,219,0);
+	--bg-main: #dae3f0;
+	--fg-main: 		#1652a1;
+	--c-primary: 	 #00b0ad;
+	--c-secondary: 		rgb(243,219,0);
 	--c-accent: 		#ff7200;
 
 	--fg-error: #721c24;
@@ -61,16 +61,16 @@
 	--hue-yellow: #FDD170;
 	--hue-bluegrey: #607D8B;
 
-	--c-header-bg: 	var(--c-primary);
+	--c-header-bg: 	var(--fg-main);
 
 	--bg-alt: 			#212121;
 	--fg-alt:			#f5f5f5;
 
 	//compat
-	--fg-tick: 		var(--c-primary);
+	--fg-tick: 		var(--fg-main);
 	--bg-form: var(--bg-mid);
 	--fg-hint-text: var(--fg-secondary-text);
-	//--fg-icon: var(--c-primary);
+	//--fg-icon: var(--fg-main);
 	--fg-unfocused: var(--fg-secondary-text);
 	--bg-background: var(--bg-mid);
 }
@@ -108,8 +108,8 @@
 	--fg-selected: 	white;
 	--bg-selected-inactive: #4a4a60;
 
-	--bg-primary: #1652a1;
-	--c-primary: #009BC9;
+	--bg-main: #1652a1;
+	--fg-main: #009BC9;
 
 	--fg-error: #FFEBEE;
 	--border-error: #a43432;
