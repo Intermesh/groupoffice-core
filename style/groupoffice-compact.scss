@@ -11,10 +11,12 @@ $font-scale: 1.1;
 		background-color:transparent;
 		width:dp(32);
 		height:dp(32);
+		min-height:dp(32);
 		padding: 0 dp(2);
 		margin:dp(3) 0;
 		&:hover{
 			background-color:$colorMain;
+			color:white;
 		}
 	}
 }
@@ -23,7 +25,7 @@ $font-scale: 1.1;
 	padding: dp(8) 0 !important;
 }
 
-.vbox > .goui-toolbar .goui-button {
+.vbox > .goui-toolbar:not(.header) .goui-button:not(.filled) {
 	background-color:var(--bg-bright);
 }
 menu.goui-dropdown>li hr {

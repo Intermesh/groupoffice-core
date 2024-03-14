@@ -6,3 +6,5 @@ export * from './FilterPanel.js';
 export * from './FilesButton.js';
 export * from './LinkBrowserButton.js';
 export * from './MainThreeColumnPanel.js';
+export * from './form/RecurrenceField.js';
+export * from './picker/RecurrencePicker.js';

@@ -9,3 +9,4 @@ export * from './permissions/index.js';
 export * from './components/index.js';
 export * from "chart.js/auto";
 export * from "./chart/index.js";
+export * from "./util/Recurrence.js";

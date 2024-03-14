@@ -1,8 +1,8 @@
 {
   "type": "module",
   "devDependencies": {
-    "typescript": "latest",
-    "sass": "latest"
+    "sass": "latest",
+    "typescript": "latest"
   },
   "scripts": {
     "test": "mocha",
@@ -19,9 +19,9 @@
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
     "@intermesh/goui": "latest",
-    "chart.js": "^4.4.1"
+    "chart.js": "^4.4.1",
+    "rrule": "^2.8.1"
   },
-
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
   "bugs": {
