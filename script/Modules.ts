@@ -197,6 +197,11 @@ class Modules {
 
 }
 
-
-
 export const modules = new Modules();
+
+//
+// //For 6.8 but not 6.9
+// GO.mainLayout.on("authenticated", () => {
+// 	client.fireAuth();
+//
+// })

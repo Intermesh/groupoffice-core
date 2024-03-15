@@ -201,6 +201,16 @@ export class Client<UserType extends User = User> extends Observable {
 	}
 
 	/**
+	 * This function is only used up to 6.8. In 6.9 authenticate() is called in mainlayout.js
+	 */
+	public async fireAuth() {
+		this.session = go.User.session;
+		this._user = go.User;
+
+		this.fire("authenticated", this, this._session);
+	}
+
+	/**
 	 * The ID of the last JMAP method call
 	 */
 	get lastCallId() {
