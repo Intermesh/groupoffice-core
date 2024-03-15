@@ -21,7 +21,7 @@ export class RecurrenceField extends Field {
 
 	protected control: HTMLInputElement | undefined
 
-	protected baseCls = 'goui-form-field rec3urrence';
+	protected baseCls = 'goui-form-field recurrence';
 
 	constructor() {
 		super();
