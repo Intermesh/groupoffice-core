@@ -84,8 +84,6 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					listeners: {
 						save: (form, data) => {
 							this.currentId = data.id;
-
-							this.closeWithModifications = true;
 							this.close();
 						},
 
@@ -134,22 +132,19 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 			return this.onShow();
 		})
 
-		this.on("beforeclose", () => {
-			return this.onBeforeClose();
+		this.on("beforeclose", (win, byUser) => {
+			return this.onBeforeClose(byUser);
 		})
 
 	}
 
-	private closeWithModifications = false;
-
-	protected onBeforeClose() {
-		if(this.closeWithModifications) {
+	protected onBeforeClose(byUser: boolean) {
+		if(!byUser) {
 			return true;
 		}
 		if(this.form.isModified()) {
 			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
 				if(confirmed) {
-					this.closeWithModifications = true;
 					this.close();
 				}
 			});
