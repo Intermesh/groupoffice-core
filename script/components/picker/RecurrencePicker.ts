@@ -278,10 +278,11 @@ export class RecurrencePicker extends CardContainer {
 
 	setStartDate(date: DateTime) {
 		this.startDate = date.clone();
-		for (var i = 0, m = date.getMonth(); m == date.getMonth(); date = date.addDays(-7)) {
-			i++;
-		}
-		this.weekOfMonth = i;
+
+		// for (var i = 0, m = date.getMonth(); m == date.getMonth(); date = date.addDays(-7)) {
+		// 	i++;
+		// }
+		this.weekOfMonth = Math.ceil((date.getDate() - 1 - date.getWeekDay()) / 7)+1;
 		this.menu.items.clear().add(...this.quickMenuItems());
 	}
 

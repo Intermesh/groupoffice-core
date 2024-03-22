@@ -7,10 +7,11 @@
  */
 
 import { datetime, RRule} from 'rrule'
-import {DateTime} from "@intermesh/goui";
+import {DateTime, Timezone} from "@intermesh/goui";
 
 interface RecurrenceConfig {
 	rule: RecurrenceRule
+	timeZone:Timezone
 	dtstart: Date
 }
 
@@ -40,6 +41,7 @@ export type RecurrenceRule = {
 export class Recurrence {
 
 	private rrule: RRule
+	private timeZone?: Timezone
 
 	private dayNb(shortName: string) {
 		return {
@@ -70,14 +72,19 @@ export class Recurrence {
 				"daily": RRule.DAILY,
 				"weekly": RRule.WEEKLY,
 				"monthly": RRule.MONTHLY,
-				"yearly": RRule.YEARLY
-			}[config.rule.frequency],
-			dtstart: config.dtstart
+				"yearly": RRule.YEARLY}[config.rule.frequency],
+			dtstart: this.makeDate(config.dtstart, true)
 		};
-
+		if(config.timeZone) {
+			this.timeZone = config.timeZone;
+			cfg.tzid = config.timeZone
+		}
 
 		if(config.rule.interval) cfg.interval = config.rule.interval;
-		if(config.rule.until) cfg.until = config.rule.until;
+		if(config.rule.until) {
+			const dmy = config.rule.until.split('-').map(i => +i) as [number,number,number];
+			cfg.until = datetime(...dmy, 23,59,59);
+		}
 		if(config.rule.count) cfg.count = config.rule.count;
 
 		if(config.rule.firstDayOfWeek) cfg.wkst = this.dayNb(config.rule.firstDayOfWeek);
@@ -92,10 +99,25 @@ export class Recurrence {
 		this.rrule = new RRule(cfg);
 	}
 
+	private makeDate(d: Date, withTime?: boolean) {
+		//d = (new DateTime(d)).toTimezone('UTC').date;
+		return withTime ? datetime(d.getFullYear(), d.getMonth()+1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()):
+			datetime(d.getFullYear(), d.getMonth()+1, d.getDate());
+	}
+
 	*loop(start:DateTime, end: DateTime){
-		const dates = this.rrule.between(start.date,end.date);
-		for(const date of dates) {
-			yield new DateTime(date);
+		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date));
+
+		for(const d of dates) {
+			console.log(d.toLocaleString());
+			const dt = new DateTime(`${d.getUTCFullYear()}-${d.getUTCMonth()+1}-${d.getUTCDate()} ${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`);
+			yield this.timeZone ? dt.toTimezone(this.timeZone) : dt;
+
+
+			// if(this.timeZone) {
+			// 	yield d.toTimezone(this.timeZone);
+			// } else
+			// 	yield d;
 		}
 	}
 
