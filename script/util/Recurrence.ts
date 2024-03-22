@@ -40,8 +40,9 @@ export type RecurrenceRule = {
  */
 export class Recurrence {
 
-	private rrule: RRule
+	private rrule?: RRule
 	private timeZone?: Timezone
+	private config: RecurrenceConfig;
 
 	private dayNb(shortName: string) {
 		return {
@@ -96,7 +97,12 @@ export class Recurrence {
 		if(config.rule.byYearDay) cfg.byyearday = config.rule.byYearDay;
 		//if(config.rule.byHour) cfg.count = config.rule.count;
 
-		this.rrule = new RRule(cfg);
+		this.config = config;
+		try {
+			this.rrule = new RRule(cfg);
+		} catch (e) {
+			console.error("Failed to parse rrule: ", cfg);
+		}
 	}
 
 	private makeDate(d: Date, withTime?: boolean) {
@@ -106,6 +112,10 @@ export class Recurrence {
 	}
 
 	*loop(start:DateTime, end: DateTime){
+		if(!this.rrule) {
+			yield new DateTime(this.config.dtstart);
+			return;
+		}
 		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date));
 
 		for(const d of dates) {
