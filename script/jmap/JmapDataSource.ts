@@ -143,8 +143,6 @@ const stores: Record<string, any> = {};
 
 /**
  * Get a single instance of a store by ID
- *
- * @param storeId
  */
 export const jmapds = <EntityType extends DefaultEntity = DefaultEntity>(storeId:string, config?: Config<JmapDataSource>) : JmapDataSource<EntityType> => {
 	if(!stores[storeId]) {

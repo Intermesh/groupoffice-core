@@ -12,7 +12,7 @@ $baseLineHeight: dp(20);
 $fontSize: sp(16);
 
 @import 'theme';
-@import '../node_modules/@intermesh/goui/style/index';
+@import '../../goui/style/index';
 
 
 .goui-share-panel {

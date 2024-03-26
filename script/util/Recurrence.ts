@@ -117,9 +117,7 @@ export class Recurrence {
 			return;
 		}
 		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date));
-
 		for(const d of dates) {
-			console.log(d.toLocaleString());
 			const dt = new DateTime(`${d.getUTCFullYear()}-${d.getUTCMonth()+1}-${d.getUTCDate()} ${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`);
 			yield this.timeZone ? dt.toTimezone(this.timeZone) : dt;
 
