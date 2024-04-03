@@ -73,7 +73,8 @@ export class Recurrence {
 				"daily": RRule.DAILY,
 				"weekly": RRule.WEEKLY,
 				"monthly": RRule.MONTHLY,
-				"yearly": RRule.YEARLY}[config.rule.frequency],
+				"yearly": RRule.YEARLY
+			}[config.rule.frequency],
 			dtstart: this.makeDate(config.dtstart, true)
 		};
 		if(config.timeZone) {
@@ -83,8 +84,15 @@ export class Recurrence {
 
 		if(config.rule.interval) cfg.interval = config.rule.interval;
 		if(config.rule.until) {
-			const dmy = config.rule.until.split('-').map(i => +i) as [number,number,number];
-			cfg.until = datetime(...dmy, 23,59,59);
+			const date = config.rule.until.substring(0,10),
+				time = config.rule.until.substring(11);
+			let [h,i,s] = time.split(':').map(i => +i) as [number,number,number];
+			if(!time) {
+				h=23; i=59; s=59;
+			}
+			const [y,m,d] = date.split('-').map(i => +i) as [number,number,number];
+
+			cfg.until = datetime(y,m,d, h,i,s);
 		}
 		if(config.rule.count) cfg.count = config.rule.count;
 
