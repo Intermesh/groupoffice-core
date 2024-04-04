@@ -119,12 +119,12 @@ export class Recurrence {
 			datetime(d.getFullYear(), d.getMonth()+1, d.getDate());
 	}
 
-	*loop(start:DateTime, end: DateTime){
+	*loop(start:DateTime, end: DateTime, iter?: (d:Date, i:number) => boolean){
 		if(!this.rrule) {
 			yield new DateTime(this.config.dtstart);
 			return;
 		}
-		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date));
+		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date),true, iter);
 		for(const d of dates) {
 			const dt = new DateTime(`${d.getUTCFullYear()}-${d.getUTCMonth()+1}-${d.getUTCDate()} ${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`);
 			yield this.timeZone ? dt.toTimezone(this.timeZone) : dt;
