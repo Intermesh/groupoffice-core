@@ -12,7 +12,7 @@ import {
 	DateTime, Field,
 	Form, Menu, numberfield,
 	NumberField, select,
-	t, tbar, textfield, Listener, ObservableListenerOpts
+	t, tbar, textfield, Listener, ObservableListenerOpts, CheckboxGroup, SelectField
 } from "@intermesh/goui";
 import {Frequency, RecurrenceRule} from "../../util/Recurrence.js";
 
@@ -43,6 +43,8 @@ export class RecurrencePicker extends CardContainer {
 	until: DateField
 
 	rule!: RecurrenceRule | undefined
+	private weeklyOptions: CheckboxGroup
+	private monthlyOptions: Component
 
 	static frequencies: { [freq: string]: FrequencyDefaults } = {
 		'daily': [t("day"), t('days'), 30, '30-d', t('Daily')],
@@ -58,15 +60,29 @@ export class RecurrencePicker extends CardContainer {
 		//this.width = 450;
 		// value = current weekday?
 
-		const weeklyOptions = checkboxgroup({
+		this.weeklyOptions = checkboxgroup({
 			itemId: 'weeklyOptions',
 			label: "Weekdays",
 			options: [0, 1, 2, 3, 4, 5, 6].map(i => {
 				return {label: DateTime.dayNames[DateTime.dayMap[i]].substring(0, 2), name: DateTime.dayMap[i]}
 			})
-		})
+		});
+		this.monthlyOptions = comp({cls: 'flow', hidden: true},
+			comp({text: t('at the'), width:50, style:{alignSelf: 'center'}}),
+			select({
+				disabled: true,
+				name: 'monthlyType',
+				itemId: 'monthlyOptions',
+				width: 200,
+				value: 'byMonthDay',
+				options: [
+					{value: 'byMonthDay', name: this.startDate.format('jS')},
+					{value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')}
+				]
+			})
+		);
 
-		this.menu = comp({}, ...this.quickMenuItems());
+		this.menu = comp({cls:'vbox'}, ...this.quickMenuItems());
 
 		const intervalField =  numberfield({
 			decimals: 0,
@@ -119,31 +135,19 @@ export class RecurrencePicker extends CardContainer {
 			hidden: true,
 			required: false
 		});
-		this.form = form({},
+		this.form = form({width:384},
 			comp({cls: 'flow pad'},
 				comp({text: t('Every'), width:50, style:{alignSelf: 'center'}}),
 				intervalField,
 				frequencyField,
 
-				select({
-					hidden: true,
-					disabled: true,
-					name: 'monthlyType',
-					itemId: 'monthlyOptions',
-					label: t('at the'),
-					width: 160,
-					value: 'byMonthDay',
-					options: [
-						{value: 'byMonthDay', name: this.startDate.format('jS')},
-						{value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')}
-					]
-				}),
-				weeklyOptions,
+				this.monthlyOptions,
+				this.weeklyOptions,
 				textfield({
 					hidden: true, name: 'byDay', listeners: {
 						'change': (fld, val) => {
 							for (let j = 0; j < 7; j++) {
-								const cb = weeklyOptions.items.get(j) as CheckboxField;
+								const cb = this.weeklyOptions.items.get(j) as CheckboxField;
 								cb.value = val.indexOf(cb.name) !== -1;
 							}
 						}
@@ -195,36 +199,37 @@ export class RecurrencePicker extends CardContainer {
 	}
 
 	quickMenuItems() {
+		const style = {textAlign:'left'};
 		return [
-			btn({
+			btn({style,
 				text: t('Not recurring'),
 				handler: _ => this.setValue(undefined)
 			}),
 			comp({tagName: 'hr'}),
-			btn({
+			btn({style,
 				text: t('Daily'),
 				handler: _ => this.setValue({frequency: 'daily'})
 			}),
-			btn({
+			btn({style,
 				text: t('Weekly') + ' ' + t('at ') + this.startDate.format('l'),
 				handler: _ => this.setValue({frequency: 'weekly'})
 			}),
-			btn({
+			btn({style,
 				text: t('Monthly') + ' ' + t('at day') + ' ' + this.startDate.format('j'),
 				handler: _ => this.setValue({frequency: 'monthly', byMonthDay: [+this.startDate.format('j')]})
 			}),
-			btn({
+			btn({style,
 				text: t('Monthly') + ' ' + t('at the') + ' ' + this.getSuffix() + ' ' + this.startDate.format('l'),
 				handler: _ => this.setValue({
 					frequency: 'monthly',
 					byDay: [{day: DateTime.dayMap[this.startDate.getWeekDay()], nthOfPeriod: this.weekOfMonth}]
 				})
 			}),
-			btn({
+			btn({style,
 				text: t('Annually') + ' ' + t('at ') + this.startDate.format('j F'),
 				handler: _ => this.setValue({frequency: 'yearly'})
 			}),
-			btn({
+			btn({style,
 				text: t('Each working day'),
 				handler: _ => this.setValue({
 					frequency: 'weekly',
@@ -232,7 +237,7 @@ export class RecurrencePicker extends CardContainer {
 				})
 			}),
 			comp({tagName: 'hr'}),
-			btn({
+			btn({style,
 				text: t('Customize') + '...', handler: () => {
 					// collapse menu, open form
 					this.changeFrequency(this.rule?.frequency || 'yearly');
@@ -278,12 +283,16 @@ export class RecurrencePicker extends CardContainer {
 
 	setStartDate(date: DateTime) {
 		this.startDate = date.clone();
+		this.weekOfMonth = Math.ceil(date.getDate() / 7);
 
-		// for (var i = 0, m = date.getMonth(); m == date.getMonth(); date = date.addDays(-7)) {
-		// 	i++;
-		// }
-		this.weekOfMonth = Math.ceil((date.getDate() - 1 - date.getWeekDay()) / 7)+1;
 		this.menu.items.clear().add(...this.quickMenuItems());
+
+		const monthOpt = this.form.findChild('monthlyOptions')! as SelectField;
+		monthOpt.options = [
+			{value: 'byMonthDay', name: this.startDate.format('jS')},
+			{value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')}
+		];
+		monthOpt.drawOptions();
 	}
 
 	changeFrequency(f: Frequency) {
@@ -297,32 +306,18 @@ export class RecurrencePicker extends CardContainer {
 		var until = this.until;
 		if (until.disabled) {
 			var add: string[] = record[3].split('-'); // untilDefault
-			add[1] == 'd' ? this.startDate.addDays(parseInt(add[0])) : this.startDate.addYears(parseInt(add[0]))
-			until.value = this.startDate.format('Y-m-d');
+			const untilDate = add[1] == 'd' ? this.startDate.clone().addDays(parseInt(add[0])) : this.startDate.clone().addYears(parseInt(add[0]))
+			until.value = untilDate.format('Y-m-d');
 		}
 
 		// show-n-hide option panels for week and month frequency
-		['weekly', 'monthly'].map(p => {
-			const el = this.form.findChild(p + 'Options')!;
-			el.hidden = (p != f);
-			el.disabled = (p != f);
-		});
+		this.weeklyOptions.hidden = this.weeklyOptions.disabled = (f != 'weekly');
+		this.form.findChild('monthlyOptions')!.disabled = this.monthlyOptions.hidden = (f != 'monthly');
 	}
 
+	private static suffixText = [t("first"),t("second"),t("third"),t("fourth")]
 	private getSuffix(week?: number) {
-		week = week || this.weekOfMonth;
-		switch (week) {
-			case 1:
-				return t("first");
-			case 2:
-				return t("second");
-			case 3:
-				return t("third");
-			case 4:
-				return t("fourth");
-			default:
-				return t("last");
-		}
+		return RecurrencePicker.suffixText[(week || this.weekOfMonth)-1] || t('last');
 	}
 
 	setValue(rrule: RecurrenceRule | undefined) {
@@ -340,6 +335,8 @@ export class RecurrencePicker extends CardContainer {
 			} else if (rrule.count) {
 				form.findField('endsRadio')!.value = 'count';
 				this.count.value = rrule.count;
+			} else {
+				form.findField('endsRadio')!.value = 'forever';
 			}
 			if (rrule.byDay) {
 				if(rrule.frequency === 'weekly') {

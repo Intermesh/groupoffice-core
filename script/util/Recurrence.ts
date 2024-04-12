@@ -79,7 +79,7 @@ export class Recurrence {
 		};
 		if(config.timeZone) {
 			this.timeZone = config.timeZone;
-			cfg.tzid = config.timeZone
+			cfg.tzid = "UTC";
 		}
 
 		if(config.rule.interval) cfg.interval = config.rule.interval;
@@ -103,11 +103,10 @@ export class Recurrence {
 		if(config.rule.bySetPosition) cfg.bysetpos = config.rule.bySetPosition;
 		if(config.rule.byWeekNo) cfg.byweekno = config.rule.byWeekNo;
 		if(config.rule.byYearDay) cfg.byyearday = config.rule.byYearDay;
-		//if(config.rule.byHour) cfg.count = config.rule.count;
 
 		this.config = config;
 		try {
-			this.rrule = new RRule(cfg);
+			this.rrule = new RRule(cfg, true);
 		} catch (e) {
 			console.error("Failed to parse rrule: ", cfg);
 		}
@@ -124,16 +123,12 @@ export class Recurrence {
 			yield new DateTime(this.config.dtstart);
 			return;
 		}
+		const pad = (n:number) => (n<10?'0':'')+n;
 		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date),true, iter);
 		for(const d of dates) {
-			const dt = new DateTime(`${d.getUTCFullYear()}-${d.getUTCMonth()+1}-${d.getUTCDate()} ${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}`);
+			const str = `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+			const dt = new DateTime(str);
 			yield this.timeZone ? dt.toTimezone(this.timeZone) : dt;
-
-
-			// if(this.timeZone) {
-			// 	yield d.toTimezone(this.timeZone);
-			// } else
-			// 	yield d;
 		}
 	}
 
