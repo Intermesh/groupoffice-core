@@ -60,7 +60,7 @@ export class Recurrence {
 		return input.map(i => {
 			const d = this.dayNb(i.day)!;
 			if(i.nthOfPeriod){
-				d.nth(i.nthOfPeriod)
+				return d.nth(i.nthOfPeriod)
 			}
 			return d;
 		});
