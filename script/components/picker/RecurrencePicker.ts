@@ -135,7 +135,7 @@ export class RecurrencePicker extends CardContainer {
 			hidden: true,
 			required: false
 		});
-		this.form = form({width:384},
+		this.form = form({width:392},
 			comp({cls: 'flow pad'},
 				comp({text: t('Every'), width:50, style:{alignSelf: 'center'}}),
 				intervalField,
