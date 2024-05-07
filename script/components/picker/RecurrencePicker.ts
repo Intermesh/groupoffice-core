@@ -18,7 +18,7 @@ import {Frequency, RecurrenceRule} from "../../util/Recurrence.js";
 
 export interface RecurrencePickerEventMap<Type> extends CardContainerEventMap<Type> {
 
-	select: (picker: Type, rule: RecurrenceRule | undefined) => false | void
+	select: (picker: Type, rule: RecurrenceRule | null) => false | void
 }
 
 export interface RecurrencePicker {
@@ -42,7 +42,7 @@ export class RecurrencePicker extends CardContainer {
 	count: NumberField
 	until: DateField
 
-	rule!: RecurrenceRule | undefined
+	rule!: RecurrenceRule | null
 	private readonly weeklyOptions: CheckboxGroup
 	private readonly monthlyOptions: Component
 
@@ -203,7 +203,7 @@ export class RecurrencePicker extends CardContainer {
 		return [
 			btn({style,
 				text: t('Not recurring'),
-				handler: _ => this.setValue(undefined)
+				handler: _ => this.setValue(null)
 			}),
 			comp({tagName: 'hr'}),
 			btn({style,
@@ -320,7 +320,7 @@ export class RecurrencePicker extends CardContainer {
 		return RecurrencePicker.suffixText[(week || this.weekOfMonth)-1] || t('last');
 	}
 
-	setValue(rrule: RecurrenceRule | undefined) {
+	setValue(rrule: RecurrenceRule | null) {
 		if (this.rule == rrule) return;
 		this.rule = rrule;
 		this.fire('select', this, rrule);

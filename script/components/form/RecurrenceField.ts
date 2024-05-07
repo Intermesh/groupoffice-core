@@ -11,7 +11,7 @@ import {Field, FieldConfig, FieldEventMap,
 	t, E} from "@intermesh/goui";
 
 export interface RecurrenceField extends Field {
-	set value(v:RecurrenceRule|undefined)
+	set value(v:RecurrenceRule|null)
 }
 
 export class RecurrenceField extends Field {
@@ -68,7 +68,7 @@ export class RecurrenceField extends Field {
 			this.control.value = RecurrenceField.toText(this.value, this.picker.startDate);
 	}
 
-	static toText(rule: RecurrenceRule|undefined, start: DateTime) {
+	static toText(rule: RecurrenceRule|null, start: DateTime) {
 		const rr = rule;
 		if (!rr || !rr.frequency) {
 			return t('Not recurring');
