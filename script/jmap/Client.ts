@@ -252,6 +252,8 @@ export class Client<UserType extends User = User> extends Observable {
 		// Simulate a click on our anchor element
 		anchor.click();
 
+		console.log("Downloading: " + url);
+
 		// Discard the object data
 		URL.revokeObjectURL(url);
 	}
