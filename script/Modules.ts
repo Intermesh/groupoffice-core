@@ -186,6 +186,17 @@ class Modules {
 		return go.Modules.isAvailable(pkg, name);
 	}
 
+	/**
+	 * Get a module
+	 *
+	 * @param pkg
+	 * @param name
+	 */
+	public get(pkg:string, name:string) : Module | undefined {
+		const mod = go.Modules.get(pkg, name);
+		return mod ? mod : undefined;
+	}
+
 
 }
 
