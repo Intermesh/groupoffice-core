@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities";
 
@@ -62,8 +62,8 @@ if(window.GO) {
 // this set's the GOUI client authenticated by using the group-office Extjs session data
 	GO.mainLayout.on("authenticated", () => {
 		client.session = go.User.session;
+		translate.load(GO.lang.core.core, "core", "core");
 		client.fireAuth();
-
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
 	})
 
