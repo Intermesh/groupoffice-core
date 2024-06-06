@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities";
 
@@ -59,6 +59,11 @@ let GouiMainPanel : any;
 
 if(window.GO) {
 	client.uri = BaseHref + "api/";
+
+	GO.mainLayout.on("authenticated", () => {
+		translate.load(GO.lang.core.core, "core", "core");
+		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
+	})
 
 	 GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
 
@@ -192,6 +197,17 @@ class Modules {
 	 */
 	public isAvailable(pkg:string, name:string) : boolean {
 		return go.Modules.isAvailable(pkg, name);
+	}
+
+	/**
+	 * Get a module
+	 *
+	 * @param pkg
+	 * @param name
+	 */
+	public get(pkg:string, name:string) : Module | undefined {
+		const mod = go.Modules.get(pkg, name);
+		return mod ? mod : undefined;
 	}
 
 
