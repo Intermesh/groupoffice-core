@@ -59,11 +59,9 @@ let GouiMainPanel : any;
 
 if(window.GO) {
 	client.uri = BaseHref + "api/";
-// this set's the GOUI client authenticated by using the group-office Extjs session data
+
 	GO.mainLayout.on("authenticated", () => {
-		client.session = go.User.session;
 		translate.load(GO.lang.core.core, "core", "core");
-		client.fireAuth();
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
 	})
 
@@ -71,17 +69,19 @@ if(window.GO) {
 
 		callback: undefined,
 
-		 cls: "go-module-panel goui-module-panel",
-
-		initComponent: function () {
-
+		initComponent () {
+			this.cls = 'goui-module-panel';
 			GouiMainPanel.superclass.initComponent.call(this);
 
 			this.on("afterrender", async () => {
 				const comp = await this.callback();
-				comp.render(this.body.dom);
+				comp.render(this.el.dom);
 			}, this);
 		},
+
+		 setSize (w:number, h:number){
+			// dont
+		 }
 
 	});
 }
@@ -100,7 +100,7 @@ interface Module extends BaseEntity{
 
 class Modules {
 
-	private mods: ModuleConfig[] = [];
+	private mods: Record<string,Record<string, ModuleConfig>> = {};
 	private modules?: Module[];
 
 	/**
@@ -109,7 +109,17 @@ class Modules {
 	 * @param config
 	 */
 	public register(config: ModuleConfig) {
-		this.mods.push(config);
+
+		if(!this.mods[config.package]) {
+			this.mods[config.package] = {};
+		}
+
+		if(this.mods[config.package][config.name]) {
+			return; //already registered
+		}
+
+		this.mods[config.package][config.name] = config;
+
 		this.registerInExtjs(config);
 
 		go.Translate.package = config.package;
@@ -175,6 +185,9 @@ class Modules {
 		return this.modules;
 	}
 
+	public get(pkg:string, name:string) {
+		return go.Modules.get(pkg, name);
+	}
 
 	/**
 	 * Check if the current user has this module
@@ -200,6 +213,11 @@ class Modules {
 
 }
 
-
-
 export const modules = new Modules();
+
+//
+// //For 6.8 but not 6.9
+// GO.mainLayout.on("authenticated", () => {
+// 	client.fireAuth();
+//
+// })

@@ -1,0 +1,44 @@
+
+$resourcePath: "../../goui/resources/";
+@import '../node_modules/@intermesh/goui/style/util';
+
+$font-scale: 1 !default;
+$density: 54% !default;
+$mobileDensity: 62.5% !default;
+
+
+$borderWidth: 1px;
+$baseLineHeight: dp(20);
+$fontSize: sp(16);
+
+@import 'theme';
+@import '../../goui/style/index';
+
+
+.goui-share-panel {
+	.goui-avatar {
+		margin-right: dp(16);
+	}
+}
+
+.goui.form-window {
+	min-width: dp(300);
+	min-height: dp(300);
+}
+
+// native window resizing for goui
+.goui-module-panel {
+	position:fixed;
+	inset:dp(64) 0 0;
+	.x-grid3 {
+		background-color: transparent; // for extjs filter panel in sidebar
+	}
+}
+@media (orientation: landscape) and (max-width: $breakpointSmall) {
+	.goui-module-panel {
+		top : 0;
+	}
+	aside ~ .vbox > .goui-toolbar {
+		margin-right: dp(240);
+	}
+}

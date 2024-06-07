@@ -1,4 +1,6 @@
 import {
+	AbstractDataSource,
+	BaseEntity,
 	btn,
 	CardContainer,
 	CardMenu,
@@ -8,12 +10,12 @@ import {
 	Component,
 	containerfield,
 	datasourceform,
-	DataSourceForm,
+	DataSourceForm, DefaultEntity,
 	EntityID,
 	Listener,
 	ObservableListenerOpts,
 	t,
-	tbar,
+	tbar, Toolbar,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
@@ -33,20 +35,23 @@ export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
 	 * @param window
 	 */
 	ready: (window: Type, currentId: string|undefined) => void
+
+	addlink: (window: Type, entityName: string, entityId: string) => void
 }
 
-export interface FormWindow {
+export interface FormWindow<EntityType extends BaseEntity = DefaultEntity> {
 	on<K extends keyof FormWindowEventMap<this>, L extends Listener>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K], options?: ObservableListenerOpts): L;
 	un<K extends keyof FormWindowEventMap<this>>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K]): boolean
 	fire<K extends keyof FormWindowEventMap<this>>(eventName: K, ...args: Parameters<FormWindowEventMap<any>[K]>): boolean
 }
 
-export abstract class FormWindow extends Window {
-	public readonly form: DataSourceForm;
+export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> extends Window {
+	public readonly form;
 
 	protected currentId?: EntityID;
 	protected readonly cards: CardContainer;
 	protected sharePanel?: SharePanel;
+	protected bbar: Toolbar
 
 	/**
 	 * The first tab
@@ -68,19 +73,17 @@ export abstract class FormWindow extends Window {
 		this.baseCls = "goui-window form-window";
 		this.cls = "vbox";
 		this.width = 460;
-		this.height = 640;
+
 
 		this.items.add(
-			this.form = datasourceform(
+			this.form = datasourceform<EntityType>(
 				{
 					dataSource: jmapds(this.entityName),
 					cls: "vbox",
 					flex: 1,
 					listeners: {
-						save: (form, data)=> {
+						save: (form, data) => {
 							this.currentId = data.id;
-
-							this.closeWithModifications = true;
 							this.close();
 						},
 
@@ -88,7 +91,7 @@ export abstract class FormWindow extends Window {
 
 							const invalid = form.findFirstInvalid();
 
-							if(invalid) {
+							if (invalid) {
 								const tab = invalid.findAncestor(cmp => {
 									return cmp.el.classList.contains('card-container-item');
 								});
@@ -99,7 +102,8 @@ export abstract class FormWindow extends Window {
 							}
 						}
 					}
-				},
+				}
+				,
 
 				this.cardMenu = cardmenu(),
 
@@ -112,7 +116,7 @@ export abstract class FormWindow extends Window {
 					)
 				),
 
-				tbar({cls: "border-top"},
+				this.bbar = tbar({cls: "border-top"},
 					"->",
 					btn({
 						type: "submit",
@@ -128,22 +132,19 @@ export abstract class FormWindow extends Window {
 			return this.onShow();
 		})
 
-		this.on("beforeclose", () => {
-			return this.onBeforeClose();
+		this.on("beforeclose", (win, byUser) => {
+			return this.onBeforeClose(byUser);
 		})
 
 	}
 
-	private closeWithModifications = false;
-
-	protected onBeforeClose() {
-		if(this.closeWithModifications) {
+	protected onBeforeClose(byUser: boolean) {
+		if(!byUser) {
 			return true;
 		}
 		if(this.form.isModified()) {
 			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
 				if(confirmed) {
-					this.closeWithModifications = true;
 					this.close();
 				}
 			});
@@ -206,7 +207,7 @@ export abstract class FormWindow extends Window {
 			await this.form.load(id);
 			this.fire("ready", this, this.currentId);
 		} catch (e) {
-			void Window.alert(t("Error"), e + "");
+			void Window.error(e + "");
 		} finally {
 			this.unmask();
 		}
@@ -297,6 +298,8 @@ export abstract class FormWindow extends Window {
 				this.form.un("save", unbindkey);
 			})
 		})
+
+		this.fire("addlink", this, entityName, entityId);
 	}
 
 }

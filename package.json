@@ -1,8 +1,8 @@
 {
   "type": "module",
   "devDependencies": {
-    "typescript": "latest",
-    "sass": "latest"
+    "sass": "latest",
+    "typescript": "latest"
   },
   "scripts": {
     "test": "mocha",
@@ -13,12 +13,14 @@
     "build": "npm run build:clean && npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --style=compressed ./style:./dist",
-    "build:ts": "tsc",
+    "build:ts": "npx tsc",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
-    "@intermesh/goui": "latest"
+    "@intermesh/goui": "latest",
+    "chart.js": "^4.4.1",
+    "rrule": "^2.8.1"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",

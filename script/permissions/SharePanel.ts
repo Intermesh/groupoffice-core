@@ -8,9 +8,9 @@ import {
 	t,
 	tbar,
 	searchbtn,
-	Table, datasourcestore, column, DataSourceStore, checkbox, avatar, select, Field, store, small
+	Table, datasourcestore, column, DataSourceStore, checkbox, avatar, select, Field, store, small, FieldValue
 } from "@intermesh/goui";
-import {FilterCondition, jmapds} from "../jmap";
+import {client, FilterCondition, jmapds} from "../jmap";
 import {entities} from "../Entities";
 
 class GroupTable extends Table<DataSourceStore> {
@@ -42,10 +42,10 @@ class GroupTable extends Table<DataSourceStore> {
 
 						const first = record.users.slice(0, 3);
 
-						const users = await jmapds("User").get(first);
+						const users = await jmapds("Principal").get(first);
 
 
-						let memberStr = users.list.map(u => u.displayName).join(", ");
+						let memberStr = users.list.map(u => u.name).join(", ");
 
 						const more = record.users.length - 3;
 
@@ -55,13 +55,13 @@ class GroupTable extends Table<DataSourceStore> {
 
 						let user;
 						if (record.isUserGroupFor) {
-							user = await jmapds("User").single(record.isUserGroupFor);
+							user = await jmapds("Principal").single(record.isUserGroupFor);
 						}
 
 						return comp({cls: "hbox"},
 							avatar({
 								displayName: record.name,
-								backgroundImage: user && user.avatarId ? go.Jmap.downloadUrl(user.avatarId) : undefined
+								backgroundImage: user && user.avatarId ? client.downloadUrl(user.avatarId) : undefined
 							}),
 							comp({flex: 1},
 								comp({text: record.name}),
@@ -88,6 +88,9 @@ class GroupTable extends Table<DataSourceStore> {
 							],
 							listeners: {
 								change: (field, newValue, oldValue) => {
+									if(!this.value) {
+										this.value = {};
+									}
 									this.value[record.id] = newValue ? newValue : null;
 								}
 							}
@@ -124,7 +127,7 @@ export class SharePanel extends Field {
 		super("div");
 
 		this.name = "acl";
-		this.cls = "vbox";
+		this.baseCls += " vbox";
 
 		this.title = t("Permissions");
 
@@ -203,13 +206,17 @@ export class SharePanel extends Field {
 	}
 
 	public load() {
-		this.groupTable.store.load();
+		void this.groupTable.store.load();
 	}
 
-  protected internalSetValue(v?:any) {
-    this.groupTable.value = v;
-    return super.internalSetValue(v);
-  }
+	get value(): FieldValue {
+		return  this.groupTable.value;
+	}
+
+	set value(v) {
+		this.groupTable.value = v;
+	}
+
 }
 
 

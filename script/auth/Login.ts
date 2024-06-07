@@ -308,9 +308,15 @@ export class Login extends Window {
 
 	private async onLoginSuccess(response: any) {
 		client.session = await response.json();
-		Notifier.success(t("Logged in successfully"));
-		this.close();
-		this.fire("login");
+		const success = await client.authenticate();
+		if(!success) {
+			//???
+			Notifier.error("Sorry, an unexpected error occurred");
+		} else {
+			Notifier.success(t("Logged in successfully"));
+			this.close();
+			this.fire("login");
+		}
 
 	}
 }
