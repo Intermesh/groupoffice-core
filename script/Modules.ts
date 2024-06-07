@@ -185,10 +185,6 @@ class Modules {
 		return this.modules;
 	}
 
-	public get(pkg:string, name:string) {
-		return go.Modules.get(pkg, name);
-	}
-
 	/**
 	 * Check if the current user has this module
 	 *
