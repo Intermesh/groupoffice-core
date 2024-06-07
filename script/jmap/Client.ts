@@ -8,7 +8,6 @@ import {DefaultEntity, Format, FunctionUtil, Listener, Observable, ObservableEve
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
-import {translate} from "../../../dist/goui/script";
 
 
 export interface LoginData {
