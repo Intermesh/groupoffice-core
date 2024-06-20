@@ -115,11 +115,6 @@ export class Client<UserType extends User = User> extends Observable {
 
 	set session(session:any) {
 
-		// Remove some extjs stuff that's not required
-		delete session.debug;
-		delete session.accounts;
-		delete session.state;
-
 		if(session.accessToken) {
 			this.accessToken = session.accessToken;
 			sessionStorage.setItem("accessToken", this.accessToken);
