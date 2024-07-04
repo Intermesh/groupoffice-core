@@ -341,7 +341,12 @@ export class RecurrencePicker extends CardContainer {
 			if (rrule.byDay) {
 				if(rrule.frequency === 'weekly') {
 					rrule.byDay.forEach(nDay => {
-						form.findField(nDay.day)!.value = true;
+						const f = form.findField(nDay.day);
+						if(!f) {
+							console.error("Unsupported weekday: ", nDay);
+							return;
+						}
+						f.value = true;
 					});
 					// ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'].forEach(day => {
 					// 	if(values[day])

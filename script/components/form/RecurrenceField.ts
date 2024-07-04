@@ -86,14 +86,14 @@ export class RecurrenceField extends Field {
 				days = [],
 				workdays = (rr.byDay.length === 5);
 			for (var i = 0; i < rr.byDay.length; i++) {
-				if (rr.byDay[i].day == 'sa' || rr.byDay[i].day == 'su') {
+				if (rr.byDay[i].day.toLowerCase() == 'sa' || rr.byDay[i].day.toLowerCase() == 'su') {
 					workdays = false;
 				}
 				var nthDay = '';
 				if (rr.byDay[i].nthOfPeriod) {
 					nthDay = t('the') + ' ' + RecurrenceField.getSuffix(rr.byDay[i].nthOfPeriod!) + ' ';
 				}
-				days.push(nthDay + DateTime.dayNames[rr.byDay[i].day]);
+				days.push(nthDay + DateTime.dayNames[rr.byDay[i].day.toLowerCase()]);
 			}
 			if (workdays) {
 				days = [t('Workdays')];
