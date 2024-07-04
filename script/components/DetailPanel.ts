@@ -164,8 +164,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			this.legacyOnLoad();
 
 		} catch (e) {
-			console.error(e);
-			void Window.error(e + "");
+			void Window.error(e);
 		} finally {
 			this.unmask();
 		}

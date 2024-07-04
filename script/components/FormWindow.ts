@@ -288,7 +288,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 			}
 
 			jmapds("Link").create(link).catch((e) => {
-				Window.error(e.message);
+				Window.error(e);
 			})
 		}, {once: true});
 
