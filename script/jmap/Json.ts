@@ -3,31 +3,31 @@ function pointer(path:string) {
 	// ignore leading / as it is implicit
 	for(let i=0; i < parts.length; i++) {
 		parts[i].replace('~1', '/')
-					.replace('~0', '~');
+			.replace('~0', '~');
 	}
 	return parts;
 }
 
-function set(doc: any, path: string[], v: any, mustExist: boolean) {
-	if(!doc) return; // skip patching item in non-existing objects
+function set(doc: any, path: string[], v: any): any {
 
-	const pathLength = path.length;
+	const part = path.shift()!,
+		length = path.length;
 
-	if(pathLength > 1) {
-		set(doc[path.shift()!], path, v, pathLength > 2);
-	} else {
-		if (v === null) {
-			delete doc[path[0]];
-		} else {
-			doc[path[0]] = v;
-		}
+	if(!(part in doc) && length > 0) {
+		throw new Error('patching item in non-existing objects')
 	}
+
+	if(!length) {
+		doc[part] = v;
+	} else {
+		doc[part] = set(doc[part], path, v);
+	}
+	return doc;
 }
 
 export function applyPatch(doc:any, patch: any) {
 	for(const p in patch) {
-		const deepPatch = p.substring(0, 1) == "/";
-		set(doc, deepPatch ? pointer(p) : [p], patch[p], deepPatch);
+		doc = set(doc, pointer(p), patch[p]);
 	}
 	return doc; // the patched document
 }
