@@ -55,7 +55,7 @@ declare global {
 	var BaseHref: string;
 }
 
-let GouiMainPanel : any;
+let GouiMainPanel : any, GouiSystemSettingsPanel : any;
 
 if(window.GO) {
 	client.uri = BaseHref + "api/";
@@ -84,10 +84,35 @@ if(window.GO) {
 		},
 
 	});
+
+	GouiSystemSettingsPanel = Ext.extend(Ext.BoxComponent, {
+
+		callback: undefined,
+
+		comp: undefined,
+
+		initComponent: function () {
+
+			GouiSystemSettingsPanel.superclass.initComponent.call(this);
+
+			this.on("afterrender", async () => {
+				this.comp = await this.callback();
+				this.comp.render(this.el.dom);
+			}, this);
+		},
+
+		onSubmit: async function (cb:any, scope: any) {
+			if(this.comp.onSubmit) {
+				await this.comp.onSubmit();
+			}
+			cb.call(scope, this, true);
+		},
+
+	});
 }
 
 
-interface Module extends BaseEntity{
+export interface Module extends BaseEntity {
 	name: string,
 	package: string,
 	rights: string[],
@@ -147,6 +172,31 @@ class Modules {
 		proto.module = module;
 
 		go.Modules.addPanel(proto);
+	}
+
+
+	/**
+	 * Add a system settings panel
+	 *
+	 * @param pkg
+	 * @param module
+	 * @param title
+	 * @param icon
+	 * @param callback
+	 */
+	public addSystemSettingsPanel(pkg: string, module: string, title: string, icon: string, callback: () => Component | Promise<Component>) {
+
+		go.Translate.package = go.package = pkg;
+		go.Translate.module = go.module = module;
+
+		// @todo, this ugly. core must play with Ext but can also be used out side of group-office like on the website
+		// @ts-ignore
+		const proto = new GouiSystemSettingsPanel();
+		proto.callback= callback;
+		proto.title = title;
+		proto.iconCls = "ic-" + icon;
+
+		GO.systemSettingsPanels.push(proto);
 	}
 
 	/**
