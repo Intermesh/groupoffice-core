@@ -160,7 +160,6 @@ class Modules {
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
 
-		// @todo, this ugly. core must play with Ext but can also be used out side of group-office like on the website
 		// @ts-ignore
 		const proto = Ext.extend(GouiMainPanel, {
 			id: id,
@@ -180,21 +179,22 @@ class Modules {
 	 *
 	 * @param pkg
 	 * @param module
+	 * @param id
 	 * @param title
 	 * @param icon
 	 * @param callback
 	 */
-	public addSystemSettingsPanel(pkg: string, module: string, title: string, icon: string, callback: () => Component | Promise<Component>) {
+	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: string, callback: () => Component | Promise<Component>) {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
 
-		// @todo, this ugly. core must play with Ext but can also be used out side of group-office like on the website
 		// @ts-ignore
 		const proto = new GouiSystemSettingsPanel();
 		proto.callback= callback;
 		proto.title = title;
 		proto.iconCls = "ic-" + icon;
+		proto.itemId = id;
 
 		GO.systemSettingsPanels.push(proto);
 	}
