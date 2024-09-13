@@ -29,15 +29,22 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		this.center = this.createCenter();
 		this.center.itemId = "center";
+		this.center.flex = 1;
 
 		//center is active by default
 		this.center.el.classList.add("active");
 
 		this.west = this.createWest();
 		this.west.itemId = "west";
+		if(!this.west.width) {
+			this.west.width = 300;
+		}
 
 		this.east = this.createEast();
 		this.east.itemId = "east";
+		if(!this.east.width) {
+			this.east.width = 300;
+		}
 
 		this.items.add(
 
