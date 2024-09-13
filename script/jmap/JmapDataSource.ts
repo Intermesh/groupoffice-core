@@ -16,7 +16,7 @@ import {
 	SetRequest
 } from "@intermesh/goui";
 
-enum andOrNot {AND, OR, NOT}
+
 
 // enum SetErrorType {
 // 	'forbidden',
@@ -32,23 +32,7 @@ enum andOrNot {AND, OR, NOT}
 // 	'stateMismatch'
 // }
 
-export interface FilterOperator {
-	operator: andOrNot
-	conditions: (FilterOperator | FilterCondition)[]
-}
 
-export type FilterCondition = Record<string, any>;
-
-export interface JmapQueryParams extends QueryParams {
-	filter?: FilterCondition | FilterOperator,
-}
-
-
-export interface JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> extends AbstractDataSource<EntityType> {
-	patchFilter(ref: string, filter: FilterCondition | FilterOperator | undefined) : void;
-	setFilter(ref: string, filter: FilterCondition | FilterOperator | undefined) : void;
-	getFilter():FilterCondition | FilterOperator
-}
 
 /**
  * JMAP Data source
@@ -67,7 +51,7 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 	 */
 	public controllerRoute:string|undefined;
 
-	protected internalQuery(params: JmapQueryParams) : Promise<QueryResponse> {
+	protected internalQuery(params: QueryParams) : Promise<QueryResponse> {
 		return client.jmap((this.controllerRoute ?? this.id) + "/query", params, this.useCallId());
 	}
 
