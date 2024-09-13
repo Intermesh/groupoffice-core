@@ -226,8 +226,8 @@ export class Client<UserType extends User = User> extends Observable {
 			body: data ? JSON.stringify(data) : undefined
 		});
 
-		if (response.status != 200) {
-			throw response.statusText;
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}: ${response.statusText}`);
 		}
 		return response;
 
