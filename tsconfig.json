@@ -9,6 +9,7 @@
     ],
     "moduleResolution": "nodenext",
     "isolatedModules": true,
+    "esModuleInterop": true,
     // important for tree shaking in esbuild
     "module": "nodenext",
     "baseUrl": ".",
