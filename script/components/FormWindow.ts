@@ -154,11 +154,11 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	}
 
 	protected onShow() {
+
+		this.cardMenu.hidden = this.cards.items.count() < 2;
+
 		// do a setTimeout so currentId is set if win.show().load() is called in that order.
 		setTimeout(() => {
-
-			this.cardMenu.hidden = this.cards.items.count() < 2;
-
 			if (!this.currentId) {
 				// focus form for new entities and not for existing ones.
 				this.form.focus();
