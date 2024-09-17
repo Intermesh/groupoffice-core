@@ -1,17 +1,25 @@
 import {
-	Component,
+	avatar,
+	column,
+	comp,
 	ComponentEventMap,
 	Config,
-	comp,
 	createComponent,
+	datasourcestore,
+	DataSourceStore,
+	Field,
+	FieldValue, FilterCondition,
 	radio,
-	t,
-	tbar,
 	searchbtn,
-	Table, datasourcestore, column, DataSourceStore, checkbox, avatar, select, Field, store, small, FieldValue
+	select,
+	small,
+	t,
+	Table,
+	tbar
 } from "@intermesh/goui";
-import {client, FilterCondition, jmapds} from "../jmap";
-import {entities} from "../Entities";
+import {client, jmapds} from "../jmap/index.js";
+import {entities} from "../Entities.js";
+
 
 class GroupTable extends Table<DataSourceStore> {
 	value: any;
@@ -106,7 +114,7 @@ class GroupTable extends Table<DataSourceStore> {
 	}
 
 	setEntity(name: string, id?: string) {
-		this.store.queryParams.filter!.inAcl = {entity: name, id: id};
+		this.store.setFilter("entity", {inAcl: {entity: name, id: id}});
 
 		if (!id) {
 			// if ID is empty then load default ACKL
@@ -141,7 +149,7 @@ export class SharePanel extends Field {
 					listeners: {
 
 						change: (field, newValue, oldValue) => {
-							const f = this.groupTable.store.queryParams.filter!;
+							const f = {} as FilterCondition;
 
 							switch (newValue) {
 								case "both":
@@ -161,7 +169,8 @@ export class SharePanel extends Field {
 
 							}
 
-							this.groupTable.store.load();
+							this.groupTable.store.setFilter("groups", f);
+							void this.groupTable.store.load();
 						}
 					},
 					options: [

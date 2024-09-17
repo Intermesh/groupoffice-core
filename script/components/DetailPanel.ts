@@ -12,8 +12,8 @@ import {
 	Toolbar,
 	Window
 } from "@intermesh/goui";
-import {jmapds} from "../jmap";
-import {router} from "../Router";
+import {jmapds} from "../jmap/index.js";
+import {router} from "../Router.js";
 
 export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap<Type> {
 	/**

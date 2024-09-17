@@ -1,6 +1,6 @@
 import {BaseEntity, Component, EntityID, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
-import {Entity} from "./Entities";
+import {Entity} from "./Entities.js";
 
 
 export interface EntityFilter {

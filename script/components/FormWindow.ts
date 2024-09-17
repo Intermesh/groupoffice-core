@@ -1,5 +1,4 @@
 import {
-	AbstractDataSource,
 	BaseEntity,
 	btn,
 	CardContainer,
@@ -10,17 +9,18 @@ import {
 	Component,
 	containerfield,
 	datasourceform,
-	DataSourceForm, DefaultEntity,
+	DefaultEntity,
 	EntityID,
 	Listener,
 	ObservableListenerOpts,
 	t,
-	tbar, Toolbar,
+	tbar,
+	Toolbar,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
-import {sharepanel, SharePanel} from "../permissions";
-import {jmapds} from "../jmap";
+import {sharepanel, SharePanel} from "../permissions/index.js";
+import {jmapds} from "../jmap/index.js";
 
 
 /**

@@ -1,7 +1,7 @@
 import {User} from "./User.js";
 import {root} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
-import {Login} from "./Login";
+import {Login} from "./Login.js";
 
 /**
  * Authentication manager

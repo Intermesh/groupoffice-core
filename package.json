@@ -6,21 +6,24 @@
   },
   "scripts": {
     "test": "mocha",
+
     "start": "npm run build:clean && npm run start:parallel",
     "start:parallel": "npm run start:watch & npm run start:sass",
     "start:watch": "npx tsc --watch",
     "start:sass": "npx sass --watch ./style:./dist",
+
     "build": "npm run build:clean && npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --style=compressed ./style:./dist",
     "build:ts": "npx tsc",
+
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
     "@intermesh/goui": "latest",
-    "chart.js": "^4.4.1",
-    "rrule": "^2.8.1"
+    "chart.js": "latest",
+    "rrule": "latest"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",

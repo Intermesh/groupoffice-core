@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "ES2018",
+    "target": "es2020",
     "sourceMap": true,
     "lib": [
-      "es2018",
+      "es2020",
       "dom"
     ],
-    "moduleResolution": "node",
-    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
     "isolatedModules": true,
     // important for tree shaking in esbuild
-    "module": "es2015",
+    "module": "nodenext",
     "baseUrl": ".",
     "outDir": "./dist",
     "declaration": true,

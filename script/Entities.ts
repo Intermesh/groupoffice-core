@@ -1,4 +1,4 @@
-import {modules} from "./Modules";
+import {modules} from "./Modules.js";
 
 export interface Entity {
 	name: string,

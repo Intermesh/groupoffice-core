@@ -1,5 +1,5 @@
 import {Component, ComponentEventMap, Config, createComponent} from "@intermesh/goui";
-import {DetailPanel} from "./DetailPanel";
+import {DetailPanel} from "./DetailPanel.js";
 
 export class LinkBrowserButton extends Component {
 	constructor() {

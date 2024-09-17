@@ -1,6 +1,6 @@
 import {AutocompleteEventMap, BaseEntity, ComboBox, ComboBoxConfig, createComponent, t} from "@intermesh/goui";
-import {jmapds} from "../jmap";
-import {Principal, User} from "../auth";
+import {jmapds} from "../jmap/index.js";
+import {Principal, User} from "../auth/index.js";
 
 
 
