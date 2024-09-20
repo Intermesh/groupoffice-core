@@ -8,7 +8,7 @@ import {
 	datasourcestore,
 	DataSourceStore,
 	Field,
-	FieldValue, FilterCondition,
+	FieldValue, Filter,
 	radio,
 	searchbtn,
 	select,
@@ -149,7 +149,7 @@ export class SharePanel extends Field {
 					listeners: {
 
 						change: (field, newValue, oldValue) => {
-							const f = {} as FilterCondition;
+							const f:Filter = {};
 
 							switch (newValue) {
 								case "both":
@@ -192,7 +192,7 @@ export class SharePanel extends Field {
 				searchbtn({
 					listeners: {
 						input: (sender, text) => {
-							(this.groupTable.store.queryParams.filter as FilterCondition).text = text;
+							this.groupTable.store.setFilter("search", {text: text});
 							void this.groupTable.store.load();
 						}
 					}
