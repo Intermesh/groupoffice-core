@@ -176,11 +176,22 @@ export class Client<UserType extends User = User> extends Observable {
 		}
 
 		const ds = jmapds<UserType>("User");
-		this._user = await ds.single(this._session.userId);
+		const user =  await ds.single(this._session.userId);
 
-		if(!this._user) {
+		if(!user) {
 			return false;
 		}
+
+		this.setUser(user);
+
+		this.fire("authenticated", this, this._session);
+
+		return true;
+	}
+
+	private setUser(user:UserType) {
+
+		this._user = user;
 
 		Format.dateFormat = this._user.dateFormat;
 		Format.timeFormat = this._user.timeFormat;
@@ -190,9 +201,15 @@ export class Client<UserType extends User = User> extends Observable {
 		Format.decimalSeparator = this._user.decimalSeparator;
 
 
-		this.fire("authenticated", this, this._session);
-
-		return true;
+		jmapds<UserType>("User").on("change", async (dataSource, changes) => {
+			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
+				const user =  await dataSource.single(this._user!.id);
+				debugger;
+				if(user) {
+					this.setUser(user);
+				}
+			}
+		})
 	}
 
 	/**
