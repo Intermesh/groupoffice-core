@@ -219,6 +219,7 @@ class Modules {
 	}
 
 	private registerInExtjs(config: ModuleConfig) {
+		go.Translate.setModule(config.package, config.name);
 		go.Modules.register(config.package, config.name, {
 			entities: config.entities
 		});
