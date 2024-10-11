@@ -32,7 +32,10 @@ class GroupTable extends Table<DataSourceStore> {
 				dataSource: jmapds("Group"),
 
 				queryParams: {
-					filter: {
+					limit: 20
+				},
+				filters: {
+					groups: {
 						hideUsers: true,
 						hideGroups: false
 					},
@@ -109,6 +112,8 @@ class GroupTable extends Table<DataSourceStore> {
 			]);
 
 		this.fitParent = true;
+
+		this.scrollLoad = true;
 
 		this.cls = 'goui-share-panel';
 	}
