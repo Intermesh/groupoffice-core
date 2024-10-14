@@ -9,7 +9,8 @@ export interface User extends DefaultEntity {
 	timeFormat:string,
 	timezone:string,
 	avatarId?:string,
-	mail_reminders: boolean
+	mail_reminders: boolean,
+	isAdmin: boolean
 }
 
 export interface Principal extends DefaultEntity {
