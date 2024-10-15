@@ -204,7 +204,6 @@ export class Client<UserType extends User = User> extends Observable {
 		jmapds<UserType>("User").on("change", async (dataSource, changes) => {
 			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
 				const user =  await dataSource.single(this._user!.id);
-				debugger;
 				if(user) {
 					this.setUser(user);
 				}
