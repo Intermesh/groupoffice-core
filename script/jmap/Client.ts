@@ -578,6 +578,8 @@ export class Client<UserType extends User = User> extends Observable {
 								}
 
 								ds.updateFromServer();
+							}).catch(e => {
+								console.warn(e);
 							})
 						}
 					}catch(e) {
