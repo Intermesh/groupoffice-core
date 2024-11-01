@@ -1,9 +1,18 @@
-@use 'groupoffice.scss';
-@use '../node_modules/@intermesh/goui/style/util';
-@use '../node_modules/@intermesh/goui/style/config';
+@use '../../goui/style/util' with (
+	$font-scale: 1.1
+);
+@use '../../goui/style/config' with (
+	$resourcePath: "../../goui/resources/",
+	$borderWidth: 1px,
+	$baseLineHeight: util.dp(20),
+	$fontSize: util.sp(16),
+	$density: 42%
+);
 
-$density: 46%;
-$font-scale: 1.1;
+@use 'theme';
+@use '../../goui/style/index';
+@use 'general';
+
 
 .goui-window .header.goui-toolbar {
 	height: util.dp(48);

@@ -1,0 +1,30 @@
+@use '../../goui/style/util';
+@use '../../goui/style/config';
+
+.goui-share-panel {
+	.goui-avatar {
+		margin-right: util.dp(16);
+	}
+}
+
+.goui.form-window {
+	min-width: util.dp(300);
+	min-height: util.dp(300);
+}
+
+// native window resizing for goui
+.goui-module-panel {
+	position:fixed;
+	inset: util.dp(64) 0 0;
+	.x-grid3 {
+		background-color: transparent; // for extjs filter panel in sidebar
+	}
+}
+@media (orientation: landscape) and (max-width: config.$breakpointSmall) {
+	.goui-module-panel {
+		top : 0;
+	}
+	aside ~ .vbox > .goui-toolbar {
+		margin-right: util.dp(240);
+	}
+}
