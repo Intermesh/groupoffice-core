@@ -1,6 +1,7 @@
 
 $resourcePath: "../../goui/resources/";
-@import '../node_modules/@intermesh/goui/style/util';
+@use '../node_modules/@intermesh/goui/style/util';
+@use '../node_modules/@intermesh/goui/style/config';
 
 $font-scale: 1 !default;
 $density: 54% !default;
@@ -8,37 +9,37 @@ $mobileDensity: 62.5% !default;
 
 
 $borderWidth: 1px;
-$baseLineHeight: dp(20);
-$fontSize: sp(16);
+$baseLineHeight: util.dp(20);
+$fontSize: util.sp(16);
 
-@import 'theme';
-@import '../../goui/style/index';
+@use 'theme';
+@use '../../goui/style/index';
 
 
 .goui-share-panel {
 	.goui-avatar {
-		margin-right: dp(16);
+		margin-right: util.dp(16);
 	}
 }
 
 .goui.form-window {
-	min-width: dp(300);
-	min-height: dp(300);
+	min-width: util.dp(300);
+	min-height: util.dp(300);
 }
 
 // native window resizing for goui
 .goui-module-panel {
 	position:fixed;
-	inset:dp(64) 0 0;
+	inset: util.dp(64) 0 0;
 	.x-grid3 {
 		background-color: transparent; // for extjs filter panel in sidebar
 	}
 }
-@media (orientation: landscape) and (max-width: $breakpointSmall) {
+@media (orientation: landscape) and (max-width: config.$breakpointSmall) {
 	.goui-module-panel {
 		top : 0;
 	}
 	aside ~ .vbox > .goui-toolbar {
-		margin-right: dp(240);
+		margin-right: util.dp(240);
 	}
 }

@@ -1,28 +1,30 @@
+@use 'groupoffice.scss';
+@use '../node_modules/@intermesh/goui/style/util';
+@use '../node_modules/@intermesh/goui/style/config';
+
 $density: 46%;
 $font-scale: 1.1;
 
-@import 'groupoffice.scss';
-
 .goui-window .header.goui-toolbar {
-	height: dp(48);
-	line-height:dp(48);
+	height: util.dp(48);
+	line-height: util.dp(48);
 	font-size: .8em;
 	.goui-button {
 		background-color:transparent;
-		width:dp(32);
-		height:dp(32);
-		min-height:dp(32);
-		padding: 0 dp(2);
-		margin:dp(3) 0;
+		width: util.dp(32);
+		height: util.dp(32);
+		min-height: util.dp(32);
+		padding: 0 util.dp(2);
+		margin: util.dp(3) 0;
 		&:hover{
-			background-color:$colorMain;
+			background-color: config.$colorMain;
 			color:white;
 		}
 	}
 }
 
 .goui-form-field.check div.control {
-	padding: dp(8) 0 !important;
+	padding: util.dp(8) 0 !important;
 }
 
 .vbox > .goui-toolbar:not(.header) .goui-button:not(.filled):not([type="submit"]) {
@@ -30,5 +32,5 @@ $font-scale: 1.1;
 }
 
 menu.goui-dropdown>li hr {
-	margin: dp(6);
+	margin: util.dp(6);
 }
