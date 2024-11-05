@@ -5,8 +5,7 @@
 	$resourcePath: "../../goui/resources/",
 	$borderWidth: 1px,
 	$baseLineHeight: util.dp(20),
-	$fontSize: util.sp(16),
-	$density: 42%
+	$fontSize: util.sp(16)
 );
 
 @use 'theme';
