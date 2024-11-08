@@ -105,6 +105,14 @@ export class Client<UserType extends User = User> extends Observable {
 	private SSEEventsRegistered: boolean = false;
 	private SSELastEntities?: string[];
 
+
+	/**
+	 * The network request timeout in milliseconds
+	 *
+	 * @private
+	 */
+	private requestTimeout = 30000;
+
 	constructor() {
 		super();
 
@@ -235,6 +243,7 @@ export class Client<UserType extends User = User> extends Observable {
 	private async request(data?: Object) {
 
 		const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?'+this.debugParam : ''), {
+			signal: AbortSignal.timeout(this.requestTimeout),
 			method: data ? "POST" : "GET",
 			mode: "cors",
 			credentials: "include", // for cookie auth
@@ -251,6 +260,7 @@ export class Client<UserType extends User = User> extends Observable {
 
 	public async logout() {
 		await fetch(this.uri + "auth.php" + (this.debugParam ? '?'+this.debugParam : ''), {
+			signal: AbortSignal.timeout(this.requestTimeout),
 			method: "DELETE",
 			mode: "cors",
 			credentials: "include",
@@ -309,6 +319,7 @@ export class Client<UserType extends User = User> extends Observable {
 	public auth(data: LoginData | RegisterData | ForgottenData) {
 
 		return fetch(this.uri + "auth.php" + (this.debugParam ? '?'+this.debugParam : ''), {
+			signal: AbortSignal.timeout(this.requestTimeout),
 			method: "POST",
 			mode: "cors",
 			credentials: "include",
@@ -475,7 +486,7 @@ export class Client<UserType extends User = User> extends Observable {
 					this._requestData[callId].reject({
 						"type": "urn:ietf:params:go:error:connectionError",
 						"status": 500,
-						"detail": "Connection error"
+						"detail": e ?? "Connection error"
 
 					});
 					delete this._requestData[callId];
