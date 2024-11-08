@@ -468,6 +468,18 @@ export class Client<UserType extends User = User> extends Observable {
 
 					delete this._requestData[callId];
 				});
+			}).catch((e) => {
+				console.error(e);
+				for(const callId in this._requestData) {
+					// request level error: https://www.rfc-editor.org/rfc/rfc7807#section-3
+					this._requestData[callId].reject({
+						"type": "urn:ietf:params:go:error:connectionError",
+						"status": 500,
+						"detail": "Connection error"
+
+					});
+					delete this._requestData[callId];
+				}
 			});
 
 		this._requests = [];
