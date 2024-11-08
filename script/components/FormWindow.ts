@@ -10,7 +10,7 @@ import {
 	containerfield,
 	datasourceform,
 	DefaultEntity,
-	EntityID,
+	EntityID, FunctionUtil,
 	Listener,
 	ObservableListenerOpts,
 	t,
@@ -265,6 +265,15 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					this.generalTab.items.add(containerfield({name: "customFields"}, fs));
 				}
 			}, this);
+
+
+			if(fieldsets.length) {
+				const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
+					fieldsets.forEach((fs: any) => fs.doLayout());
+				}));
+
+				ro.observe(this.el);
+			}
 
 		}
 	}
