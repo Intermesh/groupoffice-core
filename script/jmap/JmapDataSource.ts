@@ -10,7 +10,7 @@ import {
 	CommitResponse,
 	Config,
 	createComponent,
-	DefaultEntity,
+	DefaultEntity, EntityID, MergeResponse,
 	QueryParams,
 	QueryResponse,
 	SetRequest
@@ -119,6 +119,12 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 				sinceState: state
 			}, this.useCallId());
 
+	}
+
+	protected async internalMerge(ids: EntityID[]) : Promise<MergeResponse<EntityType>> {
+		return client.jmap((this.controllerRoute ?? this.id) + "/merge", {
+			ids: ids
+		}, this.useCallId());
 	}
 }
 
