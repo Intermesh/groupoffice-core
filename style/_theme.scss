@@ -1,5 +1,7 @@
-:root, body {
+$density: 54% !default;
 
+:root, body {
+	--density: #{$density};
 	--fg-border:	rgba(68, 68, 68, 0.26); // outline For splitter borders in layout
 	--fg-line:		#{rgba(black, 0.12)}; // outline-variant (thick)
 	--fg-divider:	#{rgba(black, 0.04)}; // (thin)
