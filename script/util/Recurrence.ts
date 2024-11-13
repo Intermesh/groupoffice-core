@@ -6,7 +6,8 @@
  * Portions Copyright (C) Philipp Kewisch
  */
 
-import { datetime, RRule} from 'rrule'
+//import { datetime, RRule} from '@akiflow/rrule'
+import ICAL from "ical.js";
 import {DateTime, Timezone} from "@intermesh/goui";
 
 interface RecurrenceConfig {
@@ -40,82 +41,48 @@ export type RecurrenceRule = {
  */
 export class Recurrence {
 
-	private rrule?: RRule
+	private rrule?: ICAL.RecurIterator
 	private timeZone?: Timezone
 	private config: RecurrenceConfig;
 
 	private dayNb(shortName: string) {
-		return {
-			'mo':RRule.MO,
-			'tu':RRule.TU,
-			'we':RRule.WE,
-			'th':RRule.TH,
-			'fr':RRule.FR,
-			'sa':RRule.SA,
-			'su':RRule.SU,
-		}[shortName.toLowerCase()];
-	}
-
-	private byWeekDay(input: NDay[]) {
-		return input.map(i => {
-			const d = this.dayNb(i.day)!;
-			if(i.nthOfPeriod){
-				return d.nth(i.nthOfPeriod)
-			}
-			return d;
-		});
+		return {'mo':2, 'tu':3, 'we':4, 'th':5, 'fr':6, 'sa':7, 'su':1}[shortName.toLowerCase()];
 	}
 
 	constructor(config: RecurrenceConfig) {
+		this.config = config;
 
-		const cfg: any = {
-			freq: {
-				"daily": RRule.DAILY,
-				"weekly": RRule.WEEKLY,
-				"monthly": RRule.MONTHLY,
-				"yearly": RRule.YEARLY
-			}[config.rule.frequency],
-			dtstart: this.makeDate(config.dtstart, true)
-		};
+		const cfg: any = {freq: config.rule.frequency.toUpperCase()};
 		if(config.timeZone) {
 			this.timeZone = config.timeZone;
-			cfg.tzid = "UTC";
+			//cfg.tzid = "UTC";
 		}
-
 		if(config.rule.interval) cfg.interval = config.rule.interval;
 		if(config.rule.until) {
-			const date = config.rule.until.substring(0,10),
-				time = config.rule.until.substring(11);
-			let [h,i,s] = time.split(':').map(i => +i) as [number,number,number];
-			if(!time) {
-				h=23; i=59; s=59;
-			}
-			const [y,m,d] = date.split('-').map(i => +i) as [number,number,number];
-
-			cfg.until = datetime(y,m,d, h,i,s);
+			cfg.until = config.rule.until.length > 10 ?
+				ICAL.Time.fromDateTimeString(config.rule.until) :
+				ICAL.Time.fromDateString(config.rule.until);
 		}
 		if(config.rule.count) cfg.count = config.rule.count;
-
 		if(config.rule.firstDayOfWeek) cfg.wkst = this.dayNb(config.rule.firstDayOfWeek);
-		if(config.rule.byDay) cfg.byweekday = this.byWeekDay(config.rule.byDay);
+		if(config.rule.byDay) cfg.byday = config.rule.byDay.map(i => i.nthOfPeriod + i.day.toUpperCase());
 		if(config.rule.byMonthDay) cfg.bymonthday = config.rule.byMonthDay;
 		if(config.rule.byMonth) cfg.bymonth = config.rule.byMonth;
 		if(config.rule.bySetPosition) cfg.bysetpos = config.rule.bySetPosition;
 		if(config.rule.byWeekNo) cfg.byweekno = config.rule.byWeekNo;
 		if(config.rule.byYearDay) cfg.byyearday = config.rule.byYearDay;
 
-		this.config = config;
 		try {
-			this.rrule = new RRule(cfg, true);
+			this.rrule = ICAL.Recur.fromData(cfg).iterator(this.makeDate(config.dtstart, true));
 		} catch (e) {
 			console.error("Failed to parse rrule: ", cfg);
 		}
 	}
 
 	private makeDate(d: Date, withTime?: boolean) {
-		//d = (new DateTime(d)).toTimezone('UTC').date;
-		return withTime ? datetime(d.getFullYear(), d.getMonth()+1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()):
-			datetime(d.getFullYear(), d.getMonth()+1, d.getDate());
+		const t = ICAL.Time.fromJSDate(d);
+		t.isDate = !withTime;
+		return t;
 	}
 
 	*loop(start:DateTime, end: DateTime, iter?: (d:Date, i:number) => boolean){
@@ -123,11 +90,15 @@ export class Recurrence {
 			yield new DateTime(this.config.dtstart);
 			return;
 		}
-		const pad = (n:number) => (n<10?'0':'')+n;
-		const dates = this.rrule.between(this.makeDate(start.date),this.makeDate(end.date),true, iter);
-		for(const d of dates) {
-			const str = `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
-			const dt = new DateTime(str);
+		const startT = ICAL.Time.fromJSDate(start.date),
+			endT = ICAL.Time.fromJSDate(end.date);
+
+		let next = this.rrule.next()
+		for (let next = this.rrule.next(); next && next.compare(endT) < 0; next = this.rrule.next()) {
+			if (next.compare(startT) < 0) {
+				continue;
+			}
+			const dt = new DateTime(next.toJSDate());
 			yield this.timeZone ? dt.toTimezone(this.timeZone) : dt;
 		}
 	}
