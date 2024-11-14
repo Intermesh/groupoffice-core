@@ -4,7 +4,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {DefaultEntity, Format, FunctionUtil, Listener, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {Format, FunctionUtil, Listener, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
@@ -587,27 +587,33 @@ export class Client<UserType extends User = User> extends Observable {
 						return;
 					}
 
+					let data;
+
 					try {
-
-						const data = JSON.parse(msg.data);
-
-						for (let entity in data) {
-							let ds = jmapds(entity);
-
-							ds.getState().then(state => {
-								if (!state || state == data[entity]) {
-									//don't fetch updates if there's no state yet because it never was used in that case.
-									return;
-								}
-
-								ds.updateFromServer();
-							}).catch(e => {
-								console.warn(e);
-							})
-						}
+						data = JSON.parse(msg.data);
 					}catch(e) {
 						console.warn(e);
+						console.warn(msg.data);
+
+						this.stopSSE();
+
+						return;
 					}
+					for (let entity in data) {
+						let ds = jmapds(entity);
+
+						ds.getState().then(state => {
+							if (!state || state == data[entity]) {
+								//don't fetch updates if there's no state yet because it never was used in that case.
+								return;
+							}
+
+							ds.updateFromServer();
+						}).catch(e => {
+							console.warn(e);
+						})
+					}
+
 				},
 				onclose: () => {
 					// if the server closes the connection then retry.
