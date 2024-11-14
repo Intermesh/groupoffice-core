@@ -7,11 +7,10 @@
       "es2020",
       "dom"
     ],
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "isolatedModules": true,
     "esModuleInterop": true,
-    // important for tree shaking in esbuild
-    "module": "nodenext",
+    "module": "preserve",
     "baseUrl": ".",
     "outDir": "./dist",
     "declaration": true,
