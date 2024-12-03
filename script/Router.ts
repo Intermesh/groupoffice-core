@@ -9,7 +9,14 @@ class Router extends GouiRouter {
 		return this;
 	}
 
-	public setPath(path: string) {
+	getParams(): string[] {
+		return go.Router.getParams();
+	}
+
+	public setPath(...pathParts: any[]) {
+
+		const path = pathParts.map(p => p ?? "").join("/");
+
 		const oldPath = this.getPath();
 		go.Router.setPath(path);
 		this.fire("change", this.getPath(), oldPath);
