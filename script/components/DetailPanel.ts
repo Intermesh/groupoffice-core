@@ -142,7 +142,6 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	public async load(id: EntityID) {
 
-
 		this.mask();
 
 		try {

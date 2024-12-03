@@ -74,8 +74,8 @@ if(window.GO) {
 			this.cls = 'goui-module-panel';
 			GouiMainPanel.superclass.initComponent.call(this);
 
-			this.on("afterrender", async () => {
-				const comp = await this.callback();
+			this.on("afterrender", () => {
+				const comp = this.callback();
 				comp.render(this.el.dom);
 			}, this);
 		},
