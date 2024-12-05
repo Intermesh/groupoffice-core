@@ -10,7 +10,8 @@
 
 @use '../../goui/style/index';
 @use 'theme' with (
-	$density: 44.53125%
+	$density: 44.53125%,
+	$mobile-density: 54%
 );
 @use 'general';
 

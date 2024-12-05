@@ -1,7 +1,9 @@
 $density: 54% !default;
+$mobile-density: 62.5% !default;
 
 :root, body {
 	--density: #{$density};
+	--mobile-density: #{$mobile-density};
 	--fg-border:	rgba(68, 68, 68, 0.26); // outline For splitter borders in layout
 	--fg-line:		#{rgba(black, 0.12)}; // outline-variant (thick)
 	--fg-divider:	#{rgba(black, 0.04)}; // (thin)
