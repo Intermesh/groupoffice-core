@@ -14,7 +14,6 @@ class Router extends GouiRouter {
 	}
 
 	public setPath(...pathParts: any[]) {
-
 		const path = pathParts.map(p => p ?? "").join("/");
 
 		const oldPath = this.getPath();
