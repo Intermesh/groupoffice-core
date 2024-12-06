@@ -1,6 +1,7 @@
 import {BaseEntity, Component, EntityID, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
+import {User} from "./auth";
 
 
 export interface EntityFilter {
@@ -55,7 +56,7 @@ declare global {
 	var BaseHref: string;
 }
 
-let GouiMainPanel : any, GouiSystemSettingsPanel : any;
+let GouiMainPanel : any, GouiSystemSettingsPanel : any, GouiAccountSettingsPanel: any;
 
 if(window.GO) {
 	client.uri = BaseHref + "api/";
@@ -107,6 +108,42 @@ if(window.GO) {
 			}
 			cb.call(scope, this, true);
 		},
+
+	});
+
+
+
+	GouiAccountSettingsPanel = Ext.extend(Ext.BoxComponent, {
+
+
+		comp: undefined,
+
+		initComponent: function () {
+
+			GouiSystemSettingsPanel.superclass.initComponent.call(this);
+
+			this.on("afterrender", () => {
+				if(!this.comp) {
+					this.comp = this.callback();
+				}
+				this.comp.render(this.el.dom);
+			}, this);
+		},
+
+		onSubmit: async function () {
+			if(this.comp.onSubmit) {
+				await this.comp.onSubmit();
+			}
+		},
+
+		onLoad: async function(user:User) {
+			if(!this.comp) {
+				this.comp = this.callback();
+			}
+			if(this.comp.onLoad) {
+				await this.comp.onLoad(user);
+			}
+		}
 
 	});
 }
@@ -207,6 +244,32 @@ class Modules {
 		proto.itemId = id;
 
 		GO.systemSettingsPanels.push(proto);
+	}
+
+	/**
+	 * Add a system settings panel
+	 *
+	 * @param pkg
+	 * @param module
+	 * @param id
+	 * @param title
+	 * @param icon
+	 * @param callback
+	 */
+	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: string, callback: () => Component) {
+
+		go.Translate.package = go.package = pkg;
+		go.Translate.module = go.module = module;
+
+		// @ts-ignore
+		const proto = new GouiAccountSettingsPanel({
+			callback: callback,
+			title: title,
+			iconCls: "ic-"+icon,
+			itemId: id
+		});
+
+		GO.userSettingsPanels.push(proto);
 	}
 
 	/**
