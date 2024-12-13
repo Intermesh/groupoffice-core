@@ -25,7 +25,7 @@ class Router extends GouiRouter {
 		return Promise.resolve();
 	}
 
-	public reload() {
+	public async reload() {
 		go.Router.check();
 	}
 }
