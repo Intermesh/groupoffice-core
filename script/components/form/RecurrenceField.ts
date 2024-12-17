@@ -125,6 +125,8 @@ export class RecurrenceField extends Field {
 				return t("third");
 			case 4:
 				return t("fourth");
+			case 5:
+				return t("fifth");
 			default:
 				return t("last");
 		}

@@ -285,13 +285,20 @@ export class RecurrencePicker extends CardContainer {
 		this.startDate = date.clone();
 		this.weekOfMonth = Math.ceil(date.getDate() / 7);
 
-		this.menu.items.clear().add(...this.quickMenuItems());
 
 		const monthOpt = this.form.findChild('monthlyOptions')! as SelectField;
 		monthOpt.options = [
 			{value: 'byMonthDay', name: this.startDate.format('jS')},
 			{value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')}
 		];
+
+		if(date.addDays(7).getMonth() != this.startDate.getMonth()) {
+			this.weekOfMonth = -1;
+			monthOpt.options.push({value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')});
+		}
+
+		this.menu.items.clear().add(...this.quickMenuItems());
+
 		monthOpt.drawOptions();
 	}
 
@@ -315,7 +322,7 @@ export class RecurrencePicker extends CardContainer {
 		this.form.findChild('monthlyOptions')!.disabled = this.monthlyOptions.hidden = (f != 'monthly');
 	}
 
-	private static suffixText = [t("first"),t("second"),t("third"),t("fourth")]
+	private static suffixText = [t("first"),t("second"),t("third"),t("fourth"),t("fifth")]
 	private getSuffix(week?: number) {
 		return RecurrencePicker.suffixText[(week || this.weekOfMonth)-1] || t('last');
 	}
