@@ -93,6 +93,9 @@ export class RecurrenceField extends Field {
 				if (rr.byDay[i].nthOfPeriod) {
 					nthDay = t('the') + ' ' + RecurrenceField.getSuffix(rr.byDay[i].nthOfPeriod!) + ' ';
 				}
+				if(rr.bySetPosition && rr.bySetPosition[i]) {
+					nthDay = t('the') + ' ' + RecurrenceField.getSuffix(rr.bySetPosition[i]) + ' ';
+				}
 				days.push(nthDay + DateTime.dayNames[rr.byDay[i].day.toLowerCase()]);
 			}
 			if (workdays) {
