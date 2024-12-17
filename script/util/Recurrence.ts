@@ -65,7 +65,7 @@ export class Recurrence {
 		}
 		if(config.rule.count) cfg.count = config.rule.count;
 		if(config.rule.firstDayOfWeek) cfg.wkst = this.dayNb(config.rule.firstDayOfWeek);
-		if(config.rule.byDay) cfg.byday = config.rule.byDay.map(i => i.nthOfPeriod + i.day.toUpperCase());
+		if(config.rule.byDay) cfg.byday = config.rule.byDay.map(i => (i.nthOfPeriod ?? "") + i.day.toUpperCase());
 		if(config.rule.byMonthDay) cfg.bymonthday = config.rule.byMonthDay;
 		if(config.rule.byMonth) cfg.bymonth = config.rule.byMonth;
 		if(config.rule.bySetPosition) cfg.bysetpos = config.rule.bySetPosition;
@@ -93,7 +93,6 @@ export class Recurrence {
 		const startT = ICAL.Time.fromJSDate(start.date),
 			endT = ICAL.Time.fromJSDate(end.date);
 
-		let next = this.rrule.next()
 		for (let next = this.rrule.next(); next && next.compare(endT) < 0; next = this.rrule.next()) {
 			if (next.compare(startT) < 0) {
 				continue;
