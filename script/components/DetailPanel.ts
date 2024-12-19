@@ -14,6 +14,7 @@ import {
 } from "@intermesh/goui";
 import {jmapds} from "../jmap/index.js";
 import {router} from "../Router.js";
+import {modules} from "../Modules.js";
 
 export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap<Type> {
 	/**
@@ -47,6 +48,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	protected readonly scroller: Component;
 	private detailView: any;
 	public readonly toolbar: Toolbar;
+	private comments: any;
 
 	protected constructor(public entityName:string) {
 		super();
@@ -110,9 +112,6 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	protected addLinks() {
 		this.legacyDetailView.addLinks();
 	}
-	protected addComments() {
-		this.legacyDetailView.addComments();
-	}
 	protected addFiles() {
 		this.legacyDetailView.addFiles();
 	}
@@ -155,10 +154,11 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			this.disabled = false;
 			this.fire("load", this, this.entity);
 
-			// this.title = this.entity.name;
-			//
-			// this.content.items.clear();
-			// this.content.items.add(Image.replace(this.entity.content));
+			this.scroller.items.forEach((i:any) => {
+				if(i.onLoad) {
+					i.onLoad(this.entity!);
+				}
+			})
 
 			this.legacyOnLoad();
 
