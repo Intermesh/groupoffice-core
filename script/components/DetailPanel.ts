@@ -115,6 +115,11 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	protected addFiles() {
 		this.legacyDetailView.addFiles();
 	}
+
+	protected addComments() {
+		this.legacyDetailView.addComments();
+	}
+
 	protected addHistory() {
 		this.legacyDetailView.addHistory();
 	}
