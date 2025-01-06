@@ -56,7 +56,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		// reload or reset on entity update or destroy
 		jmapds(this.entityName).on("change", (ds, changes) => {
 			if(this.entity) {
-				const id = this.entity.id + "";
+				const id = this.entity.id;
 				if (changes.updated && changes.updated.indexOf(id) > -1) {
 					this.load(this.entity.id!);
 				}
@@ -67,7 +67,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 					// update router path
 					const rPath = router.getPath();
 					if(rPath.match("/" + id +"$")) {
-						router.setPath(rPath.substring(0, rPath.length - id.length - 1));
+						router.setPath(rPath.substring(0, rPath.length - (id+"").length - 1));
 					}
 				}
 			}
