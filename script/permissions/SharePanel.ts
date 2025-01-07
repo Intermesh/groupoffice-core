@@ -6,7 +6,7 @@ import {
 	Config,
 	createComponent,
 	datasourcestore,
-	DataSourceStore,
+	DataSourceStore, EntityID,
 	Field,
 	FieldValue, Filter,
 	radio,
@@ -118,7 +118,7 @@ class GroupTable extends Table<DataSourceStore> {
 		this.cls = 'goui-share-panel';
 	}
 
-	setEntity(name: string, id?: string) {
+	setEntity(name: string, id?: EntityID) {
 		this.store.setFilter("entity", {inAcl: {entity: name, id: id}});
 
 		if (!id) {
@@ -215,7 +215,7 @@ export class SharePanel extends Field {
 
 	}
 
-	public setEntity(name: string, id?: string) {
+	public setEntity(name: string, id?: EntityID) {
 		this.groupTable.setEntity(name, id);
 	}
 

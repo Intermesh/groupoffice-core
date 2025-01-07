@@ -10,7 +10,8 @@ import {
 	containerfield,
 	datasourceform,
 	DefaultEntity,
-	EntityID, FunctionUtil,
+	EntityID,
+	FunctionUtil,
 	Listener,
 	ObservableListenerOpts,
 	t,
@@ -19,8 +20,8 @@ import {
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
-import {sharepanel, SharePanel} from "../permissions/index.js";
-import {jmapds} from "../jmap/index.js";
+import {sharepanel, SharePanel} from "../permissions";
+import {jmapds} from "../jmap";
 
 
 /**
@@ -34,9 +35,9 @@ export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
 	 *
 	 * @param window
 	 */
-	ready: (window: Type, currentId: string|undefined) => void
+	ready: (window: Type, currentId: EntityID|undefined) => void
 
-	addlink: (window: Type, entityName: string, entityId: string) => void
+	addlink: (window: Type, entityName: string, entityId: EntityID) => void
 }
 
 export interface FormWindow<EntityType extends BaseEntity = DefaultEntity> {
