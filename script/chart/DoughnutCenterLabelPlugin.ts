@@ -31,7 +31,7 @@ Chart.register({
 		const ctx = chart.ctx;
 		const width = chart.width;
 		const height = chart.height;
-		const fontSize = options.plugins?.doughnutCenterLabel?.fontSize ?? 28;
+		const fontSize = options.plugins?.doughnutCenterLabel?.fontSize ?? 16;
 		ctx.font = fontSize + 'px Arial';
 		ctx.fillStyle = options.plugins?.doughnutCenterLabel?.color ?? "black";
 		ctx.textAlign = 'center';
