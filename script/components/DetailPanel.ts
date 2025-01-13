@@ -57,6 +57,10 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		jmapds(this.entityName).on("change", (ds, changes) => {
 			if(this.entity) {
 				const id = this.entity.id;
+
+				console.log(id, changes.updated);
+
+				// not working
 				if (changes.updated && changes.updated.indexOf(id) > -1) {
 					this.load(this.entity.id!);
 				}
