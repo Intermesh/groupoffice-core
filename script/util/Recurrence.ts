@@ -46,7 +46,7 @@ export class Recurrence {
 	private config: RecurrenceConfig;
 
 	private dayNb(shortName: string) {
-		return {'mo':2, 'tu':3, 'we':4, 'th':5, 'fr':6, 'sa':7, 'su':1}[shortName.toLowerCase()];
+		return {'mo':2, 'tu':3, 'we':4, 'th':5, 'fr':6, 'sa':7, 'su':1}[shortName.toLowerCase()] ?? 2;
 	}
 
 	constructor(config: RecurrenceConfig) {
