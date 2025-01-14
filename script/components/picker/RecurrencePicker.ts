@@ -292,7 +292,7 @@ export class RecurrencePicker extends CardContainer {
 			{value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')}
 		];
 
-		if(date.addDays(7).getMonth() != this.startDate.getMonth()) {
+		if(date.clone().addDays(7).getMonth() != this.startDate.getMonth()) {
 			this.weekOfMonth = -1;
 			monthOpt.options.push({value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')});
 		}
