@@ -5,7 +5,6 @@ export class Text {
 	public name: string;
 	public icon: MaterialIcon;
 	public label: string;
-	public hideInNewFieldTypes: boolean = false;
 
 	constructor() {
 		this.name = "Text";

@@ -2,8 +2,8 @@ import {FormWindow} from "../components/index.js";
 import {
 	checkbox,
 	CheckboxField,
-	comp,
-	fieldset,
+	comp, Fieldset,
+	fieldset, HiddenField, hiddenfield,
 	t,
 	textarea,
 	TextAreaField,
@@ -12,7 +12,10 @@ import {
 } from "@intermesh/goui";
 
 export class FieldDialog extends FormWindow {
+	public generalFieldset: Fieldset;
+	public validationFieldset: Fieldset;
 	public typeField: TextField;
+	public fieldSetField: HiddenField;
 	private databaseNameField: TextField;
 	private readonly relatedFieldCondition: TextAreaField;
 	private readonly conRequired: CheckboxField;
@@ -33,20 +36,23 @@ export class FieldDialog extends FormWindow {
 			comp({
 					cls: "hbox"
 				},
-				fieldset({
+				this.generalFieldset = fieldset({
 						flex: 1
 					},
 					comp({
 						tagName: "h4",
 						text: t("General")
 					}),
+					this.fieldSetField = hiddenfield({
+						name: "fieldSetId"
+					}),
 					this.typeField = textfield({
-						id: "type",
+						name: "type",
 						label: t("Type"),
 						disabled: true
 					}),
 					textfield({
-						id: "name",
+						name: "name",
 						label: t("Name"),
 						required: true,
 						listeners: {
@@ -64,7 +70,7 @@ export class FieldDialog extends FormWindow {
 						}
 					}),
 					this.databaseNameField = textfield({
-						id: "databaseName",
+						name: "databaseName",
 						label: t("Database name"),
 						required: true,
 						hint: t("This name is used in the database and can only contain alphanumeric characters and underscores. It's only visible to exports and the API."),
@@ -80,25 +86,25 @@ export class FieldDialog extends FormWindow {
 						}
 					}),
 					textfield({
-						id: "hint",
+						name: "hint",
 						label: t("Hint text")
 					}),
 					textfield({
-						id: "prefix",
+						name: "prefix",
 						label: t("Prefix")
 					}),
 					textfield({
-						id: "suffix",
+						name: "suffix",
 						label: t("Suffix")
 					}),
 					checkbox({
-						id: "hiddenInGrid",
+						name: "hiddenInGrid",
 						label: t("Hidden in grid"),
 						value: true,
 						hint: t("Field will be hidden by default in grids. Users can enable it through the grid column menu.")
 					})
 				),
-				fieldset({
+				this.validationFieldset = fieldset({
 						flex: 1
 					},
 					comp({
@@ -106,11 +112,11 @@ export class FieldDialog extends FormWindow {
 						text: t("Validation")
 					}),
 					checkbox({
-						id: "unique",
+						name: "unique",
 						label: t("Unique values")
 					}),
 					this.required = checkbox({
-						id: "required",
+						name: "required",
 						label: t("Required field"),
 						listeners: {
 							change: (field, newValue, oldValue) => {
@@ -126,7 +132,7 @@ export class FieldDialog extends FormWindow {
 						}
 					}),
 					this.relatedFieldCondition = textarea({
-						id: "relatedFieldCondition",
+						name: "relatedFieldCondition",
 						label: t("Required condition"),
 						hint: t("eg. 'nameOfStandardOrCustomField = test' or 'checkbox = 1'"),
 						validateOnBlur: true,
@@ -167,7 +173,7 @@ export class FieldDialog extends FormWindow {
 						}
 					}),
 					this.conRequired = checkbox({
-						id: "conditionallyRequired",
+						name: "conditionallyRequired",
 						label: t("Conditionally required field"),
 						listeners: {
 							change: (field, newValue, oldValue) => {
@@ -189,7 +195,7 @@ export class FieldDialog extends FormWindow {
 						}
 					}),
 					this.conHidden = checkbox({
-						id: "conditionallyHidden",
+						name: "conditionallyHidden",
 						label: t("Conditionally hidden field"),
 						listeners: {
 							change: (field, newValue, oldValue) => {

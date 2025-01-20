@@ -78,6 +78,7 @@ export class EntityPanel extends Component {
 
 										const textObject = new Text();
 										const fieldDlg = textObject.getDialog();
+										fieldDlg.fieldSetField.value = record.fieldSetId;
 										fieldDlg.show();
 									}
 								})
