@@ -1,19 +1,19 @@
-import {MaterialIcon, t} from "@intermesh/goui";
+import {t} from "@intermesh/goui";
 import {TextDialog} from "./TextDialog.js";
+import {Type} from "./Type.js";
 
-export class Text {
-	public name: string;
-	public icon: MaterialIcon;
-	public label: string;
+export class Text extends Type {
 
 	constructor() {
+		super();
+
 		this.name = "Text";
 
 		this.label = t("Text");
 		this.icon = "description";
 	}
 
-	public getDialog() {
+	getDialog() {
 		return new TextDialog();
 	}
 

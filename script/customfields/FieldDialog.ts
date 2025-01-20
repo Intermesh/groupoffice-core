@@ -12,10 +12,10 @@ import {
 } from "@intermesh/goui";
 
 export class FieldDialog extends FormWindow {
-	public generalFieldset: Fieldset;
-	public validationFieldset: Fieldset;
-	public typeField: TextField;
-	public fieldSetField: HiddenField;
+	protected generalFieldset: Fieldset;
+	protected validationFieldset: Fieldset;
+	protected typeField: TextField;
+	fieldSetField: HiddenField;
 	private databaseNameField: TextField;
 	private readonly relatedFieldCondition: TextAreaField;
 	private readonly conRequired: CheckboxField;

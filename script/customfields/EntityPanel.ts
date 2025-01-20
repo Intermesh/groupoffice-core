@@ -1,6 +1,6 @@
 import {
 	browser,
-	btn,
+	btn, Button,
 	column, comp,
 	Component,
 	EntityID, menu, Notifier, Store,
@@ -13,7 +13,7 @@ import {
 import {client, jmapds} from "../jmap/index.js";
 import {FieldSetDialog} from "./FieldSetDialog.js";
 import {entities} from "../Entities.js";
-import {ExportDialog} from "./ExportDialog.js";
+import {ExportDialog} from "./ExportDialog.js"
 import {Text} from "./type/Text.js";
 
 interface StoreEntity {
@@ -63,25 +63,17 @@ export class EntityPanel extends Component {
 				column({
 					id: "menu",
 					width: 90,
-					renderer: (value, record, td, table, rowIndex) => {
+					renderer: async (value, record, td, table, rowIndex) => {
+						const menuButtons = await this.getTypeMenuButtons(record);
+
 						const addBtn = btn({
 							icon: "add",
 							cls: "primary filled",
 							// temporary code for menu handling
 							menu: menu({
-								isDropdown: true
-							},
-								btn({
-									icon: "description",
-									text: t("Text"),
-									handler: () => {
-
-										const textObject = new Text();
-										const fieldDlg = textObject.getDialog();
-										fieldDlg.fieldSetField.value = record.fieldSetId;
-										fieldDlg.show();
-									}
-								})
+									isDropdown: true
+								},
+								...menuButtons
 							)
 						})
 
@@ -135,7 +127,10 @@ export class EntityPanel extends Component {
 						const blob = await client.upload(files[0]);
 						this.mask();
 
-						client.jmap("FieldSet/importFromJson", {entity: this.entityName, blobId: blob.id}).then((response) => {
+						client.jmap("FieldSet/importFromJson", {
+							entity: this.entityName,
+							blobId: blob.id
+						}).then((response) => {
 							this.unmask();
 							this.load();
 						}).catch((response) => {
@@ -221,5 +216,62 @@ export class EntityPanel extends Component {
 
 		this.store.clear();
 		this.store.loadData(tableData);
+	}
+
+	// Temporary function to build menu with all available customfield types
+	private async getTypeMenuButtons(record: StoreEntity):Promise<Button[]> {
+		const typeNames: string[] = [
+			"Attachments",
+			"Checkbox",
+			"Data",
+			"Date",
+			"DateTime",
+			"EncryptedText",
+			"FunctionField",
+			"Group",
+			"Html",
+			"MultiSelect",
+			"Notes",
+			"Number",
+			"Select",
+			"SelectDialog",
+			"SelectOptionsTree",
+			"TemplateField",
+			"Text",
+			"TextArea",
+			"TreeSelectField",
+			"User",
+			"YesNo"
+		];
+
+		const availableTypeButtons: Button[] = []
+
+		for (const typeName of typeNames) {
+			try {
+				const typeClass = await import(`./type/${typeName}.ts`);
+
+				if(typeClass[typeName]) {
+					const type = new typeClass[typeName]();
+
+					availableTypeButtons.push(
+						btn({
+							icon: type.icon,
+							text: t(type.label),
+							handler: () => {
+								const fieldDlg = type.getDialog();
+								fieldDlg.fieldSetField.value = record.fieldSetId;
+								fieldDlg.show();
+
+								fieldDlg.on("close", () => {
+									void this.load();
+								});
+							}
+						})
+					)
+				}
+			} catch (e) {}
+		}
+
+		return availableTypeButtons
 	}
 }
