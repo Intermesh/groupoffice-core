@@ -218,7 +218,29 @@ export class FieldDialog extends FormWindow {
 					})
 				)
 			)
-		)
+		);
+
+		this.form.on("beforesave", ((form, data) => {
+			const options = Object.keys(data)
+				.filter(key => key.includes("options."))
+				.map(key => ({key, value: data[key]}));
+
+			const optionsJSON: string[] = [];
+
+			options.forEach((option) => {
+				const key = option.key.replace(/^"|"$/g, '').split('.')[1];
+				const value = option.value;
+
+				const optionJSON: string = `${key}: ${value}`;
+				optionsJSON.push(optionJSON);
+
+				delete (data[option.key]);
+			});
+
+			if(optionsJSON.length > 1)
+				data.options = optionsJSON;
+
+		}));
 	}
 
 	private isReserved(value: string) {

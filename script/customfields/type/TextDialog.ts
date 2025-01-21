@@ -5,8 +5,6 @@ export class TextDialog extends FieldDialog{
 	constructor() {
 		super();
 
-		this.typeField.value = t("Text");
-
 		this.generalFieldset.items.add(
 			textfield({
 				id: "default",

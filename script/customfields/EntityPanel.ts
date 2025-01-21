@@ -13,8 +13,7 @@ import {
 import {client, jmapds} from "../jmap/index.js";
 import {FieldSetDialog} from "./FieldSetDialog.js";
 import {entities} from "../Entities.js";
-import {ExportDialog} from "./ExportDialog.js"
-import {Text} from "./type/Text.js";
+import {ExportDialog} from "./ExportDialog.js";
 
 interface StoreEntity {
 	name: string,
@@ -218,8 +217,8 @@ export class EntityPanel extends Component {
 		this.store.loadData(tableData);
 	}
 
-	// Temporary function to build menu with all available customfield types
-	private async getTypeMenuButtons(record: StoreEntity):Promise<Button[]> {
+	// Temporary function for building menu with all available customfield types
+	private async getTypeMenuButtons(record: StoreEntity): Promise<Button[]> {
 		const typeNames: string[] = [
 			"Attachments",
 			"Checkbox",
@@ -250,7 +249,7 @@ export class EntityPanel extends Component {
 			try {
 				const typeClass = await import(`./type/${typeName}.ts`);
 
-				if(typeClass[typeName]) {
+				if (typeClass[typeName]) {
 					const type = new typeClass[typeName]();
 
 					availableTypeButtons.push(
@@ -260,7 +259,9 @@ export class EntityPanel extends Component {
 							handler: () => {
 								const fieldDlg = type.getDialog();
 								fieldDlg.fieldSetField.value = record.fieldSetId;
+								fieldDlg.typeField.value = typeName;
 								fieldDlg.show();
+								debugger
 
 								fieldDlg.on("close", () => {
 									void this.load();
@@ -269,7 +270,8 @@ export class EntityPanel extends Component {
 						})
 					)
 				}
-			} catch (e) {}
+			} catch (e) {
+			}
 		}
 
 		return availableTypeButtons
