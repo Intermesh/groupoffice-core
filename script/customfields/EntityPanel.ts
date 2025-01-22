@@ -259,9 +259,8 @@ export class EntityPanel extends Component {
 							handler: () => {
 								const fieldDlg = type.getDialog();
 								fieldDlg.fieldSetField.value = record.fieldSetId;
-								fieldDlg.typeField.value = typeName;
+								fieldDlg.typeField.value = t(typeName);
 								fieldDlg.show();
-								debugger
 
 								fieldDlg.on("close", () => {
 									void this.load();

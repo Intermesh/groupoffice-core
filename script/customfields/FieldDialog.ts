@@ -16,6 +16,9 @@ export class FieldDialog extends FormWindow {
 	protected validationFieldset: Fieldset;
 	protected typeField: TextField;
 	fieldSetField: HiddenField;
+	protected hintField: TextField;
+	protected prefixField: TextField;
+	protected suffixField: TextField;
 	private databaseNameField: TextField;
 	private readonly relatedFieldCondition: TextAreaField;
 	private readonly conRequired: CheckboxField;
@@ -85,15 +88,15 @@ export class FieldDialog extends FormWindow {
 							}
 						}
 					}),
-					textfield({
+					this.hintField = textfield({
 						name: "hint",
 						label: t("Hint text")
 					}),
-					textfield({
+					this.prefixField = textfield({
 						name: "prefix",
 						label: t("Prefix")
 					}),
-					textfield({
+					this.suffixField = textfield({
 						name: "suffix",
 						label: t("Suffix")
 					}),
@@ -237,7 +240,7 @@ export class FieldDialog extends FormWindow {
 				delete (data[option.key]);
 			});
 
-			if(optionsJSON.length > 1)
+			if (optionsJSON.length > 1)
 				data.options = optionsJSON;
 
 		}));
