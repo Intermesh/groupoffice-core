@@ -1,6 +1,5 @@
 import {Type} from "./Type.js";
 import {FieldDialog} from "../FieldDialog.js";
-import {UserDialog} from "./UserDialog.js";
 import {t} from "@intermesh/goui";
 
 export class User extends Type {
@@ -14,6 +13,6 @@ export class User extends Type {
 	}
 
 	getDialog(): FieldDialog {
-		return new UserDialog();
+		return new FieldDialog();
 	}
 }

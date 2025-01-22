@@ -1,6 +1,6 @@
 import {t} from "@intermesh/goui";
-import {TextAreaDialog} from "./TextAreaDialog.js";
 import {Type} from "./Type.js";
+import {FieldDialog} from "../FieldDialog.js";
 
 export class TextArea extends Type{
 	constructor() {
@@ -13,6 +13,6 @@ export class TextArea extends Type{
 	}
 
 	getDialog() {
-		return new TextAreaDialog();
+		return new FieldDialog();
 	}
 }

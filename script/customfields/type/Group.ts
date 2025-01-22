@@ -2,13 +2,13 @@ import {Type} from "./Type.js";
 import {t} from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
 
-export class Data extends Type {
+export class Group extends Type {
 	constructor() {
 		super();
 
-		this.name = "Data";
-		this.label = t("Data");
-		this.icon = "storage";
+		this.name = "Group";
+		this.label = t("Group")
+		this.icon = "group";
 	}
 
 	getDialog(): FieldDialog {
