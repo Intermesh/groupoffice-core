@@ -243,6 +243,8 @@ export class FieldDialog extends FormWindow {
 			if (optionsJSON.length > 1)
 				data.options = optionsJSON;
 
+			console.log(data)
+
 		}));
 	}
 
