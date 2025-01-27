@@ -74,6 +74,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		this.baseCls = "goui-window form-window";
 		this.cls = "vbox";
 		this.width = 460;
+		this.height = 600;
 
 
 		this.items.add(
