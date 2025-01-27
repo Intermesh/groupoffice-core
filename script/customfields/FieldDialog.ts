@@ -19,7 +19,8 @@ export class FieldDialog extends FormWindow {
 	protected hintField: TextField;
 	protected prefixField: TextField;
 	protected suffixField: TextField;
-	private databaseNameField: TextField;
+	protected nameField: TextField;
+	protected databaseNameField: TextField;
 	private readonly relatedFieldCondition: TextAreaField;
 	private readonly conRequired: CheckboxField;
 	private readonly conHidden: CheckboxField;
@@ -54,7 +55,7 @@ export class FieldDialog extends FormWindow {
 						label: t("Type"),
 						disabled: true
 					}),
-					textfield({
+					this.nameField = textfield({
 						name: "name",
 						label: t("Name"),
 						required: true,
