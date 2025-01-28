@@ -14,7 +14,7 @@ import {
 export class FieldDialog extends FormWindow {
 	protected generalFieldset: Fieldset;
 	protected validationFieldset: Fieldset;
-	protected typeField: TextField;
+	public typeField: TextField;
 	fieldSetField: HiddenField;
 	protected hintField: TextField;
 	protected prefixField: TextField;
@@ -51,7 +51,7 @@ export class FieldDialog extends FormWindow {
 						name: "fieldSetId"
 					}),
 					this.typeField = textfield({
-						name: "type",
+						name: "displayType",
 						label: t("Type"),
 						disabled: true
 					}),

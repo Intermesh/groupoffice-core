@@ -233,8 +233,6 @@ export class EntityPanel extends Component {
 			"Notes",
 			"Number",
 			"Select",
-			"SelectDialog",
-			"SelectOptionsTree",
 			"TemplateField",
 			"Text",
 			"TextArea",
@@ -243,7 +241,7 @@ export class EntityPanel extends Component {
 			"YesNo"
 		];
 
-		const availableTypeButtons: Button[] = []
+		const availableTypeButtons: Button[] = [];
 
 		for (const typeName of typeNames) {
 			try {
@@ -258,8 +256,15 @@ export class EntityPanel extends Component {
 							text: t(type.label),
 							handler: () => {
 								const fieldDlg = type.getDialog();
-								fieldDlg.fieldSetField.value = record.fieldSetId;
+
+								fieldDlg.form.value = {
+									fieldSetId: record.fieldSetId,
+									type: typeName
+								}
+
+								// also set typeField, this is for display purposes only
 								fieldDlg.typeField.value = t(typeName);
+
 								fieldDlg.show();
 
 								fieldDlg.on("close", () => {
@@ -269,8 +274,7 @@ export class EntityPanel extends Component {
 						})
 					)
 				}
-			} catch (e) {
-			}
+			} catch (e) {}
 		}
 
 		return availableTypeButtons
