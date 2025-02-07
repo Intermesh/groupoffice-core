@@ -48,8 +48,6 @@ export interface FormWindow<EntityType extends BaseEntity = DefaultEntity> {
 
 export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> extends Window {
 	public readonly form;
-
-	protected currentId?: EntityID;
 	protected readonly cards: CardContainer;
 	protected sharePanel?: SharePanel;
 	protected bbar: Toolbar
@@ -84,8 +82,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					cls: "vbox",
 					flex: 1,
 					listeners: {
-						save: (form, data) => {
-							this.currentId = data.id;
+						save: () => {
 							this.close();
 						},
 
@@ -161,10 +158,10 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 
 		// do a setTimeout so currentId is set if win.show().load() is called in that order.
 		setTimeout(() => {
-			if (!this.currentId) {
+			if (!this.form.currentId) {
 				// focus form for new entities and not for existing ones.
 				this.form.focus();
-				this.fire("ready", this, this.currentId);
+				this.fire("ready", this, this.form.currentId);
 			}
 		});
 	}
@@ -195,7 +192,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		this.cards.items.add(this.sharePanel);
 
 		this.on("ready", () => {
-			this.sharePanel!.setEntity(this.entityName, this.currentId);
+			this.sharePanel!.setEntity(this.entityName, this.form.currentId);
 		})
 
 	}
@@ -205,9 +202,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		this.mask();
 
 		try {
-			this.currentId = id;
 			await this.form.load(id);
-			this.fire("ready", this, this.currentId);
+			this.fire("ready", this, this.form.currentId);
 		} catch (e) {
 			void Window.error(e + "");
 		} finally {
