@@ -23,6 +23,9 @@ export class MultiSelectDialog extends FieldDialog {
 					tagName: "h4",
 					text: t("Options")
 				}),
+				containerfield({
+						name: "dataType"
+					},
 					this.arrayField = arrayfield({
 						name: "options",
 						label: t("Options"),
@@ -72,7 +75,7 @@ export class MultiSelectDialog extends FieldDialog {
 						}
 					})
 				)
-
+			)
 		)
 	}
 }

@@ -68,6 +68,7 @@ export class EntityPanel extends Component {
 						const addBtn = btn({
 							icon: "add",
 							cls: "primary filled",
+							style: {float: "left"},
 							// temporary code for menu handling
 							menu: menu({
 									isDropdown: true
@@ -90,7 +91,17 @@ export class EntityPanel extends Component {
 											void dlg.load(record.fieldSetId);
 											dlg.show();
 										} else {
+											const type = eval(`new ${record.type}()`);
 
+											const dlg = type.getDialog();
+
+											dlg.form.value = {
+												fieldSetId: record.fieldSetId,
+												type: record.type
+											}
+
+											dlg.load(record.fieldId);
+											dlg.show();
 										}
 									}
 								}),
@@ -109,7 +120,7 @@ export class EntityPanel extends Component {
 							)
 						});
 
-						return record.isFieldSet ? comp({height: 20}, addBtn, moreMenu) : moreMenu;
+						return record.isFieldSet ? comp({}, addBtn, moreMenu) : moreMenu;
 					}
 				})
 			]
@@ -262,9 +273,6 @@ export class EntityPanel extends Component {
 									type: typeName
 								}
 
-								// also set typeField, this is for display purposes only
-								fieldDlg.typeField.value = t(typeName);
-
 								fieldDlg.show();
 
 								fieldDlg.on("close", () => {
@@ -274,7 +282,8 @@ export class EntityPanel extends Component {
 						})
 					)
 				}
-			} catch (e) {}
+			} catch (e) {
+			}
 		}
 
 		return availableTypeButtons

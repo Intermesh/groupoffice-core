@@ -51,9 +51,9 @@ export class FieldDialog extends FormWindow {
 						name: "fieldSetId"
 					}),
 					this.typeField = textfield({
-						name: "displayType",
+						name: "type",
 						label: t("Type"),
-						disabled: true
+						readOnly: true
 					}),
 					this.nameField = textfield({
 						name: "name",
@@ -123,7 +123,7 @@ export class FieldDialog extends FormWindow {
 						name: "required",
 						label: t("Required field"),
 						listeners: {
-							change: (field, newValue, oldValue) => {
+							setvalue: (field, newValue, oldValue) => {
 								this.relatedFieldCondition["disabled"] = newValue;
 								this.conHidden["disabled"] = newValue;
 								this.conRequired["disabled"] = newValue;
@@ -180,7 +180,7 @@ export class FieldDialog extends FormWindow {
 						name: "conditionallyRequired",
 						label: t("Conditionally required field"),
 						listeners: {
-							change: (field, newValue, oldValue) => {
+							setvalue: (field, newValue, oldValue) => {
 								if (this.conHidden.value || newValue) {
 									this.conHidden["disabled"] = false;
 								}
@@ -202,7 +202,7 @@ export class FieldDialog extends FormWindow {
 						name: "conditionallyHidden",
 						label: t("Conditionally hidden field"),
 						listeners: {
-							change: (field, newValue, oldValue) => {
+							setvalue: (field, newValue, oldValue) => {
 								if (this.conRequired.value || newValue) {
 									this.conRequired["disabled"] = false;
 								}
@@ -243,8 +243,6 @@ export class FieldDialog extends FormWindow {
 
 			if (optionsJSON.length > 1)
 				data.options = optionsJSON;
-
-			console.log(data)
 
 		}));
 	}
