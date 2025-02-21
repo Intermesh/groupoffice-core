@@ -51,7 +51,7 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 	 */
 	public controllerRoute:string|undefined;
 
-	protected internalQuery(params: QueryParams) : Promise<QueryResponse> {
+	protected internalQuery(params: QueryParams) : Promise<QueryResponse<EntityType>> {
 		return client.jmap((this.controllerRoute ?? this.id) + "/query", params, this.useCallId());
 	}
 

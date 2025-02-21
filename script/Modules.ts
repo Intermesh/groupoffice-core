@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -231,7 +231,7 @@ class Modules {
 	 * @param icon
 	 * @param callback
 	 */
-	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: string, callback: () => Component | Promise<Component>) {
+	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component | Promise<Component>) {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
@@ -240,7 +240,7 @@ class Modules {
 		const proto = new GouiSystemSettingsPanel();
 		proto.callback= callback;
 		proto.title = title;
-		proto.iconCls = "ic-" + icon;
+		proto.iconCls = "ic-" + icon.replace('_','-');
 		proto.itemId = id;
 
 		GO.systemSettingsPanels.push(proto);
@@ -256,7 +256,7 @@ class Modules {
 	 * @param icon
 	 * @param callback
 	 */
-	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: string, callback: () => Component) {
+	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component) {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
@@ -265,7 +265,7 @@ class Modules {
 		const proto = new GouiAccountSettingsPanel({
 			callback: callback,
 			title: title,
-			iconCls: "ic-"+icon,
+			iconCls: "ic-"+icon.replace('_', '-'),
 			itemId: id
 		});
 
