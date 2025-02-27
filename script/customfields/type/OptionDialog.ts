@@ -4,21 +4,18 @@ import {
 	fieldset,
 	form,
 	Form,
-	select, StoreRecord,
+	select,
 	t,
 	tbar,
 	textfield,
 	Tree,
-	TreeRecord,
 	Window
 } from "@intermesh/goui";
 
 export class OptionDialog extends Window {
-	private form: Form;
-	private selectedRow?: StoreRecord;
+	public form: Form;
 
-
-	constructor(tree: Tree) {
+	constructor() {
 		super();
 
 		this.title = t("Edit custom select option");
@@ -33,35 +30,7 @@ export class OptionDialog extends Window {
 
 		this.items.add(
 			this.form = form({
-					flex: 1,
-					handler: form1 => {
-						const data = form1.value;
-
-						const newNode:TreeRecord = {
-							id: String(tree.data.length + 1),
-							text: data.text,
-							icon: "list",
-							dataSet: {
-								text: data.text,
-								foregroundColor: data.foregroundColor,
-								backgroundColor: data.backgroundColor,
-								renderMode: data.renderMode
-							},
-							children: []
-						}
-
-						if(this.selectedRow !== undefined) {
-							this.selectedRow.children.push(newNode);
-							tree.expand()
-						} else {
-							const root = tree.store.get(0);
-
-							if(root !== undefined)
-								root.children!.push(newNode);
-						}
-
-						this.close();
-					}
+					flex: 1
 				},
 				fieldset({},
 					textfield({
@@ -98,13 +67,10 @@ export class OptionDialog extends Window {
 					type: "submit",
 					handler: () => {
 						void this.form.submit();
+						this.close();
 					}
 				})
 			)
 		)
-	}
-
-	public load(selectedRow: StoreRecord){
-		this.selectedRow = selectedRow;
 	}
 }

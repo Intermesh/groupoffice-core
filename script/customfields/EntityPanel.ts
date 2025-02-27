@@ -228,6 +228,8 @@ export class EntityPanel extends Component {
 		this.store.loadData(tableData);
 	}
 
+	// TODO: replace with proper handling
+
 	// Temporary function for building menu with all available customfield types
 	private async getTypeMenuButtons(record: StoreEntity): Promise<Button[]> {
 		const typeNames: string[] = [
