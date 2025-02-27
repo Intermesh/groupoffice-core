@@ -10,12 +10,6 @@ export class SelectOptionsTree extends Component {
 
 	public fieldId?: EntityID;
 
-	// TODO:
-	// save options
-
-	// checks
-	// level & sortOrder
-
 	constructor() {
 		super();
 
