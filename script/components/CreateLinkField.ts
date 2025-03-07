@@ -52,11 +52,24 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 		this.label = t("Create links")
 
 		this.chipRenderer =  async (chip, value) => {
-			chip.text = (await this.list.store.dataSource.single(value.searchId) as any).name;
+			let search:any;
+			if(value.searchId) {
+				search = await this.list.store.dataSource.single(value.searchId);
+			} else {
+
+				value.searchId = (await this.list.store.dataSource.query({
+					filter: {
+						entities: [{name: value.entityName}],
+						entityId: value.entityId
+					}
+				})).ids[0]
+				search = await this.list.store.dataSource.single(value.searchId);
+			}
+			chip.text = search.name;
 		}
 
 		this.pickerRecordToValue = (field, record) => {
-			return {searchId: record.id, entityId: record.entityId, entityType: record.entity};
+			return {searchId: record.id, entityId: record.entityId, entityName: record.entity};
 		}
 
 		this.on("autocomplete" , (field, input) => {
@@ -76,7 +89,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 						fromId: f.currentId,
 						fromEntity: f.dataSource.id,
 						toId: v.entityId,
-						toEntity: v.entityType
+						toEntity: v.entityName
 					})
 				});
 

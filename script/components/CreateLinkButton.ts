@@ -10,7 +10,7 @@ import {createlinkfield, CreateLinkField} from "./CreateLinkField";
 
 
 export class CreateLinkButton extends OverlayToolbarButton {
-	private createLinkField: CreateLinkField;
+	readonly createLinkField: CreateLinkField;
 
 	constructor() {
 		super();
