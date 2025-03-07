@@ -1,6 +1,6 @@
 import {
 	BaseEntity,
-	btn,
+	btn, Button,
 	CardContainer,
 	CardMenu,
 	cardmenu,
@@ -61,12 +61,13 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	 */
 	protected readonly generalTab: Component;
 	private cardMenu: CardMenu;
-	private readonly createLinkBtn: CreateLinkButton;
+	protected readonly createLinkBtn: CreateLinkButton;
 
 	/**
 	 * Enable this for linkable entities. It will show a create link button for new items
 	 */
 	public hasLinks = false;
+	protected submitBtn: Button;
 
 	/**
 	 * Constructor
@@ -128,7 +129,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 						hidden: true
 					}),
 					"->",
-					btn({
+					this.submitBtn = btn({
 						type: "submit",
 						text: t("Save")
 					})
