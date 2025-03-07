@@ -63,6 +63,9 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	private cardMenu: CardMenu;
 	private readonly createLinkBtn: CreateLinkButton;
 
+	/**
+	 * Enable this for linkable entities. It will show a create link button for new items
+	 */
 	public hasLinks = false;
 
 	/**
