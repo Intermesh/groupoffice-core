@@ -84,7 +84,7 @@ class GroupTable extends Table<DataSourceStore> {
 
 				column({
 					id: "level",
-					width: 120,
+					width: 180,
 					header: t("Level"),
 					renderer: (columnValue, record, td, table, storeIndex) => {
 						return select({

@@ -82,7 +82,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		this.cls = "vbox";
 		this.width = 460;
 		this.height = 600;
-
+		this.maximizable = true;
+		this.resizable = true;
 
 		this.items.add(
 			this.form = datasourceform<EntityType>(
