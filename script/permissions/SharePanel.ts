@@ -122,11 +122,9 @@ class GroupTable extends Table<DataSourceStore> {
 		this.store.setFilter("entity", {inAcl: {entity: name, id: id}});
 
 		if (!id) {
-			// if ID is empty then load default ACKL
-			entities.get(name).then(entity => {
-				this.value = entity.defaultAcl;
-			});
-
+			// if ID is empty then load default ACL
+			const entity = entities.get(name);
+			this.value = entity.defaultAcl;
 		}
 	}
 }
