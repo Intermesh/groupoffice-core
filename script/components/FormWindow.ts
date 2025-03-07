@@ -22,6 +22,7 @@ import {
 } from "@intermesh/goui";
 import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
+import {createlinkbutton} from "./CreateLinkButton";
 
 
 /**
@@ -116,6 +117,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 				),
 
 				this.bbar = tbar({cls: "border-top"},
+					createlinkbutton(),
 					"->",
 					btn({
 						type: "submit",

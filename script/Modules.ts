@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -13,6 +13,7 @@ export interface EntityFilter {
 }
 
 export interface EntityLink {
+	filter?: string,
 	title?:string
 	iconCls: string,
 	linkWindow: (entity:string, entityId:EntityID) => void,
@@ -20,7 +21,7 @@ export interface EntityLink {
 }
 export interface EntityConfig {
 	name: string;
-	links?:EntityLink[],
+	links?: EntityLink[],
 	filters?:EntityFilter[]
 }
 
@@ -162,7 +163,7 @@ export interface Module extends BaseEntity {
 
 class Modules {
 
-	private mods: Record<string,Record<string, ModuleConfig>> = {};
+	private mods: Record<string, ModuleConfig> = {};
 	private modules?: Module[];
 
 	/**
@@ -172,15 +173,13 @@ class Modules {
 	 */
 	public register(config: ModuleConfig) {
 
-		if(!this.mods[config.package]) {
-			this.mods[config.package] = {};
-		}
+		const id = config.package + "/" + config.name;
 
-		if(this.mods[config.package][config.name]) {
+		if(this.mods[id]) {
 			return; //already registered
 		}
 
-		this.mods[config.package][config.name] = config;
+		this.mods[id] = config;
 
 		this.registerInExtjs(config);
 
@@ -291,12 +290,8 @@ class Modules {
 	/**
 	 * Get all modules
 	 */
-	public async getAll() {
-		if(!this.modules) {
-			const mods = await jmapds<Module>("Module").get();
-			this.modules = mods.list;
-		}
-		return this.modules;
+	public getAll() : Module[] {
+		return go.Modules.getAvailable();
 	}
 
 	/**
