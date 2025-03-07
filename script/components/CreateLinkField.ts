@@ -2,7 +2,7 @@ import {
 	AutocompleteChips,
 	column, Config, createComponent, DataSourceForm,
 	DataSourceStore,
-	datasourcestore, FieldEventMap, Format, t,
+	datasourcestore, FieldEventMap, Format, RowSelectConfig, t,
 	Table,
 	table
 } from "@intermesh/goui";
@@ -16,6 +16,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 		super(table({
 			fitParent: true,
 			headers: false,
+			rowSelectionConfig: {multiSelect: false},
 			store: datasourcestore({
 				dataSource: jmapds("Search"),
 				sort: [{isAscending:false, property:"modifiedAt"}],
