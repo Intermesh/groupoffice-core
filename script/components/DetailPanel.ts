@@ -58,11 +58,9 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			if(this.entity) {
 				const id = this.entity.id;
 
-				console.log(id, changes.updated);
-
 				// not working
 				if (changes.updated && changes.updated.indexOf(id) > -1) {
-					void this.innerLoad(this.entity.id!);
+					void this.load(this.entity.id!);
 				}
 
 				if (changes.destroyed && changes.destroyed.indexOf(id) > -1) {
@@ -100,7 +98,8 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			this.detailView = new go.detail.Panel({
 				width: undefined,
 				entityStore: go.Db.store(this.entityName),
-				header: false
+				header: false,
+				onChanges: () => undefined // don't handle onchanges as this component handles that
 			});
 
 			this.detailView.on("load", () => {
@@ -170,7 +169,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	}
 
 	private async innerLoad(id:EntityID) {
-		this.entity = await jmapds<EntityType>(this.entityName).single(id.toString());
+		this.entity = await jmapds<EntityType>(this.entityName).single(id);
 
 		if(!this.entity) {
 			throw "notfound";
