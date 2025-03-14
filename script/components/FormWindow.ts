@@ -68,6 +68,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	 */
 	public hasLinks = false;
 	protected submitBtn: Button;
+	private readonly browseLinksBtn: Button;
 
 	/**
 	 * Constructor
@@ -129,6 +130,19 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					this.createLinkBtn = createlinkbutton({
 						hidden: true
 					}),
+
+					this.browseLinksBtn = btn({
+						hidden: true,
+						icon: "link",
+						handler: () => {
+							var lb = new go.links.LinkBrowser({
+								entity: this.entityName,
+								entityId: this.form.currentId
+							});
+
+							lb.show();
+						}
+					}),
 					"->",
 					this.submitBtn = btn({
 						type: "submit",
@@ -180,6 +194,9 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 				this.fire("ready", this, this.form.currentId);
 			} else {
 				this.createLinkBtn.hide();
+				if(this.hasLinks) {
+					this.browseLinksBtn.show();
+				}
 			}
 		});
 	}
