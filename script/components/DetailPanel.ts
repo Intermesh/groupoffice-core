@@ -62,7 +62,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 				// not working
 				if (changes.updated && changes.updated.indexOf(id) > -1) {
-					this.load(this.entity.id!);
+					void this.innerLoad(this.entity.id!);
 				}
 
 				if (changes.destroyed && changes.destroyed.indexOf(id) > -1) {
@@ -157,22 +157,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		this.mask();
 
 		try {
-			this.entity = await jmapds<EntityType>(this.entityName).single(id.toString());
-
-			if(!this.entity) {
-				throw "notfound";
-			}
-
-			this.scroller.hidden = false;
-			this.disabled = false;
-			this.fire("load", this, this.entity);
-
-			this.scroller.items.forEach((i:any) => {
-				if(i != this.legacyDetailView && i.onLoad) {
-					i.onLoad(this.entity!);
-				}
-			})
-
+			await this.innerLoad(id);
 			this.legacyOnLoad();
 
 		} catch (e) {
@@ -182,6 +167,24 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		}
 
 		return this;
+	}
+
+	private async innerLoad(id:EntityID) {
+		this.entity = await jmapds<EntityType>(this.entityName).single(id.toString());
+
+		if(!this.entity) {
+			throw "notfound";
+		}
+
+		this.scroller.hidden = false;
+		this.disabled = false;
+		this.fire("load", this, this.entity);
+
+		this.scroller.items.forEach((i:any) => {
+			if(i != this.legacyDetailView && i.onLoad) {
+				i.onLoad(this.entity!);
+			}
+		})
 	}
 
 
