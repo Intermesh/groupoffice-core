@@ -103,6 +103,10 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 				header: false
 			});
 
+			this.detailView.on("load", () => {
+				this.detailView.doLayout();
+			})
+
 			this.scroller.items.add(this.detailView);
 		}
 
@@ -164,7 +168,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			this.fire("load", this, this.entity);
 
 			this.scroller.items.forEach((i:any) => {
-				if(i.onLoad) {
+				if(i != this.legacyDetailView && i.onLoad) {
 					i.onLoad(this.entity!);
 				}
 			})

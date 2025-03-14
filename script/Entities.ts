@@ -1,4 +1,5 @@
 import {EntityLink, modules} from "./Modules.js";
+import {EntityID} from "@intermesh/goui";
 
 export interface Entity {
 	name: string,
@@ -6,7 +7,8 @@ export interface Entity {
 	isAclOwner: boolean,
 	supportsCustomFields: boolean,
 	supportsFiles: boolean,
-	links: LinkConfig[]
+	links: LinkConfig[],
+	goto: (id:EntityID)=>void
 }
 
 export interface LinkConfig extends EntityLink {
