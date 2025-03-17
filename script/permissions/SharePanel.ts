@@ -49,6 +49,7 @@ class GroupTable extends Table<DataSourceStore> {
 				column({
 					header: t("Name"),
 					id: "name",
+					resizable: true,
 					renderer: async (columnValue, record, td, table, storeIndex) => {
 
 						const first = record.users.slice(0, 3);
@@ -114,6 +115,8 @@ class GroupTable extends Table<DataSourceStore> {
 		this.fitParent = true;
 
 		this.scrollLoad = true;
+
+		this.style.width = "100%";
 
 		this.cls = 'goui-share-panel';
 	}
@@ -202,12 +205,16 @@ export class SharePanel extends Field {
 				}),
 			),
 
-			comp({cls: "scroll fit", flex: 1},
+			comp({cls: "scroll fit bg-lowest", flex: 1},
 				this.groupTable
 			)
 		)
 	}
 
+
+	protected renderControl() {
+		// empty
+	}
 
 	protected createLabel(): HTMLElement | void {
 
