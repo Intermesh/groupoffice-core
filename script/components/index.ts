@@ -10,3 +10,4 @@ export * from './form/RecurrenceField.js';
 export * from './picker/RecurrencePicker.js';
 export * from './CreateLinkField.js';
 export * from './CreateLinkButton.js';
+export * from './EntityTypeTable.js';

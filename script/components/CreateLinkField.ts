@@ -1,20 +1,24 @@
 import {
-	AutocompleteChips,
-	column, Config, createComponent, DataSourceForm,
+	AutocompleteChips, checkbox, checkboxcolumn, checkboxgroup, checkboxselectcolumn,
+	column, comp, Config, createComponent, DataSourceForm,
 	DataSourceStore,
-	datasourcestore, FieldEventMap, Format, RowSelectConfig, t,
+	datasourcestore, FieldEventMap, Format, ListEventMap, RowSelectConfig, Store, store, t,
 	Table,
-	table
+	table, tbar
 } from "@intermesh/goui";
 import {jmapds} from "../jmap/index";
-import {entities} from "../Entities";
+import {entities, LinkConfig} from "../Entities";
 import {Link} from "../model/Link";
+import {entityttypeable} from "./EntityTypeTable";
+
+
+
 
 export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 
 	constructor() {
 		super(table({
-			fitParent: true,
+			width: 400,
 			headers: false,
 			rowSelectionConfig: {multiSelect: false},
 			store: datasourcestore({
@@ -48,6 +52,39 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 				})
 			]
 		}));
+
+
+		this.menu.cls = "goui-dropdown hbox";
+		this.menu.height = 400;
+
+		this.menu.items.replace(
+			comp({
+				cls: "hbox fit",
+			},
+				comp({width: 180, cls: "fit scroll border-right"},
+					entityttypeable({
+						rowSelectionConfig: {
+							multiSelect: true,
+							listeners: {
+								selectionchange: (rowSelect, selected) => {
+									this.list.store.setFilter("entityType", {entities: selected.map((r) => {
+											return {name: r.record.entity,filter: r.record.filter};
+										})})
+
+									this.list.store.load();
+								}
+							}
+						}
+					})
+				),
+				comp({
+					cls: "fit scroll",
+					flex: 1
+				},
+					this.list
+				)
+			)
+		);
 
 		this.label = t("Create links")
 
