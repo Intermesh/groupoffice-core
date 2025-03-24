@@ -180,7 +180,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		this.fire("load", this, this.entity);
 
 		this.scroller.items.forEach((i:any) => {
-			if(i != this.legacyDetailView && i.onLoad) {
+			if(i != this.detailView && i.onLoad) {
 				i.onLoad(this.entity!);
 			}
 		})
