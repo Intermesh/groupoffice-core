@@ -11,3 +11,5 @@ export * from './picker/RecurrencePicker.js';
 export * from './CreateLinkField.js';
 export * from './CreateLinkButton.js';
 export * from './EntityTypeTable.js';
+export * from './smtp/SmtpAccountGrid.js';
+export * from './smtp/SmtpAccountDialog.js';
