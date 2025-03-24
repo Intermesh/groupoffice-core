@@ -15,7 +15,6 @@ import {
 } from "@intermesh/goui";
 import {client} from "../../jmap/index.js";
 
-
 export class SmtpAccountDialog extends FormWindow {
 	constructor() {
 		super("SmtpAccount");

@@ -10,7 +10,7 @@ import {
 	TableConfig
 } from "@intermesh/goui";
 import {jmapds} from "../../jmap/index.js";
-import {smtpaccountdialog, SmtpAccountDialog} from "./SmtpAccountDialog.js";
+import {smtpaccountdialog} from "./SmtpAccountDialog.js";
 
 interface Module {
 	package: string,
