@@ -1,4 +1,5 @@
-// created from 'create-ts-index'
+
+import './LangLoader.js';
 
 export * from './auth/index.js';
 export * from './jmap/index.js';

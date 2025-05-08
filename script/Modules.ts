@@ -63,7 +63,6 @@ if(window.GO) {
 	client.uri = BaseHref + "api/";
 
 	GO.mainLayout.on("authenticated", () => {
-		translate.load(GO.lang.core.core, "core", "core");
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
 	})
 
