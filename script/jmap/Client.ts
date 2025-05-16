@@ -46,7 +46,7 @@ export interface Client {
 }
 
 
-type UploadResponse = {
+export type UploadResponse = {
 	id: string,
 	size: number,
 	type: string,
