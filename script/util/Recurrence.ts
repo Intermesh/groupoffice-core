@@ -46,7 +46,7 @@ export class Recurrence {
 	private config: RecurrenceConfig;
 
 	private dayNb(shortName: string) {
-		return {'mo':2, 'tu':3, 'we':4, 'th':5, 'fr':6, 'sa':7, 'su':1}[shortName.toLowerCase()];
+		return {'mo':2, 'tu':3, 'we':4, 'th':5, 'fr':6, 'sa':7, 'su':1}[shortName.toLowerCase()] ?? 2;
 	}
 
 	constructor(config: RecurrenceConfig) {
@@ -66,11 +66,11 @@ export class Recurrence {
 		if(config.rule.count) cfg.count = config.rule.count;
 		if(config.rule.firstDayOfWeek) cfg.wkst = this.dayNb(config.rule.firstDayOfWeek);
 		if(config.rule.byDay) cfg.byday = config.rule.byDay.map(i => (i.nthOfPeriod ?? "") + i.day.toUpperCase());
-		if(config.rule.byMonthDay) cfg.bymonthday = config.rule.byMonthDay;
+		if(config.rule.byMonthDay) cfg.bymonthday = config.rule.byMonthDay.map(i => parseInt(i as any));
 		if(config.rule.byMonth) cfg.bymonth = config.rule.byMonth;
-		if(config.rule.bySetPosition) cfg.bysetpos = config.rule.bySetPosition;
-		if(config.rule.byWeekNo) cfg.byweekno = config.rule.byWeekNo;
-		if(config.rule.byYearDay) cfg.byyearday = config.rule.byYearDay;
+		if(config.rule.bySetPosition) cfg.bysetpos = config.rule.bySetPosition.map(i => parseInt(i as any));
+		if(config.rule.byWeekNo) cfg.byweekno = config.rule.byWeekNo.map(i => parseInt(i as any));
+		if(config.rule.byYearDay) cfg.byyearday = config.rule.byYearDay.map(i => parseInt(i as any));
 
 		try {
 			this.rrule = ICAL.Recur.fromData(cfg).iterator(this.makeDate(config.dtstart, true));

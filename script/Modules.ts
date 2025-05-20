@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, translate} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -13,6 +13,7 @@ export interface EntityFilter {
 }
 
 export interface EntityLink {
+	filter?: string,
 	title?:string
 	iconCls: string,
 	linkWindow: (entity:string, entityId:EntityID) => void,
@@ -20,7 +21,7 @@ export interface EntityLink {
 }
 export interface EntityConfig {
 	name: string;
-	links?:EntityLink[],
+	links?: EntityLink[],
 	filters?:EntityFilter[]
 }
 
@@ -62,7 +63,6 @@ if(window.GO) {
 	client.uri = BaseHref + "api/";
 
 	GO.mainLayout.on("authenticated", () => {
-		translate.load(GO.lang.core.core, "core", "core");
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
 	})
 
@@ -162,7 +162,7 @@ export interface Module extends BaseEntity {
 
 class Modules {
 
-	private mods: Record<string,Record<string, ModuleConfig>> = {};
+	private mods: Record<string, ModuleConfig> = {};
 	private modules?: Module[];
 
 	/**
@@ -172,15 +172,13 @@ class Modules {
 	 */
 	public register(config: ModuleConfig) {
 
-		if(!this.mods[config.package]) {
-			this.mods[config.package] = {};
-		}
+		const id = config.package + "/" + config.name;
 
-		if(this.mods[config.package][config.name]) {
+		if(this.mods[id]) {
 			return; //already registered
 		}
 
-		this.mods[config.package][config.name] = config;
+		this.mods[id] = config;
 
 		this.registerInExtjs(config);
 
@@ -231,7 +229,7 @@ class Modules {
 	 * @param icon
 	 * @param callback
 	 */
-	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: string, callback: () => Component | Promise<Component>) {
+	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component | Promise<Component>) {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
@@ -240,7 +238,7 @@ class Modules {
 		const proto = new GouiSystemSettingsPanel();
 		proto.callback= callback;
 		proto.title = title;
-		proto.iconCls = "ic-" + icon;
+		proto.iconCls = "ic-" + icon.replace('_','-');
 		proto.itemId = id;
 
 		GO.systemSettingsPanels.push(proto);
@@ -256,7 +254,7 @@ class Modules {
 	 * @param icon
 	 * @param callback
 	 */
-	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: string, callback: () => Component) {
+	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component) {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
@@ -265,7 +263,7 @@ class Modules {
 		const proto = new GouiAccountSettingsPanel({
 			callback: callback,
 			title: title,
-			iconCls: "ic-"+icon,
+			iconCls: "ic-"+icon.replace('_', '-'),
 			itemId: id
 		});
 
@@ -291,12 +289,8 @@ class Modules {
 	/**
 	 * Get all modules
 	 */
-	public async getAll() {
-		if(!this.modules) {
-			const mods = await jmapds<Module>("Module").get();
-			this.modules = mods.list;
-		}
-		return this.modules;
+	public getAll() : Module[] {
+		return go.Modules.getAvailable();
 	}
 
 	/**

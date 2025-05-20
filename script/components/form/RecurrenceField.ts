@@ -60,6 +60,7 @@ export class RecurrenceField extends Field {
 
 	protected createControl() {
 		this.control = E('input').attr('type', 'text').attr('readOnly', true).cls('text');
+		this.control.value = t('Not recurring'); // default state until changed
 		return this.control;
 	}
 	setStartDate(date: DateTime) {

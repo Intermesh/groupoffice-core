@@ -135,7 +135,7 @@ export class RecurrencePicker extends CardContainer {
 			hidden: true,
 			required: false
 		});
-		this.form = form({width:392},
+		this.form = form({width:496},
 			comp({cls: 'flow pad'},
 				comp({text: t('Every'), width:50, style:{alignSelf: 'center'}}),
 				intervalField,
@@ -153,10 +153,10 @@ export class RecurrencePicker extends CardContainer {
 						}
 					}
 				}),
-				comp({cls: 'flow'},
+				comp({cls: 'flow', flex:1},
 					comp({html: t("Ends"), width:50, style:{alignSelf: 'center'} }),
 					select({
-						width: 100,
+						width: 160,
 						name: 'endsRadio',
 						value: 'forever',
 						textRenderer: r => r.text,
@@ -292,7 +292,7 @@ export class RecurrencePicker extends CardContainer {
 			{value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')}
 		];
 
-		if(date.addDays(7).getMonth() != this.startDate.getMonth()) {
+		if(date.clone().addDays(7).getMonth() != this.startDate.getMonth()) {
 			this.weekOfMonth = -1;
 			monthOpt.options.push({value: 'byDay', name: this.getSuffix() + ' ' + this.startDate.format('l')});
 		}

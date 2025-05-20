@@ -46,7 +46,7 @@ export interface Client {
 }
 
 
-type UploadResponse = {
+export type UploadResponse = {
 	id: string,
 	size: number,
 	type: string,
@@ -111,7 +111,7 @@ export class Client<UserType extends User = User> extends Observable {
 	 *
 	 * @private
 	 */
-	private requestTimeout = 30000;
+	public requestTimeout = 30000;
 
 	constructor() {
 		super();
