@@ -45,7 +45,7 @@ export interface DetailPanel<EntityType extends BaseEntity = DefaultEntity> exte
 export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity> extends Component {
 	protected titleCmp?: Component;
 	protected entity?: EntityType;
-	protected readonly scroller: Component;
+	public readonly scroller: Component;
 	private detailView: any;
 	public readonly toolbar: Toolbar;
 	private comments: any;
