@@ -1,14 +1,41 @@
-import {AutocompleteEventMap, BaseEntity, ComboBox, ComboBoxConfig, createComponent, t} from "@intermesh/goui";
-import {jmapds} from "../jmap/index.js";
+import {
+	AutocompleteEventMap,
+	BaseEntity,
+	ComboBox,
+	ComboBoxConfig,
+	ComboBoxDefaultRenderer, ComboBoxStoreConfig, ComboRenderer,
+	createComponent,
+	t, TableConfig
+} from "@intermesh/goui";
+import {JmapDataSource, jmapds} from "../jmap/index.js";
 import {Principal, User} from "../auth/index.js";
 
 
 
-export class PrincipalCombo extends ComboBox {
+export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 
-	constructor(entity?:string) {
+	constructor(
+		entity?:string,
+		renderer:ComboRenderer = ComboBoxDefaultRenderer,
+		storeConfig:ComboBoxStoreConfig<JmapDataSource<Principal>> = {
+			queryParams: {
+				limit: 50
+			}
+		},
+		tableConfig?: Partial<TableConfig>,
+		protected selectFirst: boolean = false
+		) {
 
-		super(jmapds<Principal>("Principal"));
+		super(
+			jmapds<Principal>("Principal"),
+			"name",
+			"id",
+			renderer,
+			storeConfig,
+			tableConfig,
+			selectFirst
+
+		);
 
 		this.name = "userId";
 
@@ -23,5 +50,13 @@ export type PrincipalComboConfig = Omit<ComboBoxConfig<PrincipalCombo>, "dataSou
 	entity?: string
 }
 
-export const principalcombo = (config?:PrincipalComboConfig) => createComponent(new PrincipalCombo(config?.entity), config);
+export const principalcombo = (config?:PrincipalComboConfig) =>
+	createComponent(new PrincipalCombo(
+			config?.entity,
+			config?.renderer ?? ComboBoxDefaultRenderer,
+			config?.storeConfig ?? {	queryParams: {limit: 50}},
+			config?.tableConfig ?? {},
+			config?.selectFirst ?? false
+		),
+		config);
 
