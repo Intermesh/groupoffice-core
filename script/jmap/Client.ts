@@ -336,11 +336,19 @@ export class Client<UserType extends User = User> extends Observable {
 		return `${this.uri}page.php/${path}`;
 	}
 
+	/**
+	 * Default headers that will be added to each request
+	 */
+	public defaultHeaders : Record<string, string> = {
+		'Content-Type': 'application/json'
+	};
+
 	private getDefaultHeaders() {
 
-		const headers: Record<string, string> = {
-			'Content-Type': 'application/json'
-		};
+		const headers: Record<string, string> = {};
+		for(const key in this.defaultHeaders) {
+			headers[key] = this.defaultHeaders[key];
+		}
 
 		if(this.accessToken) {
 			headers.Authorization =  "Bearer " + this.accessToken;
