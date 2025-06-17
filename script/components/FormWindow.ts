@@ -70,6 +70,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	protected submitBtn: Button;
 	private readonly browseLinksBtn: Button;
 
+	protected closeOnSave = true;
+
 	/**
 	 * Constructor
 	 *
@@ -94,7 +96,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					flex: 1,
 					listeners: {
 						save: () => {
-							this.close();
+							if(this.closeOnSave)
+								this.close();
 						},
 
 						invalid: (form) => {
