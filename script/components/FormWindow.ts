@@ -171,7 +171,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		if(this.form.isModified()) {
 			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
 				if(confirmed) {
-					this.close();
+					this.internalClose(byUser);
 				}
 			});
 
