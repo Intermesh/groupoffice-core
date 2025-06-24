@@ -494,7 +494,7 @@ export class Client<UserType extends User = User> extends Observable {
 					this._requestData[callId].reject({
 						"type": "urn:ietf:params:go:error:connectionError",
 						"status": 500,
-						"detail": e ?? "Connection error"
+						"detail": e ? `Error: type: ${e.name}, message: ${e.message}` :  "Connection error"
 
 					});
 					delete this._requestData[callId];
