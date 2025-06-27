@@ -37,11 +37,11 @@ export class EntityTypeTable extends Table<Store<LinkConfig>> {
 		this.headers = false;
 		this.rowSelectionConfig = {multiSelect: true};
 
-		this.on("rowclick", (list, storeIndex, row, ev) => {
+		this.on("rowclick", ({storeIndex}) => {
 			this.rowSelection!.clear();
 			this.rowSelection!.selectIndex(storeIndex);
 		})
 	}
 }
 
-export const entityttypeable = (config?: Config<EntityTypeTable, ListEventMap<EntityTypeTable>>) => createComponent(new EntityTypeTable(), config);
+export const entityttypeable = (config?: Config<EntityTypeTable>) => createComponent(new EntityTypeTable(), config);

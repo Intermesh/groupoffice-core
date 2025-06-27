@@ -5,7 +5,7 @@ export class AddButton extends Component {
 	constructor() {
 		super();
 
-		this.on("added", (comp, index) => {
+		this.on("added", () => {
 			const panel = this.findAncestor(cmp => {
 				return cmp instanceof DetailPanel;
 			}) as DetailPanel;
@@ -21,4 +21,4 @@ export class AddButton extends Component {
 	}
 }
 
-export const addbutton = (config?: Config<AddButton, ComponentEventMap<AddButton>>) => createComponent(new AddButton(), config);
+export const addbutton = (config?: Config<AddButton>) => createComponent(new AddButton(), config);

@@ -27,14 +27,14 @@ export class RecurrenceField extends Field {
 		super();
 
 		this.picker = new RecurrencePicker(new DateTime());
-		this.picker.on('select', (_, val) => {
+		this.picker.on('select', ({rule}) => {
 
 			this.pickerButton.menu!.hide();
 			this.clearInvalid();
 			this.focus();
 
-			this.value = val;
-			this.control!.value = RecurrenceField.toText(val!, this.picker.startDate);
+			this.value = rule;
+			this.control!.value = RecurrenceField.toText(rule!, this.picker.startDate);
 		});
 
 		this.buttons = [
@@ -142,4 +142,4 @@ export class RecurrenceField extends Field {
  *
  * @param config
  */
-	export const recurrencefield = (config?: FieldConfig<RecurrenceField, FieldEventMap<RecurrenceField>>) => createComponent(new RecurrenceField(), config);
+	export const recurrencefield = (config?: FieldConfig<RecurrenceField>) => createComponent(new RecurrenceField(), config);

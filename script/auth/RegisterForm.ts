@@ -48,13 +48,13 @@ export class RegisterForm extends Form {
 					name: "email",
 					required: true,
 					listeners: {
-						change: (field) => {
-							if (!field.isValid()) {
+						change: ({target}) => {
+							if (!target.isValid()) {
 								return;
 							}
 							const username = this.findField("username")!;
 							if (username.isEmpty()) {
-								username.value = field.value;
+								username.value = target.value;
 							}
 
 						}
@@ -82,10 +82,10 @@ export class RegisterForm extends Form {
 					label: t("Confirm password"),
 					required: true,
 					listeners: {
-						validate: (field) => {
-							const form = field.findAncestorByType(Form)!;
-							if (field.value != form.findField("password")!.value) {
-								field.setInvalid("The passwords don't match");
+						validate: ({target}) => {
+							const form = target.findAncestorByType(Form)!;
+							if (target.value != form.findField("password")!.value) {
+								target.setInvalid("The passwords don't match");
 							}
 						}
 					},

@@ -34,16 +34,11 @@ export interface ForgottenData {
 	email: String
 }
 
-interface ClientEventMap<Type extends Observable>  extends ObservableEventMap<Type> {
-	authenticated: <Sender extends Type>(client: Sender, session: any) => void
-	logout: <Sender extends Type>(client: Sender) => void
+interface ClientEventMap  extends ObservableEventMap {
+	authenticated: {session: any}
+	logout: {}
 }
 
-export interface Client {
-	on<K extends keyof ClientEventMap<this>, L extends Listener>(eventName: K, listener: Partial<ClientEventMap<this>>[K]): L
-	un<K extends keyof ClientEventMap<this>>(eventName: K, listener: Partial<ClientEventMap<this>>[K]): boolean
-	fire<K extends keyof ClientEventMap<Client>>(eventName: K, ...args: Parameters<NonNullable<ClientEventMap<any>[K]>>): boolean
-}
 
 
 export type UploadResponse = {
@@ -77,7 +72,7 @@ export interface ResultReference  {
 	path: string
 }
 
-export class Client<UserType extends User = User> extends Observable {
+export class Client<UserType extends User = User> extends Observable<ClientEventMap> {
 	private _lastCallCounter = 0;
 
 	private _lastCallId?:string;
@@ -192,7 +187,7 @@ export class Client<UserType extends User = User> extends Observable {
 
 		this.setUser(user);
 
-		this.fire("authenticated", this, this._session);
+		this.fire("authenticated", {session: this._session});
 
 		return true;
 	}
@@ -209,9 +204,9 @@ export class Client<UserType extends User = User> extends Observable {
 		Format.decimalSeparator = this._user.decimalSeparator;
 
 
-		jmapds<UserType>("User").on("change", async (dataSource, changes) => {
+		jmapds<UserType>("User").on("change", async ( {target, changes}) => {
 			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
-				const user =  await dataSource.single(this._user!.id);
+				const user =  await target.single(this._user!.id);
 				if(user) {
 					this.setUser(user);
 				}
@@ -226,7 +221,7 @@ export class Client<UserType extends User = User> extends Observable {
 		this.session = go.User.session;
 		this._user = go.User;
 
-		this.fire("authenticated", this, this._session);
+		this.fire("authenticated", {session: this._session});
 	}
 
 	/**

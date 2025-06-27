@@ -66,7 +66,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 						rowSelectionConfig: {
 							multiSelect: true,
 							listeners: {
-								selectionchange: (rowSelect, selected) => {
+								selectionchange: ({selected}) => {
 									this.list.store.setFilter("entityType", {entities: selected.map((r) => {
 											return {name: r.record.entity,filter: r.record.filter};
 										})})
@@ -109,7 +109,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 			return {searchId: record.id, entityId: record.entityId, entityName: record.entity};
 		}
 
-		this.on("autocomplete" , (field, input) => {
+		this.on("autocomplete" , ({input}) => {
 			this.list.store.setFilter("autocomplete", {text: input});
 			void this.list.store.load();
 		})
@@ -135,4 +135,4 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 	}
 }
 
-export const createlinkfield = (config?: Config<CreateLinkField, FieldEventMap<CreateLinkField>>) => createComponent(new CreateLinkField(), config);
+export const createlinkfield = (config?: Config<CreateLinkField>) => createComponent(new CreateLinkField(), config);

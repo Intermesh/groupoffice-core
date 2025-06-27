@@ -99,7 +99,7 @@ class GroupTable extends Table<DataSourceStore> {
 								{value: 50,name: t("Manage")}
 							],
 							listeners: {
-								change: (field, newValue, oldValue) => {
+								change: ( {newValue}) => {
 									if(!this.value) {
 										this.value = {};
 									}
@@ -154,7 +154,7 @@ export class SharePanel extends Field {
 					value: "groups",
 					listeners: {
 
-						change: (field, newValue, oldValue) => {
+						change: ({newValue}) => {
 							const f:Filter = {};
 
 							switch (newValue) {
@@ -197,7 +197,7 @@ export class SharePanel extends Field {
 				"->",
 				searchbtn({
 					listeners: {
-						input: (sender, text) => {
+						input: ( {text}) => {
 							this.groupTable.store.setFilter("search", {text: text});
 							void this.groupTable.store.load();
 						}
@@ -244,4 +244,4 @@ export class SharePanel extends Field {
  *
  * @param config
  */
-export const sharepanel = (config?: Config<SharePanel, ComponentEventMap<SharePanel>>) => createComponent(new SharePanel(), config);
+export const sharepanel = (config?: Config<SharePanel>) => createComponent(new SharePanel(), config);
