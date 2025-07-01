@@ -4,7 +4,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {Format, FunctionUtil, Listener, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
