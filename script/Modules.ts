@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, translate, Window} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -13,23 +13,62 @@ export interface EntityFilter {
 }
 
 export interface EntityLink {
-	filter?: string,
-	title?:string
-	iconCls: string,
-	searchOnly?:boolean,
-	linkWindow: (entity:string, entityId:EntityID) => void,
-	linkDetail: () => void
+	/**
+	 * Filter key. For contacts there's "isOrganization" for example.
+	 */
+	filter?: string;
+	/**
+	 * Human friendly title for menu's. Defaults to t(entity.name)
+	 */
+	title?: string;
+	/**
+	 * CSS class to render the icon
+	 */
+	iconCls: string;
+	/**
+	 * Use this link only for the search filter. Used for comments.
+	 */
+	searchOnly?: boolean;
+	/**
+	 * Create a window that will create a new linked item of this type
+	 *
+	 * @param entity
+	 * @param entityId
+	 */
+	linkWindow?: (entity: string, entityId: EntityID) => Window;
+
+
+	/**
+	 * Return a detail component to show a linked entity of this type
+	 */
+	linkDetail: () => Component;
 }
 export interface EntityConfig {
+	/**
+	 * Entity name
+	 *
+	 * eg. "Contact"
+	 */
 	name: string;
+	/**
+	 * Human friendly title for the entity
+	 *
+	 * If not given it will default to t(entity.name);
+	 */
 	title?: string;
-	links?: EntityLink[],
-	filters?:EntityFilter[]
+	/**
+	 * Available linking options.
+	 *
+	 * In most cases there will be one but for example a contact as one extra for organizations. The "filter" option is
+	 * used to differentiate the two.
+	 */
+	links?: EntityLink[];
+	/**
+	 * Custom filters for the entity
+	 */
+	filters?: EntityFilter[];
 }
-
 export type ModuleConfig = {
-	// [key:string]:unknown;
-
 	/**
 	 * Module package name
 	 */
@@ -38,17 +77,14 @@ export type ModuleConfig = {
 	 * Module name
 	 */
 	name: string;
-
 	/**
 	 * Init function. Is called when the main Group-Office page loads
 	 */
 	init?: () => void;
-
 	/**
 	 * Registered module entities
 	 */
-	entities?: (string|EntityConfig)[]
-
+	entities?: (string | EntityConfig)[];
 };
 
 // for using old components in GOUI
