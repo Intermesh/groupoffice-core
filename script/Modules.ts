@@ -21,6 +21,7 @@ export interface EntityLink {
 }
 export interface EntityConfig {
 	name: string;
+	title?: string;
 	links?: EntityLink[],
 	filters?:EntityFilter[]
 }
