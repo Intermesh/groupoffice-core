@@ -16,6 +16,7 @@ export interface EntityLink {
 	filter?: string,
 	title?:string
 	iconCls: string,
+	searchOnly?:boolean,
 	linkWindow: (entity:string, entityId:EntityID) => void,
 	linkDetail: () => void
 }
