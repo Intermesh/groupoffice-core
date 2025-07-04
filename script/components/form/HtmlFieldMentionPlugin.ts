@@ -1,9 +1,31 @@
-import {btn, HtmlField, menu, Menu, root} from "@intermesh/goui";
+import {btn, HtmlField, menu, Menu, root, t} from "@intermesh/goui";
 
 export type HtmlFieldMentionProvider = (input: string) => Promise<{value:string, display:string }[]>;
 export class HtmlFieldMentionPlugin {
 	private menu?: Menu;
-	constructor(readonly field:HtmlField, readonly provider: HtmlFieldMentionProvider) {
+	constructor(readonly field:HtmlField, readonly provider: HtmlFieldMentionProvider, btnIndex:number|undefined = undefined) {
+
+		const tbBtn = 	btn({
+			icon: "alternate_email",
+			title: t("Mention user"),
+			handler: () => {
+				const lastChar = this.getPreviousChar();
+				let insert = "@";
+				if(lastChar != 160 && lastChar != 32) {
+					insert = " " + insert;
+				}
+				field.insertHtml(insert);
+				this.mentionSequence = "";
+				this.onMention("");
+			}
+		});
+
+		if(btnIndex) {
+			field.getToolbar().items.insert(btnIndex, tbBtn);
+		} else {
+			field.getToolbar().items.add(tbBtn);
+		}
+
 		field.on("render", ({target }) => {
 			target.el.on("keydown", e => {
 				if(this.menu && !this.menu.hidden) {
@@ -62,7 +84,7 @@ export class HtmlFieldMentionPlugin {
 				this.mentionSequence += ev.key;
 			}
 
-			this.onMention(this.mentionSequence, ev);
+			this.onMention(this.mentionSequence);
 		}
 	}
 
@@ -97,10 +119,10 @@ export class HtmlFieldMentionPlugin {
 		return range.getBoundingClientRect();
 	}
 
-	private onMention(mention: string, ev: KeyboardEvent) {
+	private onMention(mention: string) {
 
 		if(!this.menu) {
-			this.menu = menu({cls: "goui-dropdown"});
+			this.menu = menu({cls: "goui-dropdown", removeOnClose: false});
 			root.items.add(this.menu);
 
 			this.field.on("remove", ()=> this.menu!.remove());
@@ -123,6 +145,8 @@ export class HtmlFieldMentionPlugin {
 						})
 				})
 			);
+
+			this.menu!.showAt(coords);
 		})
 	}
 
