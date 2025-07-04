@@ -5,7 +5,6 @@
  */
 
 import {client} from "./Client.js";
-import {User} from "../auth/User.js";
 import {
 	AbstractDataSource,
 	CommitResponse,

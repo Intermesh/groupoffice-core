@@ -58,3 +58,4 @@ export interface AclOwnerEntity extends AclItemEntity {
 }
 
 export const userDS = new JmapDataSource<User>("User");
+export const principalDS = new JmapDataSource<Principal>("Principal");

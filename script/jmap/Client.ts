@@ -8,7 +8,8 @@ import {Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@i
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
-import {User} from "../auth/index.js";
+import {User, userDS} from "../auth/index.js";
+import {customFields} from "../CustomFields";
 
 
 export interface LoginData {
@@ -72,7 +73,7 @@ export interface ResultReference  {
 	path: string
 }
 
-export class Client<UserType extends User = User> extends Observable<ClientEventMap> {
+export class Client extends Observable<ClientEventMap> {
 	private _lastCallCounter = 0;
 
 	private _lastCallId?:string;
@@ -82,7 +83,7 @@ export class Client<UserType extends User = User> extends Observable<ClientEvent
 
 	private debugParam = "";// "XDEBUG_SESSION=1"
 
-	private _user: UserType | undefined;
+	private _user: User | undefined;
 
 	public uri = "";
 
@@ -148,7 +149,7 @@ export class Client<UserType extends User = User> extends Observable<ClientEvent
 	 *
 	 * this.authenticate() as to be called first.
 	 */
-	get user() : UserType {
+	get user() : User {
 		// We assume a user is here but this is not always true. When not authenticated yet the user is undefined.
 		// But because it's annoying to have to do client.user!.id everywhere we pretend to always have user.
 		return this._user!;
@@ -177,9 +178,7 @@ export class Client<UserType extends User = User> extends Observable<ClientEvent
 		if(!this._session) {
 			return false;
 		}
-
-		const ds = jmapds<UserType>("User");
-		const user =  await ds.single(this._session.userId);
+		const user =  await userDS.single(this._session.userId);
 
 		if(!user) {
 			return false;
@@ -187,12 +186,14 @@ export class Client<UserType extends User = User> extends Observable<ClientEvent
 
 		this.setUser(user);
 
+		await customFields.init();
+
 		this.fire("authenticated", {session: this._session});
 
 		return true;
 	}
 
-	private setUser(user:UserType) {
+	private setUser(user:User) {
 
 		this._user = user;
 
@@ -204,7 +205,7 @@ export class Client<UserType extends User = User> extends Observable<ClientEvent
 		Format.decimalSeparator = this._user.decimalSeparator;
 
 
-		jmapds<UserType>("User").on("change", async ( {target, changes}) => {
+		userDS.on("change", async ( {target, changes}) => {
 			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
 				const user =  await target.single(this._user!.id);
 				if(user) {
@@ -644,4 +645,4 @@ export class Client<UserType extends User = User> extends Observable<ClientEvent
 	}
 }
 
-export const client = new Client<User>();
+export const client = new Client();

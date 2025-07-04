@@ -12,3 +12,4 @@ export * from "chart.js/auto";
 export * from "./chart/index.js";
 export * from "./util/Recurrence.js";
 export * from "./Entities.js";
+export * from "./CustomFields.js";
