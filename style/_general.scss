@@ -20,11 +20,11 @@
 		background-color: transparent; // for extjs filter panel in sidebar
 	}
 }
-@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
-	.goui-module-panel {
-		top : 0;
-	}
+//@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
+	//.goui-module-panel {
+	//	top : 0;
+	//}
 	//aside ~ .vbox > .goui-toolbar {
 	//	margin-right: util.dp(240);
 	//}
-}
+//}
