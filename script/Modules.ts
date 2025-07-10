@@ -35,7 +35,7 @@ export interface EntityLink {
 	 * @param entity
 	 * @param entityId
 	 */
-	linkWindow?: (entity: string, entityId: EntityID) => Window;
+	linkWindow?: (entity: string, entityId: EntityID) => any;
 
 
 	/**
