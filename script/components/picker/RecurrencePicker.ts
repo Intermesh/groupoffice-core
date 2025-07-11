@@ -124,7 +124,7 @@ export class RecurrencePicker extends CardContainer<RecurrencePickerEventMap> {
 		this.until = datefield({
 			itemId: 'endDate',
 			name: 'until',
-			min: this.startDate.format('Y-m-d'),
+			min: this.startDate,
 			width: 180,
 			hidden: true,
 			required: false
