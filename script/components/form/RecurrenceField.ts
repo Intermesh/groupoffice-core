@@ -6,9 +6,11 @@
 
 import {RecurrencePicker} from "../picker/RecurrencePicker.js";
 import {RecurrenceRule} from "../../util/Recurrence.js";
-import {Field, FieldConfig, FieldEventMap,
-	menu,btn, Button,createComponent,DateTime,
-	t, E} from "@intermesh/goui";
+import {
+	Field, FieldConfig, FieldEventMap,
+	menu, btn, Button, createComponent, DateTime,
+	t, E, Format
+} from "@intermesh/goui";
 
 export interface RecurrenceField extends Field {
 	set value(v:RecurrenceRule|null)
@@ -114,7 +116,7 @@ export class RecurrenceField extends Field {
 			str += ', ' + rr.count + ' ' + t('times');
 		}
 		if (rr.until) {
-			str += ', ' + t('until') + ' ' + (new DateTime(rr.until)).format("d-m-Y");
+			str += ', ' + t('until') + ' ' + Format.date(new DateTime(rr.until));
 		}
 		return str;
 	}
