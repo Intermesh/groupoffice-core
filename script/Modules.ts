@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, translate, Window} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, t, translate, Window} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -218,7 +218,7 @@ class Modules {
 
 		this.mods[id] = config;
 
-		this.registerInExtjs(config);
+
 
 		go.Translate.package = config.package;
 		go.Translate.module = config.name;
@@ -226,6 +226,7 @@ class Modules {
 		if (config.init) {
 			config.init();
 		}
+		this.registerInExtjs(config);
 	}
 
 
@@ -320,7 +321,8 @@ class Modules {
 	private registerInExtjs(config: ModuleConfig) {
 		go.Translate.setModule(config.package, config.name);
 		go.Modules.register(config.package, config.name, {
-			entities: config.entities
+			entities: config.entities,
+			title: t('name')
 		});
 	}
 
