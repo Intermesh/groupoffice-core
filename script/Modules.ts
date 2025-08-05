@@ -191,7 +191,7 @@ export interface Module extends BaseEntity {
 	name: string,
 	package: string,
 	rights: string[],
-	settings?: Record<string, any>
+	settings: Record<string, any>
 	userRights: Record<string, boolean>,
 	version: number,
 	entities: Record<string, Entity>
