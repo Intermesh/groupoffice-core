@@ -176,6 +176,10 @@ export class Client extends Observable<ClientEventMap> {
 				.catch(e => {
 					console.log(e);
 				})
+
+			if(this._session && this._session.CSRFToken) {
+				this.CSRFToken = this._session.CSRFToken;
+			}
 		}
 
 		if(!this._session) {
