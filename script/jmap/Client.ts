@@ -172,7 +172,10 @@ export class Client extends Observable<ClientEventMap> {
 		}
 
 		if(!this._session) {
-			this._session = await this.request().then(response => response.json());
+			this._session = await this.request().then(response => response.json())
+				.catch(e => {
+					console.log(e);
+				})
 		}
 
 		if(!this._session) {
