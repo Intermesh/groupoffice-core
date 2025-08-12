@@ -4,7 +4,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {DateTime, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
@@ -207,6 +207,7 @@ export class Client extends Observable<ClientEventMap> {
 		Format.dateFormat = this._user.dateFormat;
 		Format.timeFormat = this._user.timeFormat;
 		Format.timezone = this._user.timezone as Timezone;
+		DateTime.defaultTimezone = this._user.timezone as Timezone;
 		Format.currency = this._user.currency;
 		Format.thousandsSeparator = this._user.thousandsSeparator;
 		Format.decimalSeparator = this._user.decimalSeparator;

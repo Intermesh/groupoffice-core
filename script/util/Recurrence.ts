@@ -12,8 +12,7 @@ import {DateTime, Timezone} from "@intermesh/goui";
 
 interface RecurrenceConfig {
 	rule: RecurrenceRule
-	timeZone:Timezone
-	dtstart: Date
+	dtstart: DateTime
 }
 
 type NDay = { day: string, nthOfPeriod?: number };
@@ -42,7 +41,7 @@ export type RecurrenceRule = {
 export class Recurrence {
 
 	private rrule?: ICAL.RecurIterator
-	private timeZone?: Timezone
+	//private timeZone?: Timezone
 	private config: RecurrenceConfig;
 
 	private dayNb(shortName: string) {
@@ -53,10 +52,7 @@ export class Recurrence {
 		this.config = config;
 
 		const cfg: any = {freq: config.rule.frequency.toUpperCase()};
-		if(config.timeZone) {
-			this.timeZone = config.timeZone;
-			//cfg.tzid = "UTC";
-		}
+
 		if(config.rule.interval) cfg.interval = config.rule.interval;
 		if(config.rule.until) {
 			cfg.until = config.rule.until.length > 10 ?
@@ -73,7 +69,7 @@ export class Recurrence {
 		if(config.rule.byYearDay) cfg.byyearday = config.rule.byYearDay.map(i => parseInt(i as any));
 
 		try {
-			this.rrule = ICAL.Recur.fromData(cfg).iterator(this.makeDate(config.dtstart, true));
+			this.rrule = ICAL.Recur.fromData(cfg).iterator(this.makeDate(config.dtstart.date, true));
 		} catch (e) {
 			console.error("Failed to parse rrule: ", cfg);
 		}
@@ -98,7 +94,8 @@ export class Recurrence {
 				continue;
 			}
 			const dt = new DateTime(next.toJSDate());
-			yield this.timeZone ? dt.toTimezone(this.timeZone) : dt;
+			dt.timezone = this.config.dtstart.timezone;
+			yield dt;
 		}
 	}
 
