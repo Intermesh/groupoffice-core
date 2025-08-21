@@ -185,6 +185,10 @@ export class Client extends Observable<ClientEventMap> {
 		if(!this._session) {
 			return false;
 		}
+
+		// make sure we update user
+		await userDS.reset();
+
 		const user =  await userDS.single(this._session.userId);
 
 		if(!user) {
