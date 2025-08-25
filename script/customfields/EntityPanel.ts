@@ -81,7 +81,7 @@ export class EntityPanel extends Component {
 								},
 								...menuButtons
 							)
-						})
+						});
 
 						const moreMenu = btn({
 							icon: "more_vert",
@@ -128,7 +128,7 @@ export class EntityPanel extends Component {
 							)
 						});
 
-						return record.isFieldSet ? comp({}, addBtn, moreMenu) : moreMenu;
+						return record.isFieldSet ? comp({cls: "hbox gap"}, addBtn, moreMenu) : moreMenu;
 					}
 				})
 			]
