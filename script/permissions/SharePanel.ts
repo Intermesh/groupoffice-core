@@ -49,6 +49,7 @@ class GroupTable extends Table<DataSourceStore> {
 				column({
 					header: t("Name"),
 					id: "name",
+					resizable: true,
 					renderer: async (columnValue, record, td, table, storeIndex) => {
 
 						const first = record.users.slice(0, 3);
@@ -84,7 +85,7 @@ class GroupTable extends Table<DataSourceStore> {
 
 				column({
 					id: "level",
-					width: 120,
+					width: 180,
 					header: t("Level"),
 					renderer: (columnValue, record, td, table, storeIndex) => {
 						return select({
@@ -115,6 +116,8 @@ class GroupTable extends Table<DataSourceStore> {
 
 		this.scrollLoad = true;
 
+		this.style.width = "100%";
+
 		this.cls = 'goui-share-panel';
 	}
 
@@ -122,11 +125,9 @@ class GroupTable extends Table<DataSourceStore> {
 		this.store.setFilter("entity", {inAcl: {entity: name, id: id}});
 
 		if (!id) {
-			// if ID is empty then load default ACKL
-			entities.get(name).then(entity => {
-				this.value = entity.defaultAcl;
-			});
-
+			// if ID is empty then load default ACL
+			const entity = entities.get(name);
+			this.value = entity.defaultAcl;
 		}
 	}
 }
@@ -204,12 +205,16 @@ export class SharePanel extends Field {
 				}),
 			),
 
-			comp({cls: "scroll fit", flex: 1},
+			comp({cls: "scroll fit bg-lowest", flex: 1},
 				this.groupTable
 			)
 		)
 	}
 
+
+	protected renderControl() {
+		// empty
+	}
 
 	protected createLabel(): HTMLElement | void {
 

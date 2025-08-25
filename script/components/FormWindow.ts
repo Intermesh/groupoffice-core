@@ -1,6 +1,6 @@
 import {
 	BaseEntity,
-	btn,
+	btn, Button,
 	CardContainer,
 	CardMenu,
 	cardmenu,
@@ -22,6 +22,8 @@ import {
 } from "@intermesh/goui";
 import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
+import {CreateLinkButton, createlinkbutton} from "./CreateLinkButton";
+import {Link} from "../model/Link";
 
 
 /**
@@ -59,6 +61,14 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	 */
 	protected readonly generalTab: Component;
 	private cardMenu: CardMenu;
+	protected readonly createLinkBtn: CreateLinkButton;
+
+	/**
+	 * Enable this for linkable entities. It will show a create link button for new items
+	 */
+	public hasLinks = false;
+	protected submitBtn: Button;
+	private readonly browseLinksBtn: Button;
 
 	/**
 	 * Constructor
@@ -73,7 +83,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		this.cls = "vbox";
 		this.width = 460;
 		this.height = 600;
-
+		this.maximizable = true;
+		this.resizable = true;
 
 		this.items.add(
 			this.form = datasourceform<EntityType>(
@@ -116,8 +127,24 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 				),
 
 				this.bbar = tbar({cls: "border-top"},
+					this.createLinkBtn = createlinkbutton({
+						hidden: true
+					}),
+
+					this.browseLinksBtn = btn({
+						hidden: true,
+						icon: "link",
+						handler: () => {
+							var lb = new go.links.LinkBrowser({
+								entity: this.entityName,
+								entityId: this.form.currentId
+							});
+
+							lb.show();
+						}
+					}),
 					"->",
-					btn({
+					this.submitBtn = btn({
 						type: "submit",
 						text: t("Save")
 					})
@@ -159,9 +186,17 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		// do a setTimeout so currentId is set if win.show().load() is called in that order.
 		setTimeout(() => {
 			if (!this.form.currentId) {
+				if(this.hasLinks) {
+					this.createLinkBtn.show();
+				}
 				// focus form for new entities and not for existing ones.
 				this.form.focus();
 				this.fire("ready", this, this.form.currentId);
+			} else {
+				this.createLinkBtn.hide();
+				if(this.hasLinks) {
+					this.browseLinksBtn.show();
+				}
 			}
 		});
 	}
@@ -279,32 +314,37 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	/**
 	 * Adds a link between two entities on save.
 	 *
-	 * @param {string} entityName - The name of the target entity.
-	 * @param {string} entityId - The ID of the target entity.
-	 * @return {void}
+	 * @param entityName - The name of the target entity.
+	 * @param  entityId - The ID of the target entity.
 	 */
 
 	public addLinkOnSave(entityName:string, entityId:string) {
 
-		const unbindkey = this.form.on("save", (form1, data) => {
-			const link = {
-				"toId": entityId,
-				"toEntity": entityName,
-				"fromId": data.id,
-				"fromEntity": this.entityName
-			}
+		if(this.createLinkBtn) {
+			this.createLinkBtn.show();
+			this.createLinkBtn.createLinkField.value = [{entityId: entityId, entityName: entityName}]
+		} else {
 
-			jmapds("Link").create(link).catch((e) => {
-				Window.error(e);
-			})
-		}, {once: true});
+			const unbindkey = this.form.on("save", (form1, data) => {
+				const link = {
+					"toId": entityId,
+					"toEntity": entityName,
+					"fromId": data.id,
+					"fromEntity": this.entityName
+				}
 
-		this.on("close", () => {
-			// set timeout because close will fire before the save listeners above are fired.
-			setTimeout(() => {
-				this.form.un("save", unbindkey);
+				jmapds<Link>("Link").create(link).catch((e) => {
+					Window.error(e);
+				})
+			}, {once: true});
+
+			this.on("close", () => {
+				// set timeout because close will fire before the save listeners above are fired.
+				setTimeout(() => {
+					this.form.un("save", unbindkey);
+				})
 			})
-		})
+		}
 
 		this.fire("addlink", this, entityName, entityId);
 	}

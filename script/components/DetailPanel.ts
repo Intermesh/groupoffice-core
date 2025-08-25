@@ -58,11 +58,9 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			if(this.entity) {
 				const id = this.entity.id;
 
-				console.log(id, changes.updated);
-
 				// not working
 				if (changes.updated && changes.updated.indexOf(id) > -1) {
-					this.load(this.entity.id!);
+					void this.load(this.entity.id!);
 				}
 
 				if (changes.destroyed && changes.destroyed.indexOf(id) > -1) {
@@ -100,8 +98,13 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 			this.detailView = new go.detail.Panel({
 				width: undefined,
 				entityStore: go.Db.store(this.entityName),
-				header: false
+				header: false,
+				onChanges: () => undefined // don't handle onchanges as this component handles that
 			});
+
+			this.detailView.on("load", () => {
+				this.detailView.doLayout();
+			})
 
 			this.scroller.items.add(this.detailView);
 		}
@@ -153,22 +156,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		this.mask();
 
 		try {
-			this.entity = await jmapds<EntityType>(this.entityName).single(id.toString());
-
-			if(!this.entity) {
-				throw "notfound";
-			}
-
-			this.scroller.hidden = false;
-			this.disabled = false;
-			this.fire("load", this, this.entity);
-
-			this.scroller.items.forEach((i:any) => {
-				if(i.onLoad) {
-					i.onLoad(this.entity!);
-				}
-			})
-
+			await this.innerLoad(id);
 			this.legacyOnLoad();
 
 		} catch (e) {
@@ -178,6 +166,24 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		}
 
 		return this;
+	}
+
+	private async innerLoad(id:EntityID) {
+		this.entity = await jmapds<EntityType>(this.entityName).single(id);
+
+		if(!this.entity) {
+			throw "notfound";
+		}
+
+		this.scroller.hidden = false;
+		this.disabled = false;
+		this.fire("load", this, this.entity);
+
+		this.scroller.items.forEach((i:any) => {
+			if(i != this.detailView && i.onLoad) {
+				i.onLoad(this.entity!);
+			}
+		})
 	}
 
 
