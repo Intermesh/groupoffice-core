@@ -42,6 +42,11 @@ import {
  */
 export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> extends AbstractDataSource<EntityType> {
 
+	constructor(id:string) {
+		super(id);
+
+		stores[id] = this;
+	}
 	/**
 	 * The controller route
 	 *
@@ -135,13 +140,13 @@ const stores: Record<string, any> = {};
  * Get a single instance of a store by ID
  *
  * @deprecated
- * export a const instead
+ * export a const instead. This function is still used by legacy extjs framework in Datasource adapters for the entity stores
  *
  * @see User
  */
 export const jmapds = <EntityType extends DefaultEntity = DefaultEntity>(storeId:string, config?: Config<JmapDataSource>) : JmapDataSource<EntityType> => {
 	if(!stores[storeId]) {
-		stores[storeId] = createComponent(new JmapDataSource<EntityType>(storeId), config);
+		createComponent(new JmapDataSource<EntityType>(storeId), config);
 	}
 	return stores[storeId];
 }
