@@ -49,14 +49,14 @@ export class MultiSelectDialog extends FieldDialog {
 									icon: "drag_handle",
 									title: "Sort",
 									listeners: {
-										render: comp => {
-											comp.el.addEventListener("mousedown", () => {
-												const row = comp.findAncestorByType(ContainerField)!
+										render: ({target}) => {
+											target.el.addEventListener("mousedown", () => {
+												const row = target.findAncestorByType(ContainerField)!
 												row.el.draggable = true;
 											});
 
-											comp.el.addEventListener("mouseup", () => {
-												const row = comp.findAncestorByType(ContainerField)!
+											target.el.addEventListener("mouseup", () => {
+												const row = target.findAncestorByType(ContainerField)!
 												row.el.draggable = false;
 											});
 										}

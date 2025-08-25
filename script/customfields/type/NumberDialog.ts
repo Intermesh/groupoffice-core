@@ -15,7 +15,7 @@ export class NumberDialog extends FieldDialog {
 				decimals: 0,
 				label: t("Decimals"),
 				listeners: {
-					change: (field, newValue) => {
+					change: ({newValue}) => {
 						this.defaultField.decimals = newValue;
 					}
 				}

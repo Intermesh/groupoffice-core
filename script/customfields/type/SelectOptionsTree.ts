@@ -44,20 +44,20 @@ export class SelectOptionsTree extends Component {
 					multiSelect: false,
 					listeners: {
 						selectionchange: (rowSelect) => {
-							this.selectedRecord = rowSelect.getSelected()[0].record;
+							this.selectedRecord = rowSelect.selected[0].record;
 						}
 					}
 				},
 				dropOn: true,
 				draggable: true,
 				listeners: {
-					drop: (toComponent, toIndex, fromIndex, droppedOn, fromComp, dragDataSet) => {
-						if (fromComp != toComponent) {
+					drop: ({target, toIndex, fromIndex, source}) => {
+						if (source != target) {
 							return
 						}
 
-						const draggedRecord = (fromComp as Tree).store.get(fromIndex)!,
-							droppenOnRecord = toComponent.store.get(toIndex)!;
+						const draggedRecord = (source as Tree).store.get(fromIndex)!,
+							droppenOnRecord = target.store.get(toIndex)!;
 
 						if (draggedRecord.id === droppenOnRecord.id || draggedRecord.id === this.rootNode.id) {
 							return
@@ -76,8 +76,8 @@ export class SelectOptionsTree extends Component {
 
 						void this.treeComponent.store.reload();
 					},
-					rowcontextmenu: (list, storeIndex, row, ev) => {
-						const treeRecord = list.store.get(storeIndex)!;
+					rowcontextmenu: ({target, storeIndex, ev}) => {
+						const treeRecord = target.store.get(storeIndex)!;
 						if (treeRecord.id == this.rootNode.id) {
 							return
 						}
@@ -115,7 +115,7 @@ export class SelectOptionsTree extends Component {
 						contextMenu.showAt(ev);
 						ev.preventDefault();
 					},
-					checkchange: (tree, record, storeIndex, checked) => {
+					checkchange: ({record, checked}) => {
 						record.enabled = checked;
 					}
 				}

@@ -1,12 +1,12 @@
 import {FieldDialog} from "../FieldDialog.js";
-import {datefield, t} from "@intermesh/goui";
+import {datetimefield, t} from "@intermesh/goui";
 
 export class DateTimeDialog extends FieldDialog {
 	constructor() {
 		super();
 
 		this.generalFieldset.items.add(
-			datefield({
+			datetimefield({
 				name: "default",
 				label: t("Default value"),
 				withTime: true

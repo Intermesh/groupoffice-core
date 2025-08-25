@@ -1,7 +1,6 @@
 import {FieldDialog} from "../FieldDialog.js";
-import {ArrayField, arrayfield, comp, containerfield, fieldset, hiddenfield, t} from "@intermesh/goui";
+import {comp, t} from "@intermesh/goui";
 import {SelectOptionsTree} from "./SelectOptionsTree.js";
-import {jmapds} from "../../jmap/index.js";
 
 export class SelectDialog extends FieldDialog {
 	private readonly selectOptionsTree: SelectOptionsTree;
@@ -20,17 +19,8 @@ export class SelectDialog extends FieldDialog {
 			)
 		)
 
-		this.form.on("load", (form, value) => {
-			void this.selectOptionsTree.load(value.id);
-		});
-
-		this.form.on("beforesave", async (form , data) => {
-			console.log(form);
-
-			// data.dataType = {
-			// 	options: this.selectOptionsTree.rootNode.children
-			// }
-			console.log(data);
+		this.form.on("load", ({data}) => {
+			void this.selectOptionsTree.load(data.id);
 		});
 	}
 }

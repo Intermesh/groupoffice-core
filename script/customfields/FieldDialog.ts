@@ -2,8 +2,11 @@ import {FormWindow} from "../components/index.js";
 import {
 	checkbox,
 	CheckboxField,
-	comp, Fieldset,
-	fieldset, HiddenField, hiddenfield,
+	comp,
+	Fieldset,
+	fieldset,
+	HiddenField,
+	hiddenfield,
 	t,
 	textarea,
 	TextAreaField,
@@ -60,7 +63,7 @@ export class FieldDialog extends FormWindow {
 						label: t("Name"),
 						required: true,
 						listeners: {
-							change: (field, newValue, oldValue) => {
+							change: ({newValue}) => {
 								if (this.databaseNameField.value != "")
 									return;
 
@@ -79,13 +82,13 @@ export class FieldDialog extends FormWindow {
 						required: true,
 						hint: t("This name is used in the database and can only contain alphanumeric characters and underscores. It's only visible to exports and the API."),
 						listeners: {
-							change: (field, newValue, oldValue) => {
+							change: ({target, newValue}) => {
 								const dbName = this.parseDbName(newValue);
 
 								if (dbName.length === 0)
 									return;
 
-								field.value = dbName;
+								target.value = dbName;
 							}
 						}
 					}),
@@ -123,7 +126,7 @@ export class FieldDialog extends FormWindow {
 						name: "required",
 						label: t("Required field"),
 						listeners: {
-							setvalue: (field, newValue, oldValue) => {
+							setvalue: ({newValue}) => {
 								this.relatedFieldCondition["disabled"] = newValue;
 								this.conHidden["disabled"] = newValue;
 								this.conRequired["disabled"] = newValue;
@@ -141,8 +144,8 @@ export class FieldDialog extends FormWindow {
 						hint: t("eg. 'nameOfStandardOrCustomField = test' or 'checkbox = 1'"),
 						validateOnBlur: true,
 						listeners: {
-							validate: (field) => {
-								if (field.value === "")
+							validate: ({target}) => {
+								if (target.value === "")
 									return
 
 								let rawValue: string = "";
@@ -150,7 +153,7 @@ export class FieldDialog extends FormWindow {
 								const reConditions = /(={1,2}|<|>|\!=|>=|<=)/, reAdjuncts = /\ (AND|OR)\ /;
 								const reEmptyCondition = /^\w+\ is empty$/;
 								const reNotEmptyCondition = /^\w+\ is not empty$/;
-								const arSubConditions = String(field.value).split(reAdjuncts);
+								const arSubConditions = String(target.value).split(reAdjuncts);
 
 								for (let i = 0, l = arSubConditions.length; i < l; i++) {
 									const strCond = arSubConditions[i];
@@ -167,12 +170,12 @@ export class FieldDialog extends FormWindow {
 									} else if (strCond.match(reEmptyCondition) || strCond.match(reNotEmptyCondition)) {
 										rawValue += strCond.replace(/\s{2,}/, ' ').trim()
 									} else {
-										field.setInvalid(t('The value was not formatted correctly'));
+										target.setInvalid(t('The value was not formatted correctly'));
 										return;
 									}
 								}
 
-								field.value = rawValue;
+								target.value = rawValue;
 							}
 						}
 					}),
@@ -180,7 +183,7 @@ export class FieldDialog extends FormWindow {
 						name: "conditionallyRequired",
 						label: t("Conditionally required field"),
 						listeners: {
-							setvalue: (field, newValue, oldValue) => {
+							setvalue: ({newValue}) => {
 								if (this.conHidden.value || newValue) {
 									this.conHidden["disabled"] = false;
 								}
@@ -202,7 +205,7 @@ export class FieldDialog extends FormWindow {
 						name: "conditionallyHidden",
 						label: t("Conditionally hidden field"),
 						listeners: {
-							setvalue: (field, newValue, oldValue) => {
+							setvalue: ({newValue}) => {
 								if (this.conRequired.value || newValue) {
 									this.conRequired["disabled"] = false;
 								}
@@ -224,7 +227,7 @@ export class FieldDialog extends FormWindow {
 			)
 		);
 
-		this.form.on("beforesave", ((form, data) => {
+		this.form.on("beforesave", (({data}) => {
 			const options = Object.keys(data)
 				.filter(key => key.includes("options."))
 				.map(key => ({key, value: data[key]}));

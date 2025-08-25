@@ -38,7 +38,7 @@ export class SystemSettingsPanel extends Component {
 					multiSelect: false
 				},
 				listeners: {
-					rowdblclick: (list,storeIndex, row, ev) => {
+					rowdblclick: ({storeIndex}) => {
 						const dlg = new EntityDialog();
 						void dlg.load(this.store.get(storeIndex)!.entityName);
 						dlg.show();

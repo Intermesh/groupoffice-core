@@ -40,7 +40,7 @@ export class FieldSetDialog extends FormWindow {
 					name: "isTab",
 					label: t("Show as tab"),
 					listeners: {
-						change: (field, newValue) =>{
+						change: ({newValue}) =>{
 							this.fieldSetCombo["disabled"] = newValue;
 						}
 					}

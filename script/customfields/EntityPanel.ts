@@ -1,9 +1,14 @@
 import {
 	browser,
-	btn, Button,
-	column, comp,
+	btn,
+	Button,
+	column,
+	comp,
 	Component,
-	EntityID, menu, Notifier, Store,
+	EntityID,
+	menu,
+	Notifier,
+	Store,
 	store,
 	t,
 	Table,
@@ -169,7 +174,7 @@ export class EntityPanel extends Component {
 							entity: entityName
 						}
 
-						fieldSetDlg.on("close", () => {
+						fieldSetDlg.form.on("save", () => {
 							void this.load();
 						});
 

@@ -15,7 +15,7 @@ export class NotesDialog extends FieldDialog {
 					label: t("Name"),
 					required: true,
 					listeners: {
-						change: (field, newValue) => {
+						change: ({newValue}) => {
 							this.nameField.value = newValue;
 						}
 					}
