@@ -21,18 +21,16 @@ export class SelectOptionsTree extends Component {
 			children: []
 		}
 
-		this.treeData = [];
-
-		this.treeData.push(this.rootNode);
+		this.treeData = [this.rootNode];
 
 		this.items.add(
 			comp({
-				cls: "pad",
+				cls: "pad scroll",
 				tagName: "h4",
 				text: t("Warning: removing select options also removes the data from the records. You can disable select options by unchecking them.")
 			}),
 			this.treeComponent = tree({
-				cls: "scroll",
+				fitParent: true,
 				columns: [
 					treecolumn({
 						id: "text",
@@ -63,8 +61,7 @@ export class SelectOptionsTree extends Component {
 							return
 						}
 
-						const parent =
-							draggedRecord.parentId !== null ? this.treeComponent.store.find(r => r.id === draggedRecord.parentId)! : this.rootNode;
+						const parent = draggedRecord.parentId !== null ? this.treeComponent.store.find(r => r.id === draggedRecord.parentId)! : this.treeComponent.store.find((r) => r.id === this.rootNode.id)!;
 
 						const index = parent.children!.indexOf(draggedRecord);
 						if (index > -1) {
@@ -131,7 +128,6 @@ export class SelectOptionsTree extends Component {
 
 						dlg.form.handler = (form) => {
 							const newNode: TreeRecord = {
-								check: true,
 								backgroundColor: form.value.backgroundColor,
 								enabled: true,
 								fieldId: Number(this.fieldId),
@@ -141,13 +137,14 @@ export class SelectOptionsTree extends Component {
 								sortOrder: 0,
 								level: 0,
 								text: form.value.text,
+								children: []
 							}
 
 							if (this.selectedRecord) {
 								newNode.parentId = this.selectedRecord.id === this.rootNode.id ? null : this.selectedRecord.id;
 								this.selectedRecord!.children!.push(newNode);
 							} else {
-								const rootNode = this.treeComponent.store.find((r) => r.id === this.rootNode.id)
+								const rootNode = this.treeComponent.store.find((r) => r.id === this.rootNode.id);
 
 								rootNode!.children!.push(newNode);
 							}

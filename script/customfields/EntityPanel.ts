@@ -116,9 +116,7 @@ export class EntityPanel extends Component {
 									text: t("Delete"),
 									handler: () => {
 										const idToDestroy = record.isFieldSet ? record.fieldSetId : record.fieldId;
-										const typeToDestroy = record.isFieldSet ? "FieldSet" : "Field";
-
-										const DS = new JmapDataSource(typeToDestroy);
+										const DS = record.isFieldSet ? fieldSetDS : fieldDS;
 
 										DS.confirmDestroy([idToDestroy]).then(() => {
 											void this.load();
