@@ -1,0 +1,42 @@
+@use '../../goui/style/util';
+@use '../../goui/style/config';
+
+html.compact {
+	--density: 7.125px; // 44.53125% of 16px = 7.125px
+	--mobile-density: 8.64px; // 54%;
+	--font-scale: 1.1;
+	--font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+	.goui-window .header.goui-toolbar {
+		height: util.dp(48);
+		line-height: util.dp(48);
+		font-size: .8em;
+		.goui-button {
+			background-color:transparent;
+			width: util.dp(32);
+			height: util.dp(32);
+			min-height: util.dp(32);
+			padding: 0 util.dp(2);
+			margin: util.dp(3) 0;
+			&:hover{
+				background-color: config.$colorMain;
+				color:white;
+			}
+		}
+	}
+
+	.goui-form-field.check div.control {
+		padding: util.dp(8) 0 !important;
+	}
+	.vbox > .goui-toolbar:not(.header) .goui-button:not(.filled):not([type="submit"]) {
+		background-color:var(--bg-bright);
+	}
+	menu.goui-dropdown>li hr {
+		margin: util.dp(6);
+	}
+	.check, .checkbox-group {
+		.control .box-label {
+			padding: 0 util.dp(12);
+		}
+	}
+}

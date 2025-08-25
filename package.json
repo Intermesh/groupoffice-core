@@ -20,7 +20,7 @@
     "@fortaine/fetch-event-source": "latest",
     "@intermesh/goui": "latest",
     "chart.js": "latest",
-    "ical.js": "^2.1.0"
+    "ical.js": "2.1.0"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
@@ -46,6 +46,6 @@
   },
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
-  "version": "1.0.9",
+  "version": "2.0.4",
   "main": "index.js"
 }

@@ -7,10 +7,10 @@ import {
 	cards,
 	comp,
 	Component,
-	containerfield,
-	datasourceform,
+	containerfield, DataSourceEventMap,
+	datasourceform, DataSourceFormEventMap,
 	DefaultEntity,
-	EntityID,
+	EntityID, FormEventMap,
 	FunctionUtil,
 	Listener,
 	ObservableListenerOpts,
@@ -29,7 +29,7 @@ import {Link} from "../model/Link";
 /**
  * @inheritDoc
  */
-export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
+export interface FormWindowEventMap extends WindowEventMap {
 
 	/**
 	 * Fires when the window is shown and loaded with data. Also fires if the dialog is for creating new entities and
@@ -37,18 +37,14 @@ export interface FormWindowEventMap<Type> extends WindowEventMap<Type> {
 	 *
 	 * @param window
 	 */
-	ready: (window: Type, currentId: EntityID|undefined) => void
+	ready: {currentId: EntityID|undefined}
 
-	addlink: (window: Type, entityName: string, entityId: EntityID) => void
+	addlink: {entityName: string, entityId: EntityID}
 }
 
-export interface FormWindow<EntityType extends BaseEntity = DefaultEntity> {
-	on<K extends keyof FormWindowEventMap<this>, L extends Listener>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K], options?: ObservableListenerOpts): L;
-	un<K extends keyof FormWindowEventMap<this>>(eventName: K, listener: Partial<FormWindowEventMap<this>>[K]): boolean
-	fire<K extends keyof FormWindowEventMap<this>>(eventName: K, ...args: Parameters<FormWindowEventMap<any>[K]>): boolean
-}
 
-export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> extends Window {
+
+export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, EventMap extends FormWindowEventMap = FormWindowEventMap> extends Window<EventMap> {
 	public readonly form;
 	protected readonly cards: CardContainer;
 	protected sharePanel?: SharePanel;
@@ -69,6 +65,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 	public hasLinks = false;
 	protected submitBtn: Button;
 	private readonly browseLinksBtn: Button;
+
+	protected closeOnSave = true;
 
 	/**
 	 * Constructor
@@ -94,12 +92,13 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 					flex: 1,
 					listeners: {
 						save: () => {
-							this.close();
+							if(this.closeOnSave)
+								this.close();
 						},
 
-						invalid: (form) => {
+						invalid: ({target}) => {
 
-							const invalid = form.findFirstInvalid();
+							const invalid = target.findFirstInvalid();
 
 							if (invalid) {
 								const tab = invalid.findAncestor(cmp => {
@@ -158,7 +157,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 			return this.onShow();
 		})
 
-		this.on("beforeclose", (win, byUser) => {
+		this.on("beforeclose", ({byUser}) => {
 			return this.onBeforeClose(byUser);
 		})
 
@@ -171,7 +170,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 		if(this.form.isModified()) {
 			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
 				if(confirmed) {
-					this.close();
+					this.internalClose();
 				}
 			});
 
@@ -191,7 +190,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 				}
 				// focus form for new entities and not for existing ones.
 				this.form.focus();
-				this.fire("ready", this, this.form.currentId);
+				this.fire("ready", {currentId: this.form.currentId});
 			} else {
 				this.createLinkBtn.hide();
 				if(this.hasLinks) {
@@ -238,7 +237,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 
 		try {
 			await this.form.load(id);
-			this.fire("ready", this, this.form.currentId);
+			this.fire("ready", {currentId: this.form.currentId});
 		} catch (e) {
 			void Window.error(e + "");
 		} finally {
@@ -325,7 +324,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 			this.createLinkBtn.createLinkField.value = [{entityId: entityId, entityName: entityName}]
 		} else {
 
-			const unbindkey = this.form.on("save", (form1, data) => {
+			const onSave = ({data}:DataSourceFormEventMap["save"]) => {
 				const link = {
 					"toId": entityId,
 					"toEntity": entityName,
@@ -334,19 +333,21 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity> 
 				}
 
 				jmapds<Link>("Link").create(link).catch((e) => {
-					Window.error(e);
+					void Window.error(e);
 				})
-			}, {once: true});
+			};
+
+			this.form.on("save", onSave, {once: true});
 
 			this.on("close", () => {
 				// set timeout because close will fire before the save listeners above are fired.
 				setTimeout(() => {
-					this.form.un("save", unbindkey);
+					this.form.un("save", onSave);
 				})
 			})
 		}
 
-		this.fire("addlink", this, entityName, entityId);
+		this.fire("addlink", {entityName, entityId});
 	}
 
 }

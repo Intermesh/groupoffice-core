@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, t, translate, Window} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -13,21 +13,62 @@ export interface EntityFilter {
 }
 
 export interface EntityLink {
-	filter?: string,
-	title?:string
-	iconCls: string,
-	linkWindow: (entity:string, entityId:EntityID) => void,
-	linkDetail: () => void
+	/**
+	 * Filter key. For contacts there's "isOrganization" for example.
+	 */
+	filter?: string;
+	/**
+	 * Human friendly title for menu's. Defaults to t(entity.name)
+	 */
+	title?: string;
+	/**
+	 * CSS class to render the icon
+	 */
+	iconCls: string;
+	/**
+	 * Use this link only for the search filter. Used for comments.
+	 */
+	searchOnly?: boolean;
+	/**
+	 * Create a window that will create a new linked item of this type
+	 *
+	 * @param entity
+	 * @param entityId
+	 */
+	linkWindow?: (entity: string, entityId: EntityID) => any;
+
+
+	/**
+	 * Return a detail component to show a linked entity of this type
+	 */
+	linkDetail: () => Component;
 }
 export interface EntityConfig {
+	/**
+	 * Entity name
+	 *
+	 * eg. "Contact"
+	 */
 	name: string;
-	links?: EntityLink[],
-	filters?:EntityFilter[]
+	/**
+	 * Human friendly title for the entity
+	 *
+	 * If not given it will default to t(entity.name);
+	 */
+	title?: string;
+	/**
+	 * Available linking options.
+	 *
+	 * In most cases there will be one but for example a contact as one extra for organizations. The "filter" option is
+	 * used to differentiate the two.
+	 */
+	links?: EntityLink[];
+	/**
+	 * Custom filters for the entity
+	 */
+	filters?: EntityFilter[];
 }
-
 export type ModuleConfig = {
-	// [key:string]:unknown;
-
 	/**
 	 * Module package name
 	 */
@@ -36,17 +77,14 @@ export type ModuleConfig = {
 	 * Module name
 	 */
 	name: string;
-
 	/**
 	 * Init function. Is called when the main Group-Office page loads
 	 */
 	init?: () => void;
-
 	/**
 	 * Registered module entities
 	 */
-	entities?: (string|EntityConfig)[]
-
+	entities?: (string | EntityConfig)[];
 };
 
 // for using old components in GOUI
@@ -153,7 +191,7 @@ export interface Module extends BaseEntity {
 	name: string,
 	package: string,
 	rights: string[],
-	settings?: Record<string, any>
+	settings: Record<string, any>
 	userRights: Record<string, boolean>,
 	version: number,
 	entities: Record<string, Entity>
@@ -180,7 +218,7 @@ class Modules {
 
 		this.mods[id] = config;
 
-		this.registerInExtjs(config);
+
 
 		go.Translate.package = config.package;
 		go.Translate.module = config.name;
@@ -188,6 +226,7 @@ class Modules {
 		if (config.init) {
 			config.init();
 		}
+		this.registerInExtjs(config);
 	}
 
 
@@ -282,7 +321,8 @@ class Modules {
 	private registerInExtjs(config: ModuleConfig) {
 		go.Translate.setModule(config.package, config.name);
 		go.Modules.register(config.package, config.name, {
-			entities: config.entities
+			entities: config.entities,
+			title: t('name')
 		});
 	}
 

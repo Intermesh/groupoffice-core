@@ -19,19 +19,12 @@ import {RegisterForm} from "./RegisterForm.js";
 import {client, ForgottenData} from "../jmap/index.js";
 
 
-export interface LoginEventMap<T extends Observable> extends WindowEventMap<T> {
-	cancel: () => void
-	login: () => void
+export interface LoginEventMap extends WindowEventMap {
+	cancel: {}
+	login: {}
 }
 
-export interface Login extends Window {
-	on<K extends keyof LoginEventMap<this>, L extends Listener>(eventName: K, listener: Partial<LoginEventMap<this>>[K]): L;
-	un<K extends keyof LoginEventMap<this>>(eventName: K, listener: Partial<LoginEventMap<this>>[K]): boolean
-	fire<K extends keyof LoginEventMap<this>>(eventName: K, ...args: Parameters<LoginEventMap<this>[K]>): boolean;
-}
-
-
-export class Login extends Window {
+export class Login extends Window<LoginEventMap> {
 
 	private loginForm!: Form;
 
@@ -169,7 +162,7 @@ export class Login extends Window {
 					text: t("Cancel"),
 					handler: () => {
 						this.close();
-						this.fire("cancel");
+						this.fire("cancel", {});
 					}
 				}),
 				comp({
@@ -251,11 +244,11 @@ export class Login extends Window {
 
 		if (!this.registerForm) {
 			this.registerForm = new RegisterForm();
-			this.registerForm.on("submit", (form) => {
-				if(form.isValid()) {
+			this.registerForm.on("submit", ({target}) => {
+				if(target.isValid()) {
 					this.close();
 					Notifier.success(t("Registration and successful"));
-					this.fire("login");
+					this.fire("login", {});
 				}
 			});
 
@@ -315,7 +308,7 @@ export class Login extends Window {
 		} else {
 			Notifier.success(t("Logged in successfully"));
 			this.close();
-			this.fire("login");
+			this.fire("login", {});
 		}
 
 	}

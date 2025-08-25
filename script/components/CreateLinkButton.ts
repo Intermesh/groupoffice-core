@@ -22,7 +22,7 @@ export class CreateLinkButton extends OverlayToolbarButton {
 		this.createLinkField = createlinkfield({
 			flex: 1,
 			listeners: {
-				setvalue: (field, newValue) => {
+				setvalue: ({newValue}) => {
 					this.text = newValue && newValue.length ? newValue.length : "";
 				}
 			}
@@ -39,4 +39,4 @@ export class CreateLinkButton extends OverlayToolbarButton {
 /**
  * Shorthand function to create {@link CreateLinkButton}
 */
-export const createlinkbutton = (config?: Config<CreateLinkButton, ButtonEventMap<CreateLinkButton>>) => createComponent(new CreateLinkButton(), config);
+export const createlinkbutton = (config?: Config<CreateLinkButton>) => createComponent(new CreateLinkButton(), config);

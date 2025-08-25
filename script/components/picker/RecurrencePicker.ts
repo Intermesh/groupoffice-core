@@ -16,20 +16,14 @@ import {
 } from "@intermesh/goui";
 import {Frequency, RecurrenceRule} from "../../util/Recurrence.js";
 
-export interface RecurrencePickerEventMap<Type> extends CardContainerEventMap<Type> {
-
-	select: (picker: Type, rule: RecurrenceRule | null) => false | void
+export interface RecurrencePickerEventMap extends CardContainerEventMap {
+	select: {rule: RecurrenceRule | null}
 }
 
-export interface RecurrencePicker {
-	on<K extends keyof RecurrencePickerEventMap<this>, L extends Listener>(eventName: K, listener: Partial<RecurrencePickerEventMap<this>>[K], options?: ObservableListenerOpts): L;
-
-	fire<K extends keyof RecurrencePickerEventMap<this>>(eventName: K, ...args: Parameters<RecurrencePickerEventMap<Component>[K]>): boolean;
-}
 
 type FrequencyDefaults = [text: string, plural: string, repeatDefault: number, untilDefault: string, frequencyText: string]
 
-export class RecurrencePicker extends CardContainer {
+export class RecurrencePicker extends CardContainer<RecurrencePickerEventMap> {
 
 	protected baseCls = "recurrencepicker";
 
@@ -104,14 +98,14 @@ export class RecurrencePicker extends CardContainer {
 				plural: RecurrencePicker.frequencies[k as Frequency][1]
 			})),
 			listeners: {
-				'change': (_me, v) => {
-					this.changeFrequency(v);
+				'change': ({newValue}) => {
+					this.changeFrequency(newValue);
 				}
 			}
 		});
 
-		intervalField.on('setvalue', (_me, newVal, oldVal) => {
-			if (oldVal == 1 && newVal != 1 || oldVal != 1 && newVal == 1) {
+		intervalField.on('setvalue', ({newValue, oldValue}) => {
+			if (oldValue == 1 && newValue != 1 || oldValue != 1 && newValue == 1) {
 				frequencyField.drawOptions();
 			}
 		});
@@ -130,7 +124,7 @@ export class RecurrencePicker extends CardContainer {
 		this.until = datefield({
 			itemId: 'endDate',
 			name: 'until',
-			min: this.startDate.format('Y-m-d'),
+			min: this.startDate,
 			width: 180,
 			hidden: true,
 			required: false
@@ -145,10 +139,10 @@ export class RecurrencePicker extends CardContainer {
 				this.weeklyOptions,
 				textfield({
 					hidden: true, name: 'byDay', listeners: {
-						'change': (_fld, val) => {
+						change: ({newValue}) => {
 							for (let j = 0; j < 7; j++) {
 								const cb = this.weeklyOptions.items.get(j) as CheckboxField;
-								cb.value = val.indexOf(cb.name) !== -1;
+								cb.value = newValue.indexOf(cb.name) !== -1;
 							}
 						}
 					}
@@ -166,9 +160,9 @@ export class RecurrencePicker extends CardContainer {
 							{text: t("At"), value: 'until'}
 						],
 						listeners: {
-							'setvalue': (_me, v) => {
-								this.count.hidden = this.count.disabled = (v != 'count');
-								this.until.hidden = this.until.disabled = (v != 'until');
+							setvalue: ({newValue}) => {
+								this.count.hidden = this.count.disabled = (newValue != 'count');
+								this.until.hidden = this.until.disabled = (newValue != 'until');
 							}
 						}
 					}),
@@ -330,7 +324,7 @@ export class RecurrencePicker extends CardContainer {
 	setValue(rrule: RecurrenceRule | null) {
 		if (this.rule == rrule) return;
 		this.rule = rrule;
-		this.fire('select', this, rrule);
+		this.fire('select', {rule: rrule});
 
 		const form = this.form;
 		if (rrule && rrule.frequency) {

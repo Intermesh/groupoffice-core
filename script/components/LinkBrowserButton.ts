@@ -5,12 +5,12 @@ export class LinkBrowserButton extends Component {
 	constructor() {
 		super();
 
-		this.on("added", (comp, index) => {
+		this.on("added", () => {
 			const panel = this.findAncestor(cmp => {
 				return cmp instanceof DetailPanel;
 			}) as DetailPanel;
 
-			// @ts-ignore
+			// @ts-ignore ExtJS component
 			(this.items.get(0)! as any).detailView = panel.detailView;
 
 		})
@@ -21,4 +21,4 @@ export class LinkBrowserButton extends Component {
 	}
 }
 
-export const linkbrowserbutton = (config?: Config<LinkBrowserButton, ComponentEventMap<LinkBrowserButton>>) => createComponent(new LinkBrowserButton(), config);
+export const linkbrowserbutton = (config?: Config<LinkBrowserButton>) => createComponent(new LinkBrowserButton(), config);

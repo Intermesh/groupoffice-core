@@ -18,7 +18,7 @@ class Router extends GouiRouter {
 
 		const oldPath = this.getPath();
 		go.Router.setPath(path);
-		this.fire("change", this.getPath(), oldPath);
+		this.fire("change", {path: this.getPath(), oldPath});
 	}
 
 	public start(): Promise<void> {

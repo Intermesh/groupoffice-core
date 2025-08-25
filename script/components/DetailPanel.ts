@@ -16,36 +16,31 @@ import {jmapds} from "../jmap/index.js";
 import {router} from "../Router.js";
 import {modules} from "../Modules.js";
 
-export interface DetailPanelEventMap<Type, EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap<Type> {
+export interface DetailPanelEventMap<EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap {
 	/**
 	 * Fires when entity is loaded
 	 */
-	load: (detailPanel: Type, entity: EntityType) => false | void
+	load: {entity: EntityType}
 
 	/**
 	 * Fires when the panel is reset
 	 *
 	 * @param detailPanel
 	 */
-	reset: (detailPanel: Type) => void
+	reset: {}
 
 }
 
-export interface DetailPanel<EntityType extends BaseEntity = DefaultEntity> extends Component {
-	on<K extends keyof DetailPanelEventMap<this, EntityType>, L extends Listener>(eventName: K, listener: Partial<DetailPanelEventMap<this, EntityType>>[K], options?: ObservableListenerOpts): L
-	un<K extends keyof DetailPanelEventMap<this>>(eventName: K, listener: Partial<DetailPanelEventMap<this>>[K]): boolean
-	fire<K extends keyof DetailPanelEventMap<this, EntityType>>(eventName: K, ...args: Parameters<DetailPanelEventMap<any, EntityType>[K]>): boolean
-}
 
 /**
  * Detail panel
  *
  * Used to show an entity when selected in the grid.
  */
-export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity> extends Component {
+export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity> extends Component<DetailPanelEventMap<EntityType>> {
 	protected titleCmp?: Component;
 	protected entity?: EntityType;
-	protected readonly scroller: Component;
+	public readonly scroller: Component;
 	private detailView: any;
 	public readonly toolbar: Toolbar;
 	private comments: any;
@@ -54,7 +49,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		super();
 
 		// reload or reset on entity update or destroy
-		jmapds(this.entityName).on("change", (ds, changes) => {
+		jmapds(this.entityName).on("change", ( {changes}) => {
 			if(this.entity) {
 				const id = this.entity.id;
 
@@ -177,7 +172,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 		this.scroller.hidden = false;
 		this.disabled = false;
-		this.fire("load", this, this.entity);
+		this.fire("load", {entity: this.entity});
 
 		this.scroller.items.forEach((i:any) => {
 			if(i != this.detailView && i.onLoad) {

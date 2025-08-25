@@ -5,12 +5,12 @@ export class FilesButton extends Component {
 	constructor() {
 		super();
 
-		this.on("added", (comp, index) => {
+		this.on("added", () => {
 			const panel = this.findAncestor(cmp => {
 				return cmp instanceof DetailPanel;
 			}) as DetailPanel;
 
-			// @ts-ignore
+			// @ts-ignore ExtJS component
 			(this.items.get(0)! as any).detailView = panel.detailView;
 
 		})
@@ -21,4 +21,4 @@ export class FilesButton extends Component {
 	}
 }
 
-export const filesbutton = (config?: Config<FilesButton, ComponentEventMap<FilesButton>>) => createComponent(new FilesButton(), config);
+export const filesbutton = (config?: Config<FilesButton>) => createComponent(new FilesButton(), config);

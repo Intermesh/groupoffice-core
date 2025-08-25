@@ -8,7 +8,6 @@
 );
 
 @use '../../goui/style/index';
-@use 'theme' with (
-	$density: 54%
-);
+@use 'theme';
 @use 'general';
+@use 'compact';

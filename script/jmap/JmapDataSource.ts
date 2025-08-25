@@ -133,6 +133,11 @@ const stores: Record<string, any> = {};
 
 /**
  * Get a single instance of a store by ID
+ *
+ * @deprecated
+ * export a const instead
+ *
+ * @see User
  */
 export const jmapds = <EntityType extends DefaultEntity = DefaultEntity>(storeId:string, config?: Config<JmapDataSource>) : JmapDataSource<EntityType> => {
 	if(!stores[storeId]) {

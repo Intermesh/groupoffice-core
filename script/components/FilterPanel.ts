@@ -13,21 +13,12 @@ import {
 /**
  * @inheritDoc
  */
-export interface FilterPanelEventMap<Type> extends ComponentEventMap<Type> {
-
-	filterchange: (button: Type, filter: Filter) => false | void
-
-
-	variablefilterchange: (button: Type, filter: Filter) => false | void,
+export interface FilterPanelEventMap extends ComponentEventMap {
+	filterchange: {filter: Filter}
+	variablefilterchange: {filter: Filter}
 
 }
-
-export interface FilterPanel extends Component {
-	on<K extends keyof FilterPanelEventMap<this>, L extends Listener>(eventName: K, listener: Partial<FilterPanelEventMap<this>>[K], options?: ObservableListenerOpts): L
-	un<K extends keyof FilterPanelEventMap<this>>(eventName: K, listener: Partial<FilterPanelEventMap<this>>[K]): boolean
-	fire<K extends keyof FilterPanelEventMap<this>>(eventName: K, ...args: Parameters<FilterPanelEventMap<any>[K]>): boolean
-}
-export class FilterPanel extends Component {
+export class FilterPanel extends Component<FilterPanelEventMap> {
 	private goFilterPanel: any;
 	constructor(public readonly entityName:string, public readonly store?:Store) {
 		super();
@@ -47,11 +38,11 @@ export class FilterPanel extends Component {
 			}));
 
 			this.goFilterPanel.on("filterchange", (_p:any, filter:any) => {
-				this.fire("filterchange", this, filter);
+				this.fire("filterchange", {filter});
 			})
 
 			this.goFilterPanel.on("variablefilterchange", (_p:any, filter:any) => {
-				this.fire("variablefilterchange", this, filter);
+				this.fire("variablefilterchange", {filter});
 			})
 
 			ro.observe(this.el);
@@ -60,4 +51,4 @@ export class FilterPanel extends Component {
 }
 
 
-export const filterpanel = (config: Config<FilterPanel, FilterPanelEventMap<FilterPanel>, "entityName"|"store">) => createComponent(new FilterPanel(config.entityName,config.store), config);
+export const filterpanel = (config: Config<FilterPanel, "entityName"|"store">) => createComponent(new FilterPanel(config.entityName,config.store), config);

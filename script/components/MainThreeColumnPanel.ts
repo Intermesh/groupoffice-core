@@ -60,7 +60,7 @@ export abstract class MainThreeColumnPanel extends Component {
 			this.west,
 
 			splitter({
-				resizeComponentPredicate: "west",
+				resizeComponent: this.west,
 				stateId: this.id + "-west-splitter"
 			}),
 
@@ -68,7 +68,7 @@ export abstract class MainThreeColumnPanel extends Component {
 
 			splitter({
 				stateId: this.id + "-east-splitter",
-				resizeComponentPredicate: "east"
+				resizeComponent: this.east
 			}),
 
 			this.east

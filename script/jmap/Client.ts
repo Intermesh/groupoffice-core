@@ -4,11 +4,12 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {Format, FunctionUtil, Listener, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {DateTime, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
-import {User} from "../auth/index.js";
+import {User, userDS} from "../auth/index.js";
+import {customFields} from "../CustomFields";
 
 
 export interface LoginData {
@@ -34,16 +35,11 @@ export interface ForgottenData {
 	email: String
 }
 
-interface ClientEventMap<Type extends Observable>  extends ObservableEventMap<Type> {
-	authenticated: <Sender extends Type>(client: Sender, session: any) => void
-	logout: <Sender extends Type>(client: Sender) => void
+interface ClientEventMap  extends ObservableEventMap {
+	authenticated: {session: any}
+	logout: {}
 }
 
-export interface Client {
-	on<K extends keyof ClientEventMap<this>, L extends Listener>(eventName: K, listener: Partial<ClientEventMap<this>>[K]): L
-	un<K extends keyof ClientEventMap<this>>(eventName: K, listener: Partial<ClientEventMap<this>>[K]): boolean
-	fire<K extends keyof ClientEventMap<Client>>(eventName: K, ...args: Parameters<NonNullable<ClientEventMap<any>[K]>>): boolean
-}
 
 
 export type UploadResponse = {
@@ -77,7 +73,7 @@ export interface ResultReference  {
 	path: string
 }
 
-export class Client<UserType extends User = User> extends Observable {
+export class Client extends Observable<ClientEventMap> {
 	private _lastCallCounter = 0;
 
 	private _lastCallId?:string;
@@ -87,7 +83,7 @@ export class Client<UserType extends User = User> extends Observable {
 
 	private debugParam = "";// "XDEBUG_SESSION=1"
 
-	private _user: UserType | undefined;
+	private _user: User | undefined;
 
 	public uri = "";
 
@@ -153,7 +149,7 @@ export class Client<UserType extends User = User> extends Observable {
 	 *
 	 * this.authenticate() as to be called first.
 	 */
-	get user() : UserType {
+	get user() : User {
 		// We assume a user is here but this is not always true. When not authenticated yet the user is undefined.
 		// But because it's annoying to have to do client.user!.id everywhere we pretend to always have user.
 		return this._user!;
@@ -176,15 +172,24 @@ export class Client<UserType extends User = User> extends Observable {
 		}
 
 		if(!this._session) {
-			this._session = await this.request().then(response => response.json());
+			this._session = await this.request().then(response => response.json())
+				.catch(e => {
+					console.log(e);
+				})
+
+			if(this._session && this._session.CSRFToken) {
+				this.CSRFToken = this._session.CSRFToken;
+			}
 		}
 
 		if(!this._session) {
 			return false;
 		}
 
-		const ds = jmapds<UserType>("User");
-		const user =  await ds.single(this._session.userId);
+		// make sure we update user
+		await userDS.reset();
+
+		const user =  await userDS.single(this._session.userId);
 
 		if(!user) {
 			return false;
@@ -192,26 +197,29 @@ export class Client<UserType extends User = User> extends Observable {
 
 		this.setUser(user);
 
-		this.fire("authenticated", this, this._session);
+		await customFields.init();
+
+		this.fire("authenticated", {session: this._session});
 
 		return true;
 	}
 
-	private setUser(user:UserType) {
+	private setUser(user:User) {
 
 		this._user = user;
 
 		Format.dateFormat = this._user.dateFormat;
 		Format.timeFormat = this._user.timeFormat;
 		Format.timezone = this._user.timezone as Timezone;
+		DateTime.defaultTimezone = this._user.timezone as Timezone;
 		Format.currency = this._user.currency;
 		Format.thousandsSeparator = this._user.thousandsSeparator;
 		Format.decimalSeparator = this._user.decimalSeparator;
 
 
-		jmapds<UserType>("User").on("change", async (dataSource, changes) => {
+		userDS.on("change", async ( {target, changes}) => {
 			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
-				const user =  await dataSource.single(this._user!.id);
+				const user =  await target.single(this._user!.id);
 				if(user) {
 					this.setUser(user);
 				}
@@ -226,7 +234,7 @@ export class Client<UserType extends User = User> extends Observable {
 		this.session = go.User.session;
 		this._user = go.User;
 
-		this.fire("authenticated", this, this._session);
+		this.fire("authenticated", {session: this._session});
 	}
 
 	/**
@@ -336,11 +344,19 @@ export class Client<UserType extends User = User> extends Observable {
 		return `${this.uri}page.php/${path}`;
 	}
 
+	/**
+	 * Default headers that will be added to each request
+	 */
+	public defaultHeaders : Record<string, string> = {
+		'Content-Type': 'application/json'
+	};
+
 	private getDefaultHeaders() {
 
-		const headers: Record<string, string> = {
-			'Content-Type': 'application/json'
-		};
+		const headers: Record<string, string> = {};
+		for(const key in this.defaultHeaders) {
+			headers[key] = this.defaultHeaders[key];
+		}
 
 		if(this.accessToken) {
 			headers.Authorization =  "Bearer " + this.accessToken;
@@ -486,7 +502,7 @@ export class Client<UserType extends User = User> extends Observable {
 					this._requestData[callId].reject({
 						"type": "urn:ietf:params:go:error:connectionError",
 						"status": 500,
-						"detail": e ?? "Connection error"
+						"detail": e ? `Error: type: ${e.name}, message: ${e.message}` :  "Connection error"
 
 					});
 					delete this._requestData[callId];
@@ -641,4 +657,4 @@ export class Client<UserType extends User = User> extends Observable {
 	}
 }
 
-export const client = new Client<User>();
+export const client = new Client();
