@@ -5,7 +5,7 @@ export interface Entity {
 	name: string,
 	defaultAcl: Record<string, number>,
 	isAclOwner: boolean,
-	supportsCustomFields: boolean,
+	customFields: boolean,
 	supportsFiles: boolean,
 	links: LinkConfig[],
 	goto: (id:EntityID)=>void

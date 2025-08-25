@@ -1,12 +1,4 @@
-import {
-	btn,
-	column,
-	Component,
-	Store,
-	store,
-	t,
-	table
-} from "@intermesh/goui";
+import {btn, column, Component, Store, store, t, table} from "@intermesh/goui";
 import {EntityDialog} from "./EntityDialog.js";
 import {modules} from "../Modules.js";
 import {entities} from "../Entities.js";
@@ -79,13 +71,17 @@ export class SystemSettingsPanel extends Component {
 	private async load() {
 		const tableData: EntityWithCustomfields[] = [];
 
-		const mods = await modules.getAll();
+		const mods = modules.getAll();
 
 		for (const mod of mods) {
 			for (const entityName in mod.entities) {
-				const entity = await entities.get(entityName);
+				const entity = entities.get(entityName.toString());
 
-				if (entity.supportsCustomFields) {
+				if (entity == undefined) {
+					continue;
+				}
+
+				if (entity.customFields) {
 					const cfEntity: EntityWithCustomfields = {
 						entityName: entity.name,
 						moduleTitle: mod.name

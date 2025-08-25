@@ -5,7 +5,9 @@ import {AclItemEntity, AclOwnerEntity} from "./auth/index";
 export interface FieldSet extends AclOwnerEntity {
 	name: string
 	entity: string
-	showAsTab: boolean
+	showAsTab: boolean,
+	sortOrder: number,
+	aclId: string
 }
 
 export interface Field extends AclItemEntity {

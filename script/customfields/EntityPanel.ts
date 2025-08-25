@@ -15,10 +15,11 @@ import {
 	table,
 	tbar
 } from "@intermesh/goui";
-import {client, jmapds} from "../jmap/index.js";
+import {client, JmapDataSource} from "../jmap/index.js";
 import {FieldSetDialog} from "./FieldSetDialog.js";
-import {entities} from "../Entities.js";
 import {ExportDialog} from "./ExportDialog.js";
+import {fieldSetDS} from "../CustomFields.js";
+import {fieldDS} from "./index.js";
 
 interface StoreEntity {
 	name: string,
@@ -113,11 +114,13 @@ export class EntityPanel extends Component {
 								btn({
 									icon: "delete",
 									text: t("Delete"),
-									handler: (btn, ev) => {
+									handler: () => {
 										const idToDestroy = record.isFieldSet ? record.fieldSetId : record.fieldId;
 										const typeToDestroy = record.isFieldSet ? "FieldSet" : "Field";
 
-										jmapds(typeToDestroy).confirmDestroy([idToDestroy]).then(() => {
+										const DS = new JmapDataSource(typeToDestroy);
+
+										DS.confirmDestroy([idToDestroy]).then(() => {
 											void this.load();
 										});
 									}
@@ -187,13 +190,10 @@ export class EntityPanel extends Component {
 	}
 
 	public async load() {
-		const entity = await entities.get(this.entityName);
-
 		const tableData: StoreEntity[] = [];
 
-		const fieldSetIdsQueryResponse = await jmapds("FieldSet").query({filter: {entities: entity}});
-		const fieldSetsQueryResponse = await jmapds("FieldSet").get(fieldSetIdsQueryResponse.ids);
-
+		const fieldSetIdsQueryResponse = await fieldSetDS.query({filter: {entity: this.entityName}});
+		const fieldSetsQueryResponse = await fieldSetDS.get(fieldSetIdsQueryResponse.ids);
 		for (const fieldset of fieldSetsQueryResponse.list) {
 			const fieldsetStoreEntity: StoreEntity = {
 				name: fieldset.name,
@@ -209,8 +209,8 @@ export class EntityPanel extends Component {
 
 			tableData.push(fieldsetStoreEntity);
 
-			const fieldIdsQueryResponse = await jmapds("Field").query({filter: {fieldSetId: fieldset.id}})
-			const fieldQueryResponse = await jmapds("Field").get(fieldIdsQueryResponse.ids);
+			const fieldIdsQueryResponse = await fieldDS.query({filter: {fieldSetId: fieldset.id}})
+			const fieldQueryResponse = await fieldDS.get(fieldIdsQueryResponse.ids);
 
 			for (const field of fieldQueryResponse.list) {
 				const fieldStoreEntity: StoreEntity = {

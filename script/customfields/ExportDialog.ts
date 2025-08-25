@@ -1,5 +1,4 @@
 import {
-	browser,
 	btn,
 	checkboxcolumn,
 	column,
@@ -10,8 +9,9 @@ import {
 	tbar,
 	Window
 } from "@intermesh/goui";
-import {client, jmapds} from "../jmap/index.js";
+import {client} from "../jmap/index.js";
 import {entities, Entity} from "../Entities.js";
+import {fieldSetDS} from "../CustomFields.js";
 
 export class ExportDialog extends Window {
 	private entity!: Entity;
@@ -24,7 +24,7 @@ export class ExportDialog extends Window {
 		this.height = 800;
 
 		this.store = datasourcestore({
-			dataSource: jmapds("FieldSet")
+			dataSource: fieldSetDS
 		});
 
 		this.items.add(

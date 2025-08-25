@@ -9,7 +9,7 @@ import {
 	t,
 	textfield
 } from "@intermesh/goui";
-import {jmapds} from "../jmap/index.js";
+import {fieldSetDS} from "../CustomFields.js";
 
 export class FieldSetDialog extends FormWindow {
 	private readonly fieldSetCombo: ComboBox
@@ -51,7 +51,7 @@ export class FieldSetDialog extends FormWindow {
 					hint: t("Show this fieldset collapsed when all of its field have the initial value")
 				}),
 				this.fieldSetCombo = combobox({
-					dataSource: jmapds("FieldSet"),
+					dataSource: fieldSetDS,
 					name: "parentFieldSetId",
 					label: t("Show on tab"),
 					placeholder: t("Default")

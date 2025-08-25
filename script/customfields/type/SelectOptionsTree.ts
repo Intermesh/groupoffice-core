@@ -1,6 +1,6 @@
 import {btn, comp, Component, EntityID, menu, t, tbar, Tree, tree, treecolumn, TreeRecord} from "@intermesh/goui";
 import {OptionDialog} from "./OptionDialog.js";
-import {jmapds} from "../../jmap/index.js";
+import {fieldDS} from "../index.js";
 
 export class SelectOptionsTree extends Component {
 	private treeComponent: Tree;
@@ -178,7 +178,7 @@ export class SelectOptionsTree extends Component {
 
 	public async load(fieldId: EntityID) {
 		this.fieldId = fieldId;
-		const field = await jmapds("Field").single(fieldId);
+		const field = await fieldDS.single(fieldId);
 
 		this.rootNode.children = field!.dataType.options;
 	}
