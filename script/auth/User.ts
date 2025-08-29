@@ -26,6 +26,15 @@ export interface Principal extends DefaultEntity {
 	type: string
 }
 
+
+export interface Group extends DefaultEntity {
+	id:string
+	name: string
+	users: EntityID[],
+	acl: Acl,
+	permissionLevel: number
+}
+
 /**
  * Access Control List permission levels
  */
@@ -59,3 +68,5 @@ export interface AclOwnerEntity extends AclItemEntity {
 
 export const userDS = new JmapDataSource<User>("User");
 export const principalDS = new JmapDataSource<Principal>("Principal");
+
+export const groupDS = new JmapDataSource<Group>("Group");
