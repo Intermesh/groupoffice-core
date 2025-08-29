@@ -1,11 +1,31 @@
-import {boolcolumn, column, datecolumn, datetimecolumn, Table, TableColumn} from "@intermesh/goui";
+import {
+	boolcolumn,
+	column,
+	datecolumn,
+	datetimecolumn,
+	Table,
+	TableColumn,
+	numbercolumn,
+	TableColumnConfig,
+	Format
+} from "@intermesh/goui";
 import {JmapDataSource} from "./jmap/index";
-import {AclItemEntity, AclOwnerEntity} from "./auth/index";
+import {AclItemEntity, AclOwnerEntity, groupDS, principalDS} from "./auth/index";
+
 
 export interface FieldSet extends AclOwnerEntity {
 	name: string
 	entity: string
 	showAsTab: boolean
+}
+
+type SelectOption = {
+	id: number
+	text:string
+	children:SelectOption[],
+	renderMode: "cell" | "row"
+	foregroundColor: string
+	backgroundColor: string
 }
 
 export interface Field extends AclItemEntity {
@@ -15,10 +35,49 @@ export interface Field extends AclItemEntity {
 	type: string,
 	hiddenInGrid: boolean,
 	required: boolean,
-	hint?: string
+	hint?: string,
+	options: any,
+	dataType: {
+		options?: SelectOption[]
+	}
 }
 export const fieldSetDS = new JmapDataSource<FieldSet>("FieldSet");
 export const fieldDS = new JmapDataSource<Field>("Field");
+
+type CustomFieldColumnCreator = (field:Field) => TableColumn;
+
+
+function findSelectOption (optionId:number, options:SelectOption[], path:string = ""): (SelectOption & {path:string})|undefined{
+	if(!optionId){
+		return undefined;
+	}
+
+	if(!path) {
+		path = "";
+	}
+	let o;
+	for(let i = 0, l = options.length; i < l; i++) {
+		o = options[i];
+		if(o.id == optionId) {
+
+			if(path) {
+				path += " > ";
+			}
+			path += o.text;
+
+			return Object.assign(o, {path});
+		}
+
+		if(o.children) {
+			const nested = findSelectOption(optionId, o.children, path + " > " + o.text);
+			if(nested) {
+				return nested;
+			}
+		}
+	}
+
+	return undefined;
+}
 
 class CustomFields {
 	private fieldSets: Record<string, FieldSet[]> = {};
@@ -59,12 +118,49 @@ class CustomFields {
 		return f;
 	}
 
-	private tableColumnCreators: Record<string, (field:Field) => TableColumn> = {
+	private tableColumnCreators: Record<string, CustomFieldColumnCreator> = {
 		Date: f => datecolumn(this.getDefaultColumnConfig(f)),
 		DateTime: f => datetimecolumn(this.getDefaultColumnConfig(f)),
 		YesNo: f => boolcolumn(this.getDefaultColumnConfig(f)),
 		Checkbox: f => boolcolumn(this.getDefaultColumnConfig(f)),
-	};
+		Select: f => this.createSelectColumn(f),
+		User: f => this.createUserColumn(f),
+		Number: f => numbercolumn(Object.assign(this.getDefaultColumnConfig(f),  {decimals: f.options.decimals})),
+		FunctionField: f => numbercolumn(Object.assign(this.getDefaultColumnConfig(f),  {decimals: f.options.decimals})),
+		Group: f => this.createGroupColumn(f),
+		Html: f =>this.createDefaultColumn(f, {renderer: (v:string|undefined) => v ? v.stripTags() : ""})
+	}
+
+	private createSelectColumn(f:Field) {
+		return column(
+			Object.assign(
+				this.getDefaultColumnConfig(f), {
+					width: 100,
+					renderer:(columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn)=> {
+						const o = findSelectOption(columnValue, f.dataType.options!);
+						if(!o) {
+							return "";
+						}
+
+						const styleEl = o.renderMode == "cell" ? td : td.parentElement as HTMLTableRowElement;
+
+						if (o.foregroundColor) {
+							styleEl.style.color = "#" + o.foregroundColor;
+						}
+
+						if(o.backgroundColor) {
+							styleEl.style.backgroundColor = "#" + o.backgroundColor;
+						}
+						return o.path;
+					}
+				})
+		)
+	}
+
+
+	public registerTableColumnCreator(type:string, fn:CustomFieldColumnCreator) {
+		this.tableColumnCreators[type] = fn;
+	}
 
 	private getDefaultColumnConfig(f:Field) {
 		return {
@@ -83,18 +179,53 @@ class CustomFields {
 		}
 	}
 
+	private createDefaultColumn(f:Field, cfg:Partial<TableColumnConfig>) {
+		return column(Object.assign(this.getDefaultColumnConfig(f), cfg));
+	}
+
 	private fieldToTableColumn(f:Field) {
 		console.log(f.type);
 		return this.tableColumnCreators[f.type]
 			? this.tableColumnCreators[f.type](f)
-			: column(Object.assign(this.getDefaultColumnConfig(f), {width: 100})
-			);
+			: this.createDefaultColumn(f, {width: 100})
 	}
 
 	getTableColumns(entity:string) :TableColumn[] {
 		return this.getEntityFields(entity).map(f => {
 			return this.fieldToTableColumn(f);
 		})
+	}
+
+	private createUserColumn(f: Field) {
+		return column(
+			Object.assign(
+				this.getDefaultColumnConfig(f), {
+					width: 100,
+					renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn)=> {
+						if(!columnValue) {
+							return "";
+						}
+						const u = await principalDS.single(columnValue);
+						return u ? u.name : "";
+					}
+				})
+		)
+	}
+
+	private createGroupColumn(f: Field) {
+		return column(
+			Object.assign(
+				this.getDefaultColumnConfig(f), {
+					width: 100,
+					renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn)=> {
+						if(!columnValue) {
+							return "";
+						}
+						const u = await groupDS.single(columnValue);
+						return u ? u.name : "";
+					}
+				})
+		)
 	}
 }
 
