@@ -23,6 +23,7 @@ export class EntityTypeTable extends Table<Store<LinkConfig>> {
 				}),
 				column({
 					id: "title",
+					htmlEncode: false,
 					renderer: (columnValue, record) => {
 						console.log(record, columnValue);
 						return `<div class="icon ${record.iconCls}"></div>&nbsp;${columnValue.htmlEncode()}`;

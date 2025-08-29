@@ -35,6 +35,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 					id: "name",
 					sortable: true,
 					resizable: true,
+					htmlEncode: false,
 					renderer: (columnValue, record) => {
 						return `<h3>${record.name.htmlEncode()}</h3><h4>${record.description.htmlEncode()}</h4><h5>${Format.smartDateTime(record.modifiedAt)}</h5>`
 					}
@@ -44,6 +45,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 					id: "entity",
 					sortable: false,
 					width: 80,
+					htmlEncode: false,
 					renderer: (columnValue, record, td, table1, storeIndex, column1) => {
 
 						const cfg = entities.getLinkConfig(columnValue, record.filter);

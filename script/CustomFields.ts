@@ -151,6 +151,7 @@ class CustomFields {
 						if(o.backgroundColor) {
 							styleEl.style.backgroundColor = "#" + o.backgroundColor;
 						}
+
 						return o.path;
 					}
 				})
