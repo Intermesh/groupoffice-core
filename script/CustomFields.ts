@@ -128,7 +128,8 @@ class CustomFields {
 		Number: f => numbercolumn(Object.assign(this.getDefaultColumnConfig(f),  {decimals: f.options.decimals})),
 		FunctionField: f => numbercolumn(Object.assign(this.getDefaultColumnConfig(f),  {decimals: f.options.decimals})),
 		Group: f => this.createGroupColumn(f),
-		Html: f =>this.createDefaultColumn(f, {renderer: (v:string|undefined) => v ? v.stripTags() : ""})
+		Html: f =>this.createDefaultColumn(f, {renderer: (v:string|undefined) => v ? v.stripTags() : ""}),
+		TextArea: f => this.createDefaultColumn(f, {renderer: (v:string|undefined)=> v ? v.replace(/\n/g, " ") : ""} )
 	}
 
 	private createSelectColumn(f:Field) {
