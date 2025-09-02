@@ -9,7 +9,7 @@ import {DateTime, Format, FunctionUtil, Observable, ObservableEventMap, Timezone
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
-import {customFields} from "../CustomFields";
+import {customFields} from "../customfields/CustomFields.js";
 
 
 export interface LoginData {
