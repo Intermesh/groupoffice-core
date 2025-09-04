@@ -159,6 +159,4 @@ class CustomFields {
 
 }
 
-
-debugger
 export const customFields = new CustomFields();
