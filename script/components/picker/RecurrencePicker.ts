@@ -322,6 +322,9 @@ export class RecurrencePicker extends CardContainer<RecurrencePickerEventMap> {
 	}
 
 	setValue(rrule: RecurrenceRule | null) {
+
+		// console.log(rrule);
+
 		if (this.rule == rrule) return;
 		this.rule = rrule;
 		this.fire('select', {rule: rrule});

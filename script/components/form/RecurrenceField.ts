@@ -88,11 +88,11 @@ export class RecurrenceField extends Field {
 			let
 				days = [],
 				workdays = (rr.byDay.length === 5);
-			for (var i = 0; i < rr.byDay.length; i++) {
+			for (let i = 0; i < rr.byDay.length; i++) {
 				if (rr.byDay[i].day.toLowerCase() == 'sa' || rr.byDay[i].day.toLowerCase() == 'su') {
 					workdays = false;
 				}
-				var nthDay = '';
+				let nthDay = '';
 				if (rr.byDay[i].nthOfPeriod) {
 					nthDay = t('the') + ' ' + RecurrenceField.getSuffix(rr.byDay[i].nthOfPeriod!) + ' ';
 				}
@@ -122,7 +122,8 @@ export class RecurrenceField extends Field {
 	}
 
 	private static getSuffix(week: number) {
-		switch (week) {
+		// @ts-ignore On migrations this became strings..
+		switch (parseInt(week)) {
 			case 1:
 				return t("first");
 			case 2:
