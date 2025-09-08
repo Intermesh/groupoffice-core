@@ -283,7 +283,12 @@ export class Client extends Observable<ClientEventMap> {
 
 	private static blobCache: Record<string, Promise<any>> = {};
 
-	public getBlobURL(blobId: string) {
+	/**
+	 * Generate a URL for a blob ID
+	 *
+	 * @param blobId
+	 */
+	public getBlobURL(blobId: string) : Promise<string> {
 
 		if (!Client.blobCache[blobId]) {
 			let type: undefined | string;
@@ -305,6 +310,25 @@ export class Client extends Observable<ClientEventMap> {
 		return Client.blobCache[blobId];
 	}
 
+
+	/**
+	 * Releases an existing object URL which was previously created by calling getBlobURL()
+	 *
+	 * @param blobId
+	 */
+	public async revokeBlobURL(blobId:string) {
+		if(blobId in Client.blobCache) {
+			URL.revokeObjectURL(await Client.blobCache[blobId]);
+			delete Client.blobCache[blobId];
+		}
+	}
+
+	/**
+	 * Downloads a blob ID
+	 *
+	 * @param blobId
+	 * @param filename
+	 */
 	public async downloadBlobId(blobId: string, filename: string) {
 		// Create a URL for the blob
 		const url = await this.getBlobURL(blobId)
@@ -320,7 +344,8 @@ export class Client extends Observable<ClientEventMap> {
 		console.log("Downloading: " + url);
 
 		// Discard the object data
-		URL.revokeObjectURL(url);
+		// URL.revokeObjectURL(url);
+		void this.revokeBlobURL(url);
 	}
 
 
