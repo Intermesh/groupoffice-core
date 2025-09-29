@@ -8,7 +8,7 @@ import {
 	t, TableConfig
 } from "@intermesh/goui";
 import {JmapDataSource, jmapds} from "../jmap/index.js";
-import {Principal, User} from "../auth/index.js";
+import {Principal, principalDS, User} from "../auth/index.js";
 
 
 
@@ -27,7 +27,7 @@ export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 		) {
 
 		super(
-			jmapds<Principal>("Principal"),
+			principalDS,
 			"name",
 			"id",
 			renderer,
