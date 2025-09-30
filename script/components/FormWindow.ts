@@ -24,6 +24,8 @@ import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
 import {CreateLinkButton, createlinkbutton} from "./CreateLinkButton";
 import {Link} from "../model/Link";
+import {customFields} from "../customfields/CustomFields";
+import {FormFieldset} from "../customfields/FormFieldset";
 
 
 /**
@@ -250,13 +252,25 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 
 	protected addCustomFields() {
 
-		this.on("render", () => {
-			if(this.hidden) {
-				this.on("show", () => this.renderCustomFields())
+		const fieldsets = customFields.getFieldSets("Project3").map(fs => new FormFieldset(fs))
+
+		fieldsets.forEach((fs) => {
+			if (fs.fieldSet.isTab) {
+				fs.title = "";
+				this.cards.items.add(
+					containerfield({
+							name: "customFields",
+							cls: "scroll",
+							title: fs.fieldSet.name
+						}, fs
+					)
+				);
 			} else {
-				this.renderCustomFields();
+				//in case formPanelLayout is set to column
+				// fs.columnWidth = 1;
+				this.generalTab.items.add(containerfield({name: "customFields"}, fs));
 			}
-		})
+		}, this);
 	}
 
 

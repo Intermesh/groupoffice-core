@@ -10,9 +10,12 @@ import {
 	Table,
 	TableColumn,
 	textfield,
-	TextField, Config, t, datefield,
-	Field as FormField, datetimefield, checkbox, select, numberfield, htmlfield, textarea
+	TableColumnConfig, Config, t, datefield,
+	Field as FormField, datetimefield, checkbox, select, numberfield, htmlfield, textarea, table, datasourcestore,
+	autocompletechips, store
 } from "@intermesh/goui";
+import {principalcombo} from "../components/index";
+import {groupcombo} from "../components/GroupCombo";
 
 
 /**
@@ -34,9 +37,6 @@ export abstract class AbstractCustomField {
 	}
 
 	protected getFormFieldConfig() :any  {
-
-
-
 		const cfg:Config<FormField> = {
 			name: this.field.databaseName,
 			hint: this.field.hint,
@@ -64,7 +64,7 @@ export abstract class AbstractCustomField {
 		return column(this.getColumnConfig());
 	}
 
-	protected getColumnConfig() {
+	protected getColumnConfig() : TableColumnConfig {
 		return {
 			id: this.field.databaseName,
 			property: "customFields/" + this.field.databaseName,
@@ -105,17 +105,14 @@ export class YesNoCustomField extends AbstractCustomField {
 	}
 
 	public createFormField() {
-		return select(
-			Object.assign(
-				this.getFormFieldConfig(),
-				{
-					options: [
-						{value: null, name: ""},
-						{value: 0, name: t("No")},
-						{value: 1, name: t("Yes")}
-					]
-				})
-		);
+		return select({
+			...this.getFormFieldConfig(),
+			options: [
+				{value: null, name: ""},
+				{value: 0, name: t("No")},
+				{value: 1, name: t("Yes")}
+			]
+		});
 	}
 }
 
@@ -166,44 +163,40 @@ export class SelectCustomField extends AbstractCustomField {
 	}
 
 	createTableColumn() {
-		return column(
-			Object.assign(
-				this.getColumnConfig(), {
-					width: 100,
-					renderer: (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-						const o = this.findSelectOption(columnValue, this.field.dataType.options!);
-						if (!o) {
-							return "";
-						}
-
-						const styleEl = o.renderMode == "cell" ? td : td.parentElement as HTMLTableRowElement;
-
-						if (o.foregroundColor) {
-							styleEl.style.color = "#" + o.foregroundColor;
-						}
-
-						if (o.backgroundColor) {
-							styleEl.style.backgroundColor = "#" + o.backgroundColor;
-						}
-
-						return o.path;
-					}
+		return column({
+			...this.getColumnConfig(),
+			width: 100,
+			renderer: (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+				const o = this.findSelectOption(columnValue, this.field.dataType.options!);
+				if (!o) {
+					return "";
 				}
-			)
-		)
+
+				const styleEl = o.renderMode == "cell" ? td : td.parentElement as HTMLTableRowElement;
+
+				if (o.foregroundColor) {
+					styleEl.style.color = "#" + o.foregroundColor;
+				}
+
+				if (o.backgroundColor) {
+					styleEl.style.backgroundColor = "#" + o.backgroundColor;
+				}
+
+				return o.path;
+			}
+		})
 	}
 
 	createFormField() {
 		return select(
-			Object.assign(
-				this.getFormFieldConfig(),
-				{
-					options: this.field.dataType.options!.map(o => {
-						return {value: o.id, name: o.text}
-					}
-				)
+			{
+				...this.getFormFieldConfig(),
+
+				options: this.field.dataType.options!.map(o => {
+					return {value: o.id, name: o.text}
+				})
+
 			}
-		)
 		);
 	}
 }
@@ -211,73 +204,122 @@ export class SelectCustomField extends AbstractCustomField {
 export class MultiSelectCustomField extends SelectCustomField {
 	createTableColumn() {
 		return column(
-			Object.assign(
-				this.getColumnConfig(), {
-					width: 100,
-					renderer: (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-						if (!columnValue) {
-							return "";
-						}
-
-						return columnValue.map((id: number) => this.findSelectOption(id, this.field.dataType.options!)?.text).join(", ")
-
+			{
+				...this.getColumnConfig(),
+				width: 100,
+				renderer: (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+					if (!columnValue) {
+						return "";
 					}
+
+					return columnValue.map((id: number) => this.findSelectOption(id, this.field.dataType.options!)?.text).join(", ")
+
 				}
-			)
+			}
+
 		)
+	}
+
+	createFormField(): any {
+
+		return autocompletechips({
+			...this.getFormFieldConfig(),
+			listeners: {
+				autocomplete: ({target, input}) => {
+
+				}
+			},
+
+			chipRenderer: (chip, value) => {
+				console.log(value);
+				chip.text = this.findSelectOption(value, this.field.dataType.options!)?.text ?? "?";
+			},
+			pickerRecordToValue (field, record) : any {
+				return record.id;
+			},
+
+			list: table({
+				fitParent: true,
+				headers: false,
+				store: store({
+					data: this.field.dataType.options
+				}),
+				columns: [
+					column({
+						id: "text"
+					})
+				]
+			})
+		});
 	}
 }
 
 export class UserCustomField extends AbstractCustomField {
 	createTableColumn() {
 		return column(
-			Object.assign(
-				this.getColumnConfig(), {
-					width: 100,
-					renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-						if (!columnValue) {
-							return "";
-						}
-						const u = await principalDS.single(columnValue);
-						return u ? u.name : "";
+			{
+				...this.getColumnConfig(),
+				width: 100,
+				renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+					if (!columnValue) {
+						return "";
 					}
-				})
+					const u = await principalDS.single(columnValue);
+					return u ? u.name : "";
+				}
+			}
 		)
+	}
+
+	createFormField(): FormField {
+		return principalcombo({...this.getFormFieldConfig(), storeConfig: {filters: {default: {isEmployee: true}}}});
 	}
 }
 
 export class NumberCustomField extends AbstractCustomField {
 	createTableColumn() {
-		return numbercolumn(Object.assign(this.getColumnConfig(), {decimals: this.field.options.decimals}))
+		return numbercolumn({...this.getColumnConfig(),decimals: this.field.options.decimals});
 	}
 
 	public createFormField() {
-		return numberfield(Object.assign(this.getFormFieldConfig(), {decimals: this.field.options.decimals}));
+		return numberfield({...this.getFormFieldConfig(), decimals: this.field.options.decimals});
+	}
+}
+
+export class FunctionCustomField extends AbstractCustomField {
+	createTableColumn() {
+		return numbercolumn({...this.getColumnConfig(), decimals: this.field.options.decimals})
+	}
+
+	public createFormField() {
+		return numberfield({...this.getFormFieldConfig(), readOnly: true,decimals: this.field.options.decimals});
 	}
 }
 
 export class GroupCustomField extends AbstractCustomField {
 	createTableColumn() {
-		return column(
-			Object.assign(
-				this.getColumnConfig(), {
-					width: 100,
-					renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-						if (!columnValue) {
-							return "";
-						}
-						const u = await groupDS.single(columnValue);
-						return u ? u.name : "";
-					}
-				})
-		)
+		return column({
+			...this.getColumnConfig(),
+			width: 100,
+			renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+				if (!columnValue) {
+					return "";
+				}
+				const u = await groupDS.single(columnValue);
+				return u ? u.name : "";
+			}
+		})
 
+	}
+
+	createFormField(): FormField {
+		return groupcombo(this.getFormFieldConfig());
 	}
 }
 
 export class HtmlCustomField extends AbstractCustomField {
-	protected getColumnConfig(): { id: string; property: string; header: string; hidden: boolean; resizable: boolean } {
-		return Object.assign(super.getColumnConfig(), {renderer: (v: string | undefined) => v ? v.stripTags() : ""});
+	protected getColumnConfig() {
+		return {...super.getColumnConfig(), renderer: (v: string | undefined) => v ? v.stripTags() : ""};
 	}
 
 	public createFormField() {
@@ -286,8 +328,8 @@ export class HtmlCustomField extends AbstractCustomField {
 }
 
 export class TextAreaCustomField extends AbstractCustomField {
-	protected getColumnConfig(): { id: string; property: string; header: string; hidden: boolean; resizable: boolean } {
-		return Object.assign(super.getColumnConfig(), {renderer: (v: string | undefined) => v ? v.replace(/\n/g, " ") : ""});
+	protected getColumnConfig() {
+		return {...super.getColumnConfig(), renderer: (v: string | undefined) => v ? v.replace(/\n/g, " ") : ""};
 	}
 
 	public createFormField() {
@@ -297,18 +339,17 @@ export class TextAreaCustomField extends AbstractCustomField {
 
 export class ProjectCustomField extends AbstractCustomField {
 	createTableColumn() {
-		return column(
-			Object.assign(
-				this.getColumnConfig(), {
-					width: 100,
-					renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-						if (!columnValue) {
-							return "";
-						}
-						const u = await jmapds("Project").single(columnValue);
-						return u ? u.name : "";
+		return column({
+			...this.getColumnConfig(),
+				width: 100,
+				renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+					if (!columnValue) {
+						return "";
 					}
-				})
+					const u = await jmapds("Project").single(columnValue);
+					return u ? u.name : "";
+				}
+			}
 		)
 
 	}
@@ -316,19 +357,16 @@ export class ProjectCustomField extends AbstractCustomField {
 
 export class ContactCustomField extends AbstractCustomField {
 	createTableColumn() {
-		return column(
-			Object.assign(
-				this.getColumnConfig(), {
-					width: 100,
-					renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-						if (!columnValue) {
-							return "";
-						}
-						const u = await jmapds("Contact").single(columnValue);
-						return u ? u.name : "";
-					}
-				})
-		)
-
+		return column({
+			...this.getColumnConfig(),
+			width: 100,
+			renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+				if (!columnValue) {
+					return "";
+				}
+				const u = await jmapds("Contact").single(columnValue);
+				return u ? u.name : "";
+			}
+		})
 	}
 }
