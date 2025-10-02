@@ -59,10 +59,17 @@ export class TreeSelectField extends Field {
 
 	protected internalRender(): HTMLElement {
 
-		this.items.add(this.createSelect([{id: null, text: "---"},...this.options]));
+		this.addFirstCombo();
 
 		return super.internalRender();
 	}
+
+	protected addFirstCombo() {
+		if(this.items.count() == 0)
+			this.items.add(this.createSelect([{id: null, text: "---"},...this.options]));
+
+	}
+
 
 	protected internalSetValue(v?: number) {
 		super.internalSetValue(v);
@@ -76,6 +83,8 @@ export class TreeSelectField extends Field {
 		if(!opt) {
 			return;
 		}
+
+		this.addFirstCombo();
 
 		opt.parents?.forEach((o, index) => {
 			const field = this.items.get(index) as SelectField;
