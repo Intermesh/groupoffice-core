@@ -12,7 +12,7 @@ import {
 	textfield,
 	TableColumnConfig, Config, t, datefield,
 	Field as FormField, datetimefield, checkbox, select, numberfield, htmlfield, textarea, table, datasourcestore,
-	autocompletechips, store
+	autocompletechips, store, combobox, btn, ComboBox, span
 } from "@intermesh/goui";
 import {principalcombo} from "../components/index";
 import {groupcombo} from "../components/GroupCombo";
@@ -27,6 +27,8 @@ import {treeselect} from "./TreeSelectField";
  * prefix
  *
  * detail view
+ *
+ * MultiContact
  *
  */
 
@@ -47,6 +49,14 @@ export abstract class AbstractCustomField {
 			value: this.field.default,
 			hidden: !!this.field.conditionallyHidden
 		};
+
+		if(this.field.prefix) {
+			cfg.label +=  ' (' + this.field.prefix + ')';
+		}
+
+		// if(this.field.suffix) {
+		// 	cfg.buttons = [span(this.field.suffix)]
+		// }
 
 		if(this.field.options.validationRegex) {
 			cfg.listeners = {
@@ -351,6 +361,20 @@ export class ProjectCustomField extends AbstractCustomField {
 		)
 
 	}
+
+	createFormField(): FormField {
+		return combobox({
+			...this.getFormFieldConfig(),
+			dataSource: jmapds("Project"),
+			filterName: "text",
+			buttons: [btn({
+				icon: "clear",
+				handler: (button, ev) => {
+					button.findAncestorByType(ComboBox)!.value = null;
+				}
+			})]
+		})
+	}
 }
 
 export class ContactCustomField extends AbstractCustomField {
@@ -364,6 +388,32 @@ export class ContactCustomField extends AbstractCustomField {
 				}
 				const u = await jmapds("Contact").single(columnValue);
 				return u ? u.name : "";
+			}
+		})
+	}
+
+	createFormField(): FormField {
+
+		const filter:any = {isOrganization: this.field.options.isOrganization};
+
+		if(this.field.options.addressBookId?.length) {
+			filter.addressBookId = this.field.options.addressBookId;
+		}
+
+		return combobox({
+			...this.getFormFieldConfig(),
+			dataSource: jmapds("Contact"),
+			filterName: "text",
+			buttons: [btn({
+				icon: "clear",
+				handler: (button, ev) => {
+					button.findAncestorByType(ComboBox)!.value = null;
+				}
+			})],
+			storeConfig: {
+				filters: {
+					default: filter
+				}
 			}
 		})
 	}

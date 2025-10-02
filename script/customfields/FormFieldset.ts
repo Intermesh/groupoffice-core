@@ -1,4 +1,4 @@
-import {comp, fieldset, Fieldset, Field as FormField, Format, p} from "@intermesh/goui";
+import {comp, fieldset, Fieldset, Field as FormField, Format, p, Component, span} from "@intermesh/goui";
 import {customFields, Field, FieldSet as CustomFieldSet} from "./CustomFields.js"
 
 export class FormFieldset extends Fieldset {
@@ -12,7 +12,7 @@ export class FormFieldset extends Fieldset {
 		}
 
 		const fields = customFields.getFieldSetFields(fieldSet),
-			formFields = fields.map(f => customFields.getType(f).createFormField());
+			formFields = fields.map(f => this.createFormField(f));
 
 		if(fieldSet.columns == 1) {
 			this.items.add(...formFields);
@@ -22,7 +22,7 @@ export class FormFieldset extends Fieldset {
 
 	}
 
-	private addInColumns(fields: FormField[]) {
+	private addInColumns(fields: Component[]) {
 		const fieldsPerColumn = Math.floor(fields.length / this.fieldSet.columns),
 			fieldsInFirstColumn = fieldsPerColumn + (fields.length % this.fieldSet.columns);
 
@@ -34,5 +34,16 @@ export class FormFieldset extends Fieldset {
 				flex: 1
 			}, ...fields.splice(0, colIndex === 0 ? fieldsInFirstColumn : fieldsPerColumn)));
 		}
+	}
+
+	private createFormField(f: Field) : Component {
+		const cmp = customFields.getType(f).createFormField();
+
+		if(f.suffix) {
+			cmp.flex = 1;
+			return comp({cls: "hbox"}, cmp, span({text: f.suffix, cls: "customfield-suffix"}));
+		}
+
+		return cmp
 	}
 }
