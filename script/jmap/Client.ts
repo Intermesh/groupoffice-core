@@ -210,8 +210,8 @@ export class Client extends Observable<ClientEventMap> {
 
 		Format.dateFormat = this._user.dateFormat;
 		Format.timeFormat = this._user.timeFormat;
-		Format.timezone = this._user.timezone as Timezone;
-		DateTime.defaultTimezone = this._user.timezone as Timezone;
+		Format.timezone = this._user.timezone.toLowerCase() as Timezone;
+		DateTime.defaultTimezone = Format.timezone;
 		Format.currency = this._user.currency;
 		Format.thousandsSeparator = this._user.thousandsSeparator;
 		Format.decimalSeparator = this._user.decimalSeparator;
