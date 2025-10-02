@@ -22,12 +22,9 @@ import {treeselect} from "./TreeSelectField";
 /**
  * TODO:
  *
- * TreeSelectField
  * requiredCondition
  * suffix
  * prefix
- *
- * columns in forms
  *
  * detail view
  *
