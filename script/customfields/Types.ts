@@ -16,6 +16,7 @@ import {
 } from "@intermesh/goui";
 import {principalcombo} from "../components/index";
 import {groupcombo} from "../components/GroupCombo";
+import {treeselect} from "./TreeSelectField";
 
 
 /**
@@ -25,6 +26,10 @@ import {groupcombo} from "../components/GroupCombo";
  * requiredCondition
  * suffix
  * prefix
+ *
+ * columns in forms
+ *
+ * detail view
  *
  */
 
@@ -188,14 +193,11 @@ export class SelectCustomField extends AbstractCustomField {
 	}
 
 	createFormField() {
-		return select(
+
+		return treeselect(
 			{
 				...this.getFormFieldConfig(),
-
-				options: this.field.dataType.options!.map(o => {
-					return {value: o.id, name: o.text}
-				})
-
+				options: this.field.dataType.options!
 			}
 		);
 	}
@@ -231,7 +233,6 @@ export class MultiSelectCustomField extends SelectCustomField {
 			},
 
 			chipRenderer: (chip, value) => {
-				console.log(value);
 				chip.text = this.findSelectOption(value, this.field.dataType.options!)?.text ?? "?";
 			},
 			pickerRecordToValue (field, record) : any {

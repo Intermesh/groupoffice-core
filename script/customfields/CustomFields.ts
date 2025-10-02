@@ -36,6 +36,7 @@ export type SelectOption = {
 	renderMode: "cell" | "row"
 	foregroundColor: string
 	backgroundColor: string
+	parents?: SelectOption[]
 }
 
 export interface Field extends AclItemEntity {
