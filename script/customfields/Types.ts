@@ -12,7 +12,7 @@ import {
 	textfield,
 	TableColumnConfig, Config, t, datefield,
 	Field as FormField, datetimefield, checkbox, select, numberfield, htmlfield, textarea, table, datasourcestore,
-	autocompletechips, store, combobox, btn, ComboBox, span
+	autocompletechips, store, combobox, btn, ComboBox, span, Component, p
 } from "@intermesh/goui";
 import {principalcombo} from "../components/index";
 import {groupcombo} from "../components/GroupCombo";
@@ -23,12 +23,12 @@ import {treeselect} from "./TreeSelectField";
  * TODO:
  *
  * requiredCondition
- * suffix
- * prefix
  *
  * detail view
  *
  * MultiContact
+ *
+ * collapse if empty
  *
  */
 
@@ -36,8 +36,8 @@ export abstract class AbstractCustomField {
 	constructor(protected readonly field: Field) {
 	}
 
-	public createFormField() : FormField {
-		return textfield(this.getFormFieldConfig())
+	public createFormField() : Component|undefined {
+		return undefined;
 	}
 
 	protected getFormFieldConfig() :any  {
@@ -49,6 +49,7 @@ export abstract class AbstractCustomField {
 			value: this.field.default,
 			hidden: !!this.field.conditionallyHidden
 		};
+
 
 		if(this.field.prefix) {
 			cfg.label +=  ' (' + this.field.prefix + ')';
@@ -88,7 +89,18 @@ export abstract class AbstractCustomField {
 }
 
 export class TextCustomField extends AbstractCustomField {
+	public createFormField() : Component|undefined {
+		return textfield(this.getFormFieldConfig())
+	}
+}
 
+export class TemplateCustomField extends AbstractCustomField {
+}
+
+export class NotesCustomField extends AbstractCustomField {
+	createFormField() {
+		return p({html: this.field.options.formNotes});
+	}
 }
 
 export class DateCustomField extends AbstractCustomField {

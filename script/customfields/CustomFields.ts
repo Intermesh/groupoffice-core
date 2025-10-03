@@ -8,10 +8,10 @@ import {
 	DateTimeCustomField, FunctionCustomField,
 	GroupCustomField,
 	HtmlCustomField,
-	MultiSelectCustomField,
+	MultiSelectCustomField, NotesCustomField,
 	NumberCustomField,
 	ProjectCustomField,
-	SelectCustomField,
+	SelectCustomField, TemplateCustomField,
 	TextAreaCustomField,
 	TextCustomField,
 	UserCustomField,
@@ -44,6 +44,8 @@ export interface Field extends AclItemEntity {
 	name: string
 	default:any
 	conditionallyHidden: boolean,
+	conditionallyRequired: boolean,
+	relatedFieldCondition?:string,
 	databaseName: string
 	type: string,
 	hiddenInGrid: boolean,
@@ -132,6 +134,8 @@ class CustomFields {
 		Html: HtmlCustomField,
 		TextArea: TextAreaCustomField,
 		Text: TextCustomField,
+		Notes: NotesCustomField,
+		Template: TemplateCustomField,
 
 		// Todo, these should be added by the modules using registerTableColumnCreator
 		Project: ProjectCustomField,

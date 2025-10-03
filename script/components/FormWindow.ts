@@ -259,9 +259,10 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 				fs.title = "";
 				this.cards.items.add(
 					containerfield({
-							name: "customFields",
-							cls: "scroll",
-							title: fs.fieldSet.name
+						keepUnknownValues: false, // important because we create multiple container fields with the same object. If this is true then they will overwrite eachother.
+						name: "customFields",
+						cls: "scroll",
+						title: fs.fieldSet.name
 						}, fs
 					)
 				);
