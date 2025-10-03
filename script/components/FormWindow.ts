@@ -1,19 +1,18 @@
 import {
 	BaseEntity,
-	btn, Button,
+	btn,
+	Button,
 	CardContainer,
 	CardMenu,
 	cardmenu,
 	cards,
 	comp,
 	Component,
-	containerfield, DataSourceEventMap,
-	datasourceform, DataSourceFormEventMap,
+	containerfield,
+	datasourceform,
+	DataSourceFormEventMap,
 	DefaultEntity,
-	EntityID, FormEventMap,
-	FunctionUtil,
-	Listener,
-	ObservableListenerOpts,
+	EntityID,
 	t,
 	tbar,
 	Toolbar,
@@ -267,62 +266,9 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 					)
 				);
 			} else {
-				//in case formPanelLayout is set to column
-				// fs.columnWidth = 1;
 				this.generalTab.items.add(containerfield({name: "customFields"}, fs));
 			}
 		}, this);
-	}
-
-
-	private renderCustomFields() {
-		if (go.Entities.get(this.entityName).customFields) {
-
-			const fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityName);
-			fieldsets.forEach((fs: any) => {
-
-				//replace customFields. because we will use a containerfield here.
-				fs.cascade((item: any) => {
-					if (item.getName) {
-						let fieldName = item.getName().replace('customFields.', '');
-						item.name = item.hiddenName =  fieldName;
-					}
-				});
-
-				if (fs.fieldSet.isTab) {
-					fs.title = null;
-					fs.collapsible = false;
-
-					this.cards.items.add(
-						containerfield({
-							name: "customFields",
-							cls: "scroll",
-							title: fs.fieldSet.name,
-							listeners: {
-								show: () => {
-									fs.doLayout();
-								}
-							}
-						}, fs
-						)
-					);
-				} else {
-					//in case formPanelLayout is set to column
-					fs.columnWidth = 1;
-					this.generalTab.items.add(containerfield({name: "customFields"}, fs));
-				}
-			}, this);
-
-
-			if(fieldsets.length) {
-				const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
-					fieldsets.forEach((fs: any) => fs.doLayout());
-				}));
-
-				ro.observe(this.el);
-			}
-
-		}
 	}
 
 	/**

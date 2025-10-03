@@ -12,7 +12,7 @@ import {
 	textfield,
 	TableColumnConfig, Config, t, datefield,
 	Field as FormField, datetimefield, checkbox, select, numberfield, htmlfield, textarea, table, datasourcestore,
-	autocompletechips, store, combobox, btn, ComboBox, span, Component, p
+	autocompletechips, store, combobox, btn, ComboBox, span, Component, p, TextField
 } from "@intermesh/goui";
 import {principalcombo} from "../components/index";
 import {groupcombo} from "../components/GroupCombo";
@@ -55,10 +55,6 @@ export abstract class AbstractCustomField {
 			cfg.label +=  ' (' + this.field.prefix + ')';
 		}
 
-		// if(this.field.suffix) {
-		// 	cfg.buttons = [span(this.field.suffix)]
-		// }
-
 		if(this.field.options.validationRegex) {
 			cfg.listeners = {
 				validate: ({target}) => {
@@ -73,7 +69,7 @@ export abstract class AbstractCustomField {
 		return cfg;
 	}
 
-	public createTableColumn() {
+	public createTableColumn() : TableColumn|undefined {
 		return column(this.getColumnConfig());
 	}
 
@@ -100,6 +96,10 @@ export class TemplateCustomField extends AbstractCustomField {
 export class NotesCustomField extends AbstractCustomField {
 	createFormField() {
 		return p({html: this.field.options.formNotes});
+	}
+
+	createTableColumn() {
+		return  undefined;
 	}
 }
 
@@ -427,6 +427,57 @@ export class ContactCustomField extends AbstractCustomField {
 					default: filter
 				}
 			}
+		})
+	}
+}
+
+
+
+export class FileCustomField extends AbstractCustomField {
+
+	createFormField(): FormField {
+
+		const filter:any = {isOrganization: this.field.options.isOrganization};
+
+		if(this.field.options.addressBookId?.length) {
+			filter.addressBookId = this.field.options.addressBookId;
+		}
+
+		return textfield({
+			...this.getFormFieldConfig(),
+
+			buttons: [btn({
+				icon: "clear",
+				handler: (button, ev) => {
+					button.findAncestorByType(ComboBox)!.value = null;
+				}
+			}),
+				btn({
+					icon: "folder",
+					handler: (button, ev) => {
+
+						const field = button.findAncestorByType(TextField)!
+
+						GO.files.createSelectFileBrowser();
+
+						GO.selectFileBrowser.setFileClickHandler((r:any) => {
+							if(r){
+								field.value = r.data.path;
+							}else
+							{
+								field.value = GO.selectFileBrowser.path;
+							}
+
+							GO.selectFileBrowserWindow.hide();
+						}, this);
+
+
+						GO.selectFileBrowser.setRootID(0, 0);
+						GO.selectFileBrowserWindow.show();
+					}
+				})
+			]
+
 		})
 	}
 }

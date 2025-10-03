@@ -5,7 +5,7 @@ import {
 	AbstractCustomField, CheckboxCustomField,
 	ContactCustomField,
 	DateCustomField,
-	DateTimeCustomField, FunctionCustomField,
+	DateTimeCustomField, FileCustomField, FunctionCustomField,
 	GroupCustomField,
 	HtmlCustomField,
 	MultiSelectCustomField, NotesCustomField,
@@ -140,6 +140,7 @@ class CustomFields {
 		// Todo, these should be added by the modules using registerTableColumnCreator
 		Project: ProjectCustomField,
 		Contact: ContactCustomField,
+		File: FileCustomField
 	}
 
 
@@ -155,10 +156,10 @@ class CustomFields {
 			: new this.types["Text"](f)
 	}
 
-	getTableColumns(entity: string): TableColumn[] {
+	public getTableColumns(entity: string): TableColumn[] {
 		return this.getEntityFields(entity).map(f => {
 			return this.getType(f).createTableColumn();
-		})
+		}).filter(c => c !== undefined);
 	}
 
 
