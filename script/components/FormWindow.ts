@@ -251,7 +251,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 
 	protected addCustomFields() {
 
-		const fieldsets = customFields.getFieldSets("Project3").map(fs => new FormFieldset(fs))
+		const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
 
 		fieldsets.forEach((fs) => {
 			if (fs.fieldSet.isTab) {
