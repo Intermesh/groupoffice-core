@@ -4,7 +4,7 @@ export class FormFieldset extends Fieldset {
 	constructor(public readonly fieldSet:CustomFieldSet) {
 		super();
 
-		this.title = fieldSet.name;
+		this.legend = fieldSet.name;
 
 		if(fieldSet.description) {
 			this.items.add(p(Format.textToHtml(fieldSet.description)));
@@ -39,14 +39,16 @@ export class FormFieldset extends Fieldset {
 		const fieldsPerColumn = Math.floor(fields.length / this.fieldSet.columns),
 			fieldsInFirstColumn = fieldsPerColumn + (fields.length % this.fieldSet.columns);
 
-		this.cls = "hbox gap";
+		const container = comp({cls: "hbox gap"});
 
 		for(let colIndex = 0; colIndex <this.fieldSet.columns; colIndex++) {
-			this.items.add(comp({
+			container.items.add(comp({
 				cls: "flow",
 				flex: 1
 			}, ...fields.splice(0, colIndex === 0 ? fieldsInFirstColumn : fieldsPerColumn)));
 		}
+
+		this.items.add(container);
 	}
 
 	private createFormField(f: Field) : Component|undefined {

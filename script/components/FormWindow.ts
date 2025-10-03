@@ -255,7 +255,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 
 		fieldsets.forEach((fs) => {
 			if (fs.fieldSet.isTab) {
-				fs.title = "";
+				fs.legend = "";
 				this.cards.items.add(
 					containerfield({
 						keepUnknownValues: false, // important because we create multiple container fields with the same object. If this is true then they will overwrite eachother.
