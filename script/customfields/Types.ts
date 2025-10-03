@@ -44,9 +44,6 @@ import {treeselect} from "./TreeSelectField";
 /**
  * TODO:
  *
- * requiredCondition
- *
- * detail view
  *
  * MultiContact
  *
@@ -66,12 +63,13 @@ export abstract class AbstractCustomField {
 		return displayfield(this.getDetailFieldConfig());
 	}
 
-	protected getDetailFieldConfig() :any {
-		const cfg: Config<FormField> = {
+	protected getDetailFieldConfig() : Config<FormField> {
+		return {
 			name: this.field.databaseName,
+			hidden:true,
 			label: this.field.name
 		};
-		return cfg;
+
 	}
 
 	protected getFormFieldConfig() :any  {
@@ -81,7 +79,7 @@ export abstract class AbstractCustomField {
 			required: this.field.required,
 			label: this.field.name,
 			value: this.field.default,
-			hidden: !!this.field.conditionallyHidden
+			hidden: this.field.conditionallyHidden
 		};
 
 
@@ -132,6 +130,10 @@ export class NotesCustomField extends AbstractCustomField {
 		return p({html: this.field.options.formNotes});
 	}
 
+	createDetailField() {
+		return p({html: this.field.options.detailNotes});
+	}
+
 	createTableColumn() {
 		return  undefined;
 	}
@@ -147,7 +149,7 @@ export class DateCustomField extends AbstractCustomField {
 	}
 
 	createDetailField() {
-		return displaydatefield({...this.getFormFieldConfig(), icon: undefined});
+		return displaydatefield({...this.getDetailFieldConfig(), icon: undefined});
 	}
 }
 
@@ -161,7 +163,7 @@ export class DateTimeCustomField extends AbstractCustomField {
 	}
 
 	createDetailField() {
-		return displaydatefield({withTime: true,icon: undefined, ...this.getFormFieldConfig()});
+		return displaydatefield({withTime: true,icon: undefined, ...this.getDetailFieldConfig()});
 	}
 }
 
@@ -185,7 +187,7 @@ export class YesNoCustomField extends AbstractCustomField {
 		return displayfield({
 			...this.getDetailFieldConfig(),
 			renderer: (v: string) => {
-				return v ? t("Yes") : t("No");
+				return v === null || v === undefined ? "" : v ? t("Yes") : t("No");
 			}
 		})
 	}
@@ -201,7 +203,7 @@ export class CheckboxCustomField extends AbstractCustomField {
 	}
 
 	createDetailField() {
-		return displaycheckboxfield(this.getFormFieldConfig());
+		return displaycheckboxfield(this.getDetailFieldConfig());
 	}
 }
 
@@ -242,7 +244,7 @@ export class SelectCustomField extends AbstractCustomField {
 		return column({
 			...this.getColumnConfig(),
 			width: 100,
-			renderer: (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
+			renderer: (columnValue: any, record: any, td: HTMLTableCellElement) => {
 				const o = this.findSelectOption(columnValue, this.field.dataType.options!);
 				if (!o) {
 					return "";
@@ -315,11 +317,6 @@ export class MultiSelectCustomField extends SelectCustomField {
 
 		return autocompletechips({
 			...this.getFormFieldConfig(),
-			listeners: {
-				autocomplete: ({target, input}) => {
-
-				}
-			},
 
 			chipRenderer: (chip, value) => {
 				chip.text = this.findSelectOption(value, this.field.dataType.options!)?.text ?? "?";
@@ -404,7 +401,7 @@ export class FunctionCustomField extends AbstractCustomField {
 	createDetailField() {
 		return displayfield({
 			...this.getDetailFieldConfig(),
-			renderer: v => Format.number(v, this.field.options.decimals)
+			renderer: v => v > 0 ? Format.number(v, this.field.options.decimals) : ""
 		});
 	}
 }
@@ -498,7 +495,7 @@ export class ProjectCustomField extends AbstractCustomField {
 			filterName: "text",
 			buttons: [btn({
 				icon: "clear",
-				handler: (button, ev) => {
+				handler: (button) => {
 					button.findAncestorByType(ComboBox)!.value = null;
 				}
 			})]
@@ -544,7 +541,7 @@ export class ContactCustomField extends AbstractCustomField {
 			filterName: "text",
 			buttons: [btn({
 				icon: "clear",
-				handler: (button, ev) => {
+				handler: (button) => {
 					button.findAncestorByType(ComboBox)!.value = null;
 				}
 			})],
@@ -610,13 +607,13 @@ export class FileCustomField extends AbstractCustomField {
 
 			buttons: [btn({
 				icon: "clear",
-				handler: (button, ev) => {
+				handler: (button) => {
 					button.findAncestorByType(ComboBox)!.value = null;
 				}
 			}),
 				btn({
 					icon: "folder",
-					handler: (button, ev) => {
+					handler: (button) => {
 
 						const field = button.findAncestorByType(TextField)!
 
