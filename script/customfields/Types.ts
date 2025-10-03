@@ -28,7 +28,6 @@ import {
 	select,
 	store,
 	t,
-	Table,
 	table,
 	TableColumn,
 	TableColumnConfig,
