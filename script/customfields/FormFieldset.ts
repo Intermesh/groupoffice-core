@@ -1,6 +1,18 @@
-import {comp, fieldset, Fieldset, Field as FormField, Format, p, Component, span, Form} from "@intermesh/goui";
+import {
+	comp,
+	fieldset,
+	Fieldset,
+	Field as FormField,
+	Format,
+	p,
+	Component,
+	span,
+	Form,
+	containerfield, ContainerField
+} from "@intermesh/goui";
 import {customFields, Field, FieldSet as CustomFieldSet} from "./CustomFields.js";
 export class FormFieldset extends Fieldset {
+	private container: ContainerField;
 	constructor(public readonly fieldSet:CustomFieldSet) {
 		super();
 
@@ -9,46 +21,38 @@ export class FormFieldset extends Fieldset {
 		if(fieldSet.description) {
 			this.items.add(p(Format.textToHtml(fieldSet.description)));
 		}
+		
+		this.items.add(this.container = containerfield({cls: "hbox gap", keepUnknownValues: false, name: "customFields"}));
 
 		const fields = customFields.getFieldSetFields(fieldSet),
 			formFields = fields.map(f => this.createFormField(f)).filter(f => f !== undefined);
 
 		if(fieldSet.columns == 1) {
-			this.items.add(...formFields);
+			this.container.items.add(...formFields);
 		} else{
 			this.addInColumns(formFields);
 		}
 
 		this.on("render", () => {
-
-			this.findChildrenByType(FormField).forEach( (f) => {
+			this.container.findChildrenByType(FormField).forEach( (f) => {
 				f.on("setvalue", (ev) => {
-					this.findChildrenByType(FormField).forEach((field) => {
+					this.container.findChildrenByType(FormField).forEach((field) => {
 							this.checkRequiredCondition(field);
 					});
 				});
 			});
-
 		})
-
 	}
-
-
-
 	private addInColumns(fields: Component[]) {
 		const fieldsPerColumn = Math.floor(fields.length / this.fieldSet.columns),
 			fieldsInFirstColumn = fieldsPerColumn + (fields.length % this.fieldSet.columns);
 
-		const container = comp({cls: "hbox gap"});
-
 		for(let colIndex = 0; colIndex <this.fieldSet.columns; colIndex++) {
-			container.items.add(comp({
+			this.container.items.add(comp({
 				cls: "flow",
 				flex: 1
 			}, ...fields.splice(0, colIndex === 0 ? fieldsInFirstColumn : fieldsPerColumn)));
 		}
-
-		this.items.add(container);
 	}
 
 	private createFormField(f: Field) : Component|undefined {

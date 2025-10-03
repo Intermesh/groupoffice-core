@@ -255,18 +255,11 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 
 		fieldsets.forEach((fs) => {
 			if (fs.fieldSet.isTab) {
+				fs.title = fs.fieldSet.name;
 				fs.legend = "";
-				this.cards.items.add(
-					containerfield({
-						keepUnknownValues: false, // important because we create multiple container fields with the same object. If this is true then they will overwrite eachother.
-						name: "customFields",
-						cls: "scroll",
-						title: fs.fieldSet.name
-						}, fs
-					)
-				);
+				this.cards.items.add(fs);
 			} else {
-				this.generalTab.items.add(containerfield({name: "customFields", keepUnknownValues: false}, fs));
+				this.generalTab.items.add(fs);
 			}
 		}, this);
 	}
