@@ -2,17 +2,39 @@ import {jmapds} from "../jmap/index.js";
 import {groupDS, principalDS} from "../auth/index.js";
 import {Field, SelectOption} from "./CustomFields.js";
 import {
+	autocompletechips,
 	boolcolumn,
+	btn,
+	checkbox,
 	column,
+	combobox,
+	ComboBox,
+	comp,
+	Component,
+	Config,
 	datecolumn,
-	numbercolumn,
+	datefield,
 	datetimecolumn,
+	datetimefield,
+	displaycheckboxfield,
+	displaydatefield,
+	displayfield,
+	Field as FormField,
+	Format,
+	htmlfield,
+	numbercolumn,
+	numberfield,
+	p,
+	select,
+	store,
+	t,
 	Table,
+	table,
 	TableColumn,
+	TableColumnConfig,
+	textarea,
 	textfield,
-	TableColumnConfig, Config, t, datefield,
-	Field as FormField, datetimefield, checkbox, select, numberfield, htmlfield, textarea, table, datasourcestore,
-	autocompletechips, store, combobox, btn, ComboBox, span, Component, p, TextField
+	TextField
 } from "@intermesh/goui";
 import {principalcombo} from "../components/index";
 import {groupcombo} from "../components/GroupCombo";
@@ -38,6 +60,18 @@ export abstract class AbstractCustomField {
 
 	public createFormField() : Component|undefined {
 		return undefined;
+	}
+
+	public createDetailField() : Component|undefined {
+		return displayfield(this.getDetailFieldConfig());
+	}
+
+	protected getDetailFieldConfig() :any {
+		const cfg: Config<FormField> = {
+			name: this.field.databaseName,
+			label: this.field.name
+		};
+		return cfg;
 	}
 
 	protected getFormFieldConfig() :any  {
@@ -111,6 +145,10 @@ export class DateCustomField extends AbstractCustomField {
 	public createFormField() {
 		return datefield(this.getFormFieldConfig())
 	}
+
+	createDetailField() {
+		return displaydatefield({...this.getFormFieldConfig(), icon: undefined});
+	}
 }
 
 export class DateTimeCustomField extends AbstractCustomField {
@@ -120,6 +158,10 @@ export class DateTimeCustomField extends AbstractCustomField {
 
 	public createFormField() {
 		return datetimefield(this.getFormFieldConfig())
+	}
+
+	createDetailField() {
+		return displaydatefield({withTime: true,icon: undefined, ...this.getFormFieldConfig()});
 	}
 }
 
@@ -138,6 +180,15 @@ export class YesNoCustomField extends AbstractCustomField {
 			]
 		});
 	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: (v: string) => {
+				return v ? t("Yes") : t("No");
+			}
+		})
+	}
 }
 
 export class CheckboxCustomField extends AbstractCustomField {
@@ -147,6 +198,10 @@ export class CheckboxCustomField extends AbstractCustomField {
 
 	public createFormField() {
 		return checkbox(this.getFormFieldConfig())
+	}
+
+	createDetailField() {
+		return displaycheckboxfield(this.getFormFieldConfig());
 	}
 }
 
@@ -159,15 +214,12 @@ export class SelectCustomField extends AbstractCustomField {
 			return undefined;
 		}
 
-		if (!path) {
-			path = "";
-		}
 		let o;
 		for (let i = 0, l = options.length; i < l; i++) {
 			o = options[i];
 			if (o.id == optionId) {
 
-				if (path) {
+				if (path != "") {
 					path += " > ";
 				}
 				path += o.text;
@@ -176,7 +228,7 @@ export class SelectCustomField extends AbstractCustomField {
 			}
 
 			if (o.children) {
-				const nested = this.findSelectOption(optionId, o.children, path + " > " + o.text);
+				const nested = this.findSelectOption(optionId, o.children, path == "" ? o.text : path + " > " + o.text);
 				if (nested) {
 					return nested;
 				}
@@ -212,7 +264,6 @@ export class SelectCustomField extends AbstractCustomField {
 	}
 
 	createFormField() {
-
 		return treeselect(
 			{
 				...this.getFormFieldConfig(),
@@ -220,25 +271,44 @@ export class SelectCustomField extends AbstractCustomField {
 			}
 		);
 	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: v => {
+				const o = this.findSelectOption(v, this.field.dataType.options!);
+				return o?.path ?? "";
+			}
+		})
+	}
 }
 
 export class MultiSelectCustomField extends SelectCustomField {
+
+	private renderer = (columnValue: any) => {
+		if (!columnValue) {
+			return "";
+		}
+
+		return columnValue.map((id: number) => this.findSelectOption(id, this.field.dataType.options!)?.text).join(", ")
+
+	}
 	createTableColumn() {
 		return column(
 			{
 				...this.getColumnConfig(),
 				width: 100,
-				renderer: (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-					if (!columnValue) {
-						return "";
-					}
-
-					return columnValue.map((id: number) => this.findSelectOption(id, this.field.dataType.options!)?.text).join(", ")
-
-				}
+				renderer: this.renderer
 			}
 
 		)
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		})
 	}
 
 	createFormField(): any {
@@ -275,20 +345,29 @@ export class MultiSelectCustomField extends SelectCustomField {
 }
 
 export class UserCustomField extends AbstractCustomField {
+
+	private renderer = async (columnValue: any) => {
+		if (!columnValue) {
+			return "";
+		}
+		const u = await principalDS.single(columnValue);
+		return u ? u.name : "";
+	}
+
+
 	createTableColumn() {
-		return column(
-			{
-				...this.getColumnConfig(),
-				width: 100,
-				renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-					if (!columnValue) {
-						return "";
-					}
-					const u = await principalDS.single(columnValue);
-					return u ? u.name : "";
-				}
-			}
-		)
+		return column({
+			...this.getColumnConfig(),
+			width: 100,
+			renderer: this.renderer
+		})
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		});
 	}
 
 	createFormField(): FormField {
@@ -304,6 +383,13 @@ export class NumberCustomField extends AbstractCustomField {
 	public createFormField() {
 		return numberfield({...this.getFormFieldConfig(), decimals: this.field.options.decimals});
 	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: v => Format.number(v, this.field.options.decimals)
+		});
+	}
 }
 
 export class FunctionCustomField extends AbstractCustomField {
@@ -314,26 +400,42 @@ export class FunctionCustomField extends AbstractCustomField {
 	public createFormField() {
 		return numberfield({...this.getFormFieldConfig(), readOnly: true,decimals: this.field.options.decimals});
 	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: v => Format.number(v, this.field.options.decimals)
+		});
+	}
 }
 
 export class GroupCustomField extends AbstractCustomField {
+
+	private renderer = async (columnValue: any) => {
+		if (!columnValue) {
+			return "";
+		}
+		const u = await groupDS.single(columnValue);
+		return u ? u.name : "";
+	}
 	createTableColumn() {
 		return column({
 			...this.getColumnConfig(),
 			width: 100,
-			renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-				if (!columnValue) {
-					return "";
-				}
-				const u = await groupDS.single(columnValue);
-				return u ? u.name : "";
-			}
+			renderer: this.renderer
 		})
 
 	}
 
 	createFormField(): FormField {
 		return groupcombo(this.getFormFieldConfig());
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		});
 	}
 }
 
@@ -344,6 +446,13 @@ export class HtmlCustomField extends AbstractCustomField {
 
 	public createFormField() {
 		return htmlfield(this.getFormFieldConfig());
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			htmlEncode: false
+		})
 	}
 }
 
@@ -358,20 +467,28 @@ export class TextAreaCustomField extends AbstractCustomField {
 }
 
 export class ProjectCustomField extends AbstractCustomField {
+
+	private renderer = async (columnValue: any) => {
+		if (!columnValue) {
+			return "";
+		}
+		const u = await jmapds("Project").single(columnValue);
+		return u ? comp({tagName: "a", text: u.name, attr: {href: `#project/${columnValue}`}}) : "";
+	}
+
 	createTableColumn() {
 		return column({
 			...this.getColumnConfig(),
-				width: 100,
-				renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-					if (!columnValue) {
-						return "";
-					}
-					const u = await jmapds("Project").single(columnValue);
-					return u ? u.name : "";
-				}
-			}
-		)
+			width: 100,
+			renderer: this.renderer
+		})
+	}
 
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		});
 	}
 
 	createFormField(): FormField {
@@ -390,18 +507,27 @@ export class ProjectCustomField extends AbstractCustomField {
 }
 
 export class ContactCustomField extends AbstractCustomField {
+
+	private renderer = async (columnValue: any) => {
+		if (!columnValue) {
+			return "";
+		}
+		const u = await jmapds("Contact").single(columnValue);
+		return u ? comp({tagName: "a", text: u.name, attr: {href: `#contact/${columnValue}`}}) : "";
+	}
 	createTableColumn() {
 		return column({
 			...this.getColumnConfig(),
 			width: 100,
-			renderer: async (columnValue: any, record: any, td: HTMLTableCellElement, table: Table, storeIndex: number, column: TableColumn) => {
-				if (!columnValue) {
-					return "";
-				}
-				const u = await jmapds("Contact").single(columnValue);
-				return u ? u.name : "";
-			}
+			renderer: this.renderer
 		})
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		});
 	}
 
 	createFormField(): FormField {
@@ -434,6 +560,42 @@ export class ContactCustomField extends AbstractCustomField {
 
 
 export class FileCustomField extends AbstractCustomField {
+
+	//GO.files.launchFile({path: \''+  go.util.addSlashes(value) + '\'})
+
+	private renderer = (columnValue: any) => {
+		if (!columnValue) {
+			return "";
+		}
+
+		return comp({
+			tagName: "a",
+			text: columnValue,
+			listeners: {
+				render: ({target}) => {
+					target.el.addEventListener("click", () => {
+						GO.files.launchFile({
+							path: columnValue
+						})
+					});
+				}
+			}
+		});
+	}
+	createTableColumn() {
+		return column({
+			...this.getColumnConfig(),
+			width: 100,
+			renderer: this.renderer
+		})
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		});
+	}
 
 	createFormField(): FormField {
 

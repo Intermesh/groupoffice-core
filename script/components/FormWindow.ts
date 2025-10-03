@@ -266,7 +266,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 					)
 				);
 			} else {
-				this.generalTab.items.add(containerfield({name: "customFields"}, fs));
+				this.generalTab.items.add(containerfield({name: "customFields", keepUnknownValues: false}, fs));
 			}
 		}, this);
 	}

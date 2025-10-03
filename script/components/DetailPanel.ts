@@ -6,15 +6,14 @@ import {
 	DefaultEntity,
 	EntityID,
 	FunctionUtil,
-	Listener,
-	ObservableListenerOpts,
 	tbar,
 	Toolbar,
 	Window
 } from "@intermesh/goui";
 import {jmapds} from "../jmap/index.js";
 import {router} from "../Router.js";
-import {modules} from "../Modules.js";
+import {customFields} from "../customfields/CustomFields";
+import {DetailFieldset} from "../customfields/DetailFieldset";
 
 export interface DetailPanelEventMap<EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap {
 	/**

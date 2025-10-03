@@ -14,3 +14,4 @@ export * from "./Entities.js";
 export * from "./customfields/Types.js";
 export * from "./customfields/CustomFields.js";
 export * from "./customfields/FormFieldset.js";
+export * from "./customfields/DetailFieldset.js";
