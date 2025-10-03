@@ -2,7 +2,8 @@ import {jmapds} from "../jmap/index.js";
 import {groupDS, principalDS} from "../auth/index.js";
 import {Field, SelectOption} from "./CustomFields.js";
 import {
-	autocompletechips,
+	AutocompleteChips,
+	autocompletechips, AutocompleteField,
 	boolcolumn,
 	btn,
 	checkbox,
@@ -11,7 +12,7 @@ import {
 	ComboBox,
 	comp,
 	Component,
-	Config,
+	Config, datasourcestore,
 	datecolumn,
 	datefield,
 	datetimecolumn,
@@ -45,9 +46,7 @@ import {treeselect} from "./TreeSelectField";
  *
  *
  * MultiContact
- *
- * collapse if empty
- *
+ * Contact allow new
  */
 
 export abstract class AbstractCustomField {
@@ -551,6 +550,83 @@ export class ContactCustomField extends AbstractCustomField {
 			}
 		})
 	}
+}
+
+
+export class MultiContactCustomField extends AbstractCustomField {
+
+	private renderer = async (columnValue: any) => {
+
+		const response = await jmapds("Contact").get(columnValue);
+		return comp({cls:"comma-list"}, ...response.list.map(c => comp({tagName: "a", text: c.name, attr: {href: `#contact/${c.id}`}})));
+	}
+	createTableColumn() {
+		return column({
+			...this.getColumnConfig(),
+			width: 100,
+			renderer: this.renderer
+		})
+	}
+
+	createDetailField() {
+		return displayfield({
+			...this.getDetailFieldConfig(),
+			renderer: this.renderer
+		});
+	}
+
+	createFormField(): FormField {
+
+		const filter:any = {isOrganization: this.field.options.isOrganization};
+
+		if(this.field.options.addressBookId?.length) {
+			filter.addressBookId = this.field.options.addressBookId;
+		}
+
+		const store =datasourcestore({
+			dataSource:  jmapds("Contact"),
+			filters: {default: filter}
+		});
+
+		return autocompletechips({
+			...this.getFormFieldConfig(),
+
+			chipRenderer: async (chip, value) => {
+				chip.text = (await jmapds("Contact").single(value)).name;
+			},
+			pickerRecordToValue (field, record) : any {
+				return record.id;
+			},
+
+			listeners: {
+				autocomplete: ({input}) => {
+					store.setFilter("search", {text: input});
+					void store.load();
+				}
+			},
+
+
+			buttons: [btn({
+				icon: "clear",
+				handler: (button) => {
+					button.findAncestorByType(AutocompleteChips)!.value = [];
+				}
+			})],
+
+			list: table({
+				fitParent: true,
+				headers: false,
+				store: store,
+				columns: [
+					column({
+						id: "name"
+					})
+				]
+			})
+		});
+	}
+
+
 }
 
 

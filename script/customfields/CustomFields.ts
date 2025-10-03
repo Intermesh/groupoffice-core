@@ -7,7 +7,7 @@ import {
 	DateCustomField,
 	DateTimeCustomField, FileCustomField, FunctionCustomField,
 	GroupCustomField,
-	HtmlCustomField,
+	HtmlCustomField, MultiContactCustomField,
 	MultiSelectCustomField, NotesCustomField,
 	NumberCustomField,
 	ProjectCustomField,
@@ -140,6 +140,7 @@ class CustomFields {
 		// Todo, these should be added by the modules using registerTableColumnCreator
 		Project: ProjectCustomField,
 		Contact: ContactCustomField,
+		MultiContact: MultiContactCustomField,
 		File: FileCustomField
 	}
 
