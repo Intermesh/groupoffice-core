@@ -98,7 +98,7 @@ declare global {
 let GouiMainPanel : any, GouiSystemSettingsPanel : any, GouiAccountSettingsPanel: any;
 
 if(window.GO) {
-	client.uri = BaseHref + "api/";
+	client.uri = document.location.origin + BaseHref + "api/";
 
 	GO.mainLayout.on("authenticated", () => {
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));

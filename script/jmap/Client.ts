@@ -85,6 +85,9 @@ export class Client extends Observable<ClientEventMap> {
 
 	private _user: User | undefined;
 
+	/**
+	 * Full URI to API without jmap.php
+	 */
 	public uri = "";
 
 	private CSRFToken = "";
