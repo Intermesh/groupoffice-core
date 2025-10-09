@@ -151,7 +151,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 		try {
 			await this.innerLoad(id);
-			this.legacyOnLoad();
+			this.legacyOnLoad(id);
 
 		} catch (e) {
 			void Window.error(e);
@@ -194,9 +194,9 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		this.fire("reset", this);
 	}
 
-	private legacyOnLoad() {
+	protected legacyOnLoad(entityId:EntityID) {
 		if(this.detailView) {
-			this.detailView.currentId = this.entity!.id;
+			this.detailView.currentId = entityId;;
 			this.detailView.internalLoad(this.entity);
 		}
 	}
