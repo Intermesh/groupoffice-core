@@ -251,7 +251,7 @@ export class Client extends Observable<ClientEventMap> {
 		return !!this._user;
 	}
 
-	private async request(data?: Object) {
+	private async request(data?: Object, tries = 1) : Promise<Response> {
 
 		const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?'+this.debugParam : ''), {
 			signal: AbortSignal.timeout(this.requestTimeout),
@@ -263,10 +263,15 @@ export class Client extends Observable<ClientEventMap> {
 		});
 
 		if (!response.ok) {
+			// network request fails. Try 3 times with 100ms delay
+			if((response.status === 0 && tries < 4)) {
+				console.log("Retrying request " + tries);
+				return FunctionUtil.delay(100, () => this.request(data, tries + 1))();
+			}
 			throw new Error(`Response status: ${response.status}: ${response.statusText}`);
 		}
-		return response;
 
+		return response;
 	}
 
 	public async logout() {
