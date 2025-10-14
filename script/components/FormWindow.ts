@@ -25,6 +25,7 @@ import {CreateLinkButton, createlinkbutton} from "./CreateLinkButton";
 import {Link} from "../model/Link";
 import {customFields} from "../customfields/CustomFields";
 import {FormFieldset} from "../customfields/FormFieldset";
+import {LinkBrowseButton, linkbrowsebutton} from "./LinkBrowseButton";
 
 
 /**
@@ -65,7 +66,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 	 */
 	public hasLinks = false;
 	protected submitBtn: Button;
-	private readonly browseLinksBtn: Button;
+	private readonly browseLinksBtn: LinkBrowseButton;
 
 	protected closeOnSave = true;
 
@@ -131,17 +132,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 						hidden: true
 					}),
 
-					this.browseLinksBtn = btn({
-						hidden: true,
-						icon: "link",
-						handler: () => {
-							var lb = new go.links.LinkBrowser({
-								entity: this.entityName,
-								entityId: this.form.currentId
-							});
-
-							lb.show();
-						}
+					this.browseLinksBtn = linkbrowsebutton({
+						hidden: true
 					}),
 					"->",
 					this.submitBtn = btn({
@@ -195,6 +187,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 			} else {
 				this.createLinkBtn.hide();
 				if(this.hasLinks) {
+					this.browseLinksBtn.setEntity(this.entityName, this.form.currentId);
 					this.browseLinksBtn.show();
 				}
 			}
