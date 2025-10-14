@@ -242,83 +242,21 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 	}
 
 
-	// protected addCustomFields() {
-	//
-	// 	const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
-	//
-	// 	fieldsets.forEach((fs) => {
-	// 		if (fs.fieldSet.isTab) {
-	// 			fs.title = fs.fieldSet.name;
-	// 			fs.legend = "";
-	// 			this.cards.items.add(fs);
-	// 		} else {
-	// 			this.generalTab.items.add(fs);
-	// 		}
-	// 	}, this);
-	// }
-
-
 	protected addCustomFields() {
 
-		this.on("render", () => {
-			if(this.hidden) {
-				this.on("show", () => this.renderCustomFields())
+		const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
+
+		fieldsets.forEach((fs) => {
+			if (fs.fieldSet.isTab) {
+				fs.title = fs.fieldSet.name;
+				fs.legend = "";
+				this.cards.items.add(fs);
 			} else {
-				this.renderCustomFields();
+				this.generalTab.items.add(fs);
 			}
-		})
+		}, this);
 	}
 
-
-	private renderCustomFields() {
-		if (go.Entities.get(this.entityName).customFields) {
-
-			const fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityName);
-			fieldsets.forEach((fs: any) => {
-
-				//replace customFields. because we will use a containerfield here.
-				fs.cascade((item: any) => {
-					if (item.getName) {
-						let fieldName = item.getName().replace('customFields.', '');
-						item.name = item.hiddenName =  fieldName;
-					}
-				});
-
-				if (fs.fieldSet.isTab) {
-					fs.title = null;
-					fs.collapsible = false;
-
-					this.cards.items.add(
-						containerfield({
-								name: "customFields",
-								cls: "scroll",
-								title: fs.fieldSet.name,
-								listeners: {
-									show: () => {
-										fs.doLayout();
-									}
-								}
-							}, fs
-						)
-					);
-				} else {
-					//in case formPanelLayout is set to column
-					fs.columnWidth = 1;
-					this.generalTab.items.add(containerfield({name: "customFields"}, fs));
-				}
-			}, this);
-
-
-			if(fieldsets.length) {
-				const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
-					fieldsets.forEach((fs: any) => fs.doLayout());
-				}));
-
-				ro.observe(this.el);
-			}
-
-		}
-	}
 
 	/**
 	 * Adds a link between two entities on save.
