@@ -291,7 +291,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 					this.cards.items.add(
 						containerfield({
 								name: "customFields",
-								cls: "scroll",
+								cls: "scroll fit",
 								title: fs.fieldSet.name,
 								listeners: {
 									show: () => {
