@@ -221,7 +221,8 @@ export class Client extends Observable<ClientEventMap> {
 
 
 		userDS.on("change", async ( {target, changes}) => {
-			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
+
+			if(changes.updated && changes.updated.indexOf(this._user!.id) > -1) {
 				const user =  await target.single(this._user!.id);
 				if(user) {
 					this.setUser(user);
