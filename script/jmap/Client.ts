@@ -251,16 +251,29 @@ export class Client extends Observable<ClientEventMap> {
 		return !!this._user;
 	}
 
+	private nextRequestTimeout:number|undefined;
+
+	/**
+	 * Raises the timeout for the next HTTP request. A HTTP requests contains multiple JMAP calls.
+	 *
+	 * @param nextTimeout
+	 */
+	public raiseNextRequestTimeout(nextTimeout:number) {
+		this.nextRequestTimeout = nextTimeout;
+	}
+
 	private async request(data?: Object, tries = 1) : Promise<Response> {
 
 		const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?'+this.debugParam : ''), {
-			signal: AbortSignal.timeout(this.requestTimeout),
+			signal: AbortSignal.timeout(this.nextRequestTimeout ?? this.requestTimeout),
 			method: data ? "POST" : "GET",
 			mode: "cors",
 			credentials: "include", // for cookie auth
 			headers: this.buildHeaders(),
 			body: data ? JSON.stringify(data) : undefined
 		});
+
+		this.nextRequestTimeout = undefined;
 
 		if (!response.ok) {
 			// network request fails. Try 3 times with 100ms delay
