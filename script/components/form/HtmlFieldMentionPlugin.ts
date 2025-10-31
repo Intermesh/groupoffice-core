@@ -122,7 +122,7 @@ export class HtmlFieldMentionPlugin {
 	private onMention(mention: string) {
 
 		if(!this.menu) {
-			this.menu = menu({cls: "goui-dropdown", removeOnClose: false});
+			this.menu = menu({cls: "goui-dropdown", removeOnClose: false, autoFocusFirst: true, hidden: true});
 			root.items.add(this.menu);
 
 			this.field.on("remove", ()=> this.menu!.remove());
