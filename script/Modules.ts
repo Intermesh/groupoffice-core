@@ -1,4 +1,14 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, ObjectUtil, t, translate, Window} from "@intermesh/goui";
+import {
+	BaseEntity,
+	Component,
+	EntityID,
+	MaterialIcon,
+	ObjectUtil,
+	t,
+	Translate,
+	translate,
+	Window
+} from "@intermesh/goui";
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -113,6 +123,7 @@ if(window.GO) {
 			GouiMainPanel.superclass.initComponent.call(this);
 
 			this.on("afterrender", () => {
+				translate.setDefaultModule(this.package, this.module);
 				const comp = this.callback();
 				comp.render(this.el.dom);
 			}, this);
@@ -135,6 +146,9 @@ if(window.GO) {
 			GouiSystemSettingsPanel.superclass.initComponent.call(this);
 
 			this.on("afterrender", async () => {
+
+				translate.setDefaultModule(this.package, this.module);
+
 				this.comp = await this.callback();
 				this.comp.render(this.el.dom);
 			}, this);
@@ -243,6 +257,8 @@ class Modules {
 
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
+
+		translate.setDefaultModule(pkg, module);
 
 		// @ts-ignore
 		const proto = Ext.extend(GouiMainPanel, {
