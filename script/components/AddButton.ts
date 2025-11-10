@@ -15,9 +15,9 @@ export class AddButton extends Component {
 
 		})
 
-		this.items.add(new go.detail.addButton({
-			// detailView: this.detailView
-		}))
+		// this.items.add(new go.detail.addButton({
+		// 	// detailView: this.detailView
+		// }))
 	}
 }
 

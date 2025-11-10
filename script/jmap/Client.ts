@@ -10,6 +10,7 @@ import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
 import {customFields} from "../customfields/CustomFields.js";
+import {modules} from "../Modules";
 
 
 export interface LoginData {
@@ -201,6 +202,8 @@ export class Client extends Observable<ClientEventMap> {
 		this.setUser(user);
 
 		await customFields.init();
+
+		await modules.init();
 
 		this.fire("authenticated", {session: this._session});
 

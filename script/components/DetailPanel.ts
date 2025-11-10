@@ -82,8 +82,8 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	}
 
 	private get legacyDetailView() {
-		if(!this.detailView) {
-			const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
+		if (!this.detailView) {
+			const ro = new ResizeObserver(FunctionUtil.onRepaint(() => {
 				this.detailView.doLayout();
 			}));
 
@@ -107,22 +107,22 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	}
 
 	protected addCustomFields() {
-		this.legacyDetailView.addCustomFields();
+		// this.legacyDetailView.addCustomFields();
 	}
 
 	protected addLinks() {
-		this.legacyDetailView.addLinks();
+		// this.legacyDetailView.addLinks();
 	}
 	protected addFiles() {
-		this.legacyDetailView.addFiles();
+		// this.legacyDetailView.addFiles();
 	}
 
 	protected addComments() {
-		this.legacyDetailView.addComments();
+		// this.legacyDetailView.addComments();
 	}
 
 	protected addHistory() {
-		this.legacyDetailView.addHistory();
+		// this.legacyDetailView.addHistory();
 	}
 
 	private createToolbar() {

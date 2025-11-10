@@ -3,13 +3,10 @@ import {
 	Component,
 	EntityID,
 	MaterialIcon,
-	ObjectUtil,
 	t,
-	Translate,
 	translate,
-	Window
 } from "@intermesh/goui";
-import {client, jmapds} from "./jmap/index.js";
+import {client, JmapDataSource, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
 
@@ -96,6 +93,14 @@ export type ModuleConfig = {
 	 */
 	entities?: (string | EntityConfig)[];
 };
+
+export type MainPanel = {
+	package: string
+	module: string,
+	id: string,
+	title: string
+	callback: () => Component | Promise<Component>
+}
 
 // for using old components in GOUI
 declare global {
@@ -211,11 +216,39 @@ export interface Module extends BaseEntity {
 	entities: Record<string, Entity>
 }
 
+export const moduleDS = new JmapDataSource<Module>("Module");
 
 class Modules {
 
-	private mods: Record<string, ModuleConfig> = {};
-	private modules?: Module[];
+	private clientModules: Record<string, ModuleConfig> = {};
+	private serverModules: Record<string, Module> = {};
+
+	private mainPanels: MainPanel[] = [];
+
+
+	public async init() {
+		const serverMods = await moduleDS.get();
+
+		const proms =serverMods.list.map(m => {
+			if(!m.package) {
+				m.package = "legacy";
+			}
+			const id = m.package + "/" + m.name;
+
+			this.serverModules[id] = m;
+
+			if(m.package != "core" && m.package != "legacy") {
+				const mod = "../../../../../../../go/modules/" + m.package + "/" + m.name + "/views/goui/dist/Index.js?v=25.0.60";
+				return import(mod).catch((e) => {
+					console.error("Module loading error: ", e);
+				})
+			}
+		})
+
+		await Promise.all(proms);
+
+	}
+
 
 	/**
 	 * Register a module so it's functionally is added to the GUI
@@ -224,23 +257,30 @@ class Modules {
 	 */
 	public register(config: ModuleConfig) {
 
+
 		const id = config.package + "/" + config.name;
 
-		if(this.mods[id]) {
+		console.log(id);
+		// debugger;
+		if(this.clientModules[id]) {
 			return; //already registered
 		}
 
-		this.mods[id] = config;
+		this.clientModules[id] = config;
 
 
-
-		go.Translate.package = config.package;
-		go.Translate.module = config.name;
+		if(window.go) {
+			go.Translate.package = config.package;
+			go.Translate.module = config.name;
+		}
 
 		if (config.init) {
 			config.init();
 		}
-		this.registerInExtjs(config);
+
+		if(window.go) {
+			this.registerInExtjs(config);
+		}
 	}
 
 
@@ -255,22 +295,37 @@ class Modules {
 	 */
 	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
 
-		go.Translate.package = go.package = pkg;
-		go.Translate.module = go.module = module;
 
 		translate.setDefaultModule(pkg, module);
 
-		// @ts-ignore
-		const proto = Ext.extend(GouiMainPanel, {
-			id: id,
-			title: title,
-			callback: callback
-		});
+		if(window.go) {
+			go.Translate.package = go.package = pkg;
+			go.Translate.module = go.module = module;
+			// @ts-ignore
+			const proto = Ext.extend(GouiMainPanel, {
+				id: id,
+				title: title,
+				callback: callback
+			});
 
-		proto.package = pkg;
-		proto.module = module;
+			proto.package = pkg;
+			proto.module = module;
 
-		go.Modules.addPanel(proto);
+			go.Modules.addPanel(proto);
+		}
+
+
+		this.mainPanels.push({
+			package: pkg,
+			module: module,
+			id,
+			title,
+			callback
+		})
+	}
+
+	public getMainPanels() {
+		return this.mainPanels;
 	}
 
 
@@ -286,6 +341,11 @@ class Modules {
 	 */
 	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component | Promise<Component>) {
 
+		if(!window.go) {
+
+			//todo
+			return;
+		}
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
 
@@ -310,7 +370,11 @@ class Modules {
 	 * @param callback
 	 */
 	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component) {
+		if(!window.go) {
 
+			//todo
+			return;
+		}
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
 
@@ -346,7 +410,7 @@ class Modules {
 	 * Get all modules
 	 */
 	public getAll() : Module[] {
-		return go.Modules.getAvailable();
+		return Object.values(this.serverModules);
 	}
 
 	/**
@@ -356,7 +420,7 @@ class Modules {
 	 * @param name
 	 */
 	public isAvailable(pkg:string, name:string) : boolean {
-		return go.Modules.isAvailable(pkg, name);
+		return !!this.get(pkg, name);
 	}
 
 	/**
@@ -366,8 +430,7 @@ class Modules {
 	 * @param name
 	 */
 	public get(pkg:string, name:string) : Module | undefined {
-		const mod = go.Modules.get(pkg, name);
-		return mod ? mod : undefined;
+		return this.serverModules[pkg + "/" + name];
 	}
 
 

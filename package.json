@@ -10,10 +10,14 @@
     "start:parallel": "npm run start:watch & npm run start:sass",
     "start:watch": "npx tsc --watch",
     "start:sass": "npx sass --watch ./style:./dist",
+
     "build": "npm run build:clean && npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --style=compressed ./style:./dist",
     "build:ts": "npx tsc",
+
+
+
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

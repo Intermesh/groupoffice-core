@@ -5,12 +5,17 @@ import {Router as GouiRouter, RouterMethod} from "@intermesh/goui";
  */
 class Router extends GouiRouter {
 	public add(re: RegExp | RouterMethod, handler?: RouterMethod) {
-		go.Router.add(re, handler);
+		if(window.go)
+			go.Router.add(re, handler);
+		else
+			super.add(re, handler);
+
 		return this;
 	}
 
 	getParams(): string[] {
-		return go.Router.getParams();
+
+		return window.go ? go.Router.getParams() : super.getParams();
 	}
 
 	public setPath(...pathParts: any[]) {
