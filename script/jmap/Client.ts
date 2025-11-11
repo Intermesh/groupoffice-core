@@ -263,29 +263,40 @@ export class Client extends Observable<ClientEventMap> {
 		this.nextRequestTimeout = nextTimeout;
 	}
 
+	private requestsInProgress = 0;
+
+	public isBusy() {
+		return this.requestsInProgress > 0;
+	}
+
 	private async request(data?: Object, tries = 1) : Promise<Response> {
 
-		const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?'+this.debugParam : ''), {
-			signal: AbortSignal.timeout(this.nextRequestTimeout ?? this.requestTimeout),
-			method: data ? "POST" : "GET",
-			mode: "cors",
-			credentials: "include", // for cookie auth
-			headers: this.buildHeaders(),
-			body: data ? JSON.stringify(data) : undefined
-		});
+		this.requestsInProgress++;
+		try {
+			const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?' + this.debugParam : ''), {
+				signal: AbortSignal.timeout(this.nextRequestTimeout ?? this.requestTimeout),
+				method: data ? "POST" : "GET",
+				mode: "cors",
+				credentials: "include", // for cookie auth
+				headers: this.buildHeaders(),
+				body: data ? JSON.stringify(data) : undefined
+			});
 
-		this.nextRequestTimeout = undefined;
+			this.nextRequestTimeout = undefined;
 
-		if (!response.ok) {
-			// network request fails. Try 3 times with 100ms delay
-			if((response.status === 0 && tries < 4)) {
-				console.log("Retrying request " + tries);
-				return FunctionUtil.delay(100, () => this.request(data, tries + 1))();
+			if (!response.ok) {
+				// network request fails. Try 3 times with 100ms delay
+				if ((response.status === 0 && tries < 4)) {
+					console.log("Retrying request " + tries);
+					return FunctionUtil.delay(100, () => this.request(data, tries + 1))();
+				}
+				throw new Error(`Response status: ${response.status}: ${response.statusText}`);
 			}
-			throw new Error(`Response status: ${response.status}: ${response.statusText}`);
-		}
 
-		return response;
+			return response;
+		} finally {
+			this.requestsInProgress--;
+		}
 	}
 
 	public async logout() {
