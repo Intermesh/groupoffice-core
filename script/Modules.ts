@@ -174,6 +174,8 @@ if(window.GO) {
 			}
 		},
 
+		destroy : () => {},
+
 		onLoad: async function(user:User) {
 			if(!this.comp) {
 				this.comp = this.callback();
