@@ -15,7 +15,7 @@ import {
 	EntityID, FunctionUtil,
 	t,
 	tbar,
-	Toolbar,
+	Toolbar, translate,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
@@ -26,6 +26,7 @@ import {Link} from "../model/Link";
 import {customFields} from "../customfields/CustomFields";
 import {FormFieldset} from "../customfields/FormFieldset";
 import {LinkBrowseButton, linkbrowsebutton} from "./LinkBrowseButton";
+import {entities} from "../Entities";
 
 
 /**
@@ -85,6 +86,9 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 		this.height = 600;
 		this.maximizable = true;
 		this.resizable = true;
+
+		const e = entities.get(this.entityName);
+		translate.setDefaultModule(e.package, e.module);
 
 		this.items.add(
 			this.form = datasourceform<EntityType>(
