@@ -1,5 +1,7 @@
 import {Button, Config, createComponent, EntityID} from "@intermesh/goui";
-import {linkDS} from "../model/Link";
+import {linkDS} from "../../model/Link";
+import {DetailPanel} from "../DetailPanel";
+import {FormWindow} from "../FormWindow";
 
 export class LinkBrowseButton extends Button {
 
@@ -8,6 +10,7 @@ export class LinkBrowseButton extends Button {
 	constructor() {
 		super();
 		this.icon = "link";
+		this.disabled = true;
 
 		this.handler = ()=> {
 			const lb = new go.links.LinkBrowser({
@@ -17,11 +20,29 @@ export class LinkBrowseButton extends Button {
 
 			lb.show();
 		}
+
+
+		this.on("render", () => {
+			const cmp = this.findAncestor(cmp => {
+				return cmp instanceof DetailPanel || cmp instanceof FormWindow;
+			}) as DetailPanel;
+
+			cmp.on("load", ({entity}) => {
+				this.setEntity(cmp.entityName, entity.id);
+
+			})
+
+			cmp.on("reset", () => {
+				this.disabled = true;
+			})
+
+		})
 	}
 
 	setEntity(entity:string, entityId:EntityID) {
 		this.entity = entity;
 		this.entityId = entityId;
+		this.disabled = false;
 
 		linkDS.query({
 			calculateTotal: true,

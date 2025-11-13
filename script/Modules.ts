@@ -12,6 +12,7 @@ import {
 import {client, jmapds} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
+import {DetailPanel} from "./components/index";
 
 
 export interface EntityFilter {
@@ -51,7 +52,9 @@ export interface EntityLink {
 	/**
 	 * Return a detail component to show a linked entity of this type
 	 */
-	linkDetail: () => Component;
+	linkDetail: () => DetailPanel;
+
+	linkDetailCards?: () => Component[]
 }
 export interface EntityConfig {
 	/**

@@ -175,7 +175,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 		this.scroller.items.forEach((i:any) => {
 			if(i != this.detailView && i.onLoad) {
-				i.onLoad(this.entity!);
+				i.onLoad(this.entity!, this);
 			}
 		})
 	}
