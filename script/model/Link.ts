@@ -22,6 +22,10 @@ export interface Search extends BaseEntity {
 	name: string,
 	description: string,
 	modifiedAt: string
-	acl: Acl
+	acl: Acl,
+	permissionLevel: number,
+	entity: string,
+	entityId: EntityID
+	filter: string
 }
 export const searchDS = new JmapDataSource<Search>("Search");

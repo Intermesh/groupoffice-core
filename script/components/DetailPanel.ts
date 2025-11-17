@@ -44,7 +44,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	public readonly toolbar: Toolbar;
 	private comments: any;
 
-	protected constructor(public entityName:string) {
+	public constructor(public entityName:string) {
 		super();
 
 		// reload or reset on entity update or destroy
@@ -143,6 +143,10 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	get title() {
 		return super.title;
+	}
+
+	public async reload() {
+		return this.load(this.entity!.id);
 	}
 
 	public async load(id: EntityID) {

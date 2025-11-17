@@ -13,6 +13,9 @@ export class LinkBrowseButton extends Button {
 		this.disabled = true;
 
 		this.handler = ()=> {
+
+			// TODO remove Extjs
+
 			const lb = new go.links.LinkBrowser({
 				entity: this.entity,
 				entityId: this.entityId
