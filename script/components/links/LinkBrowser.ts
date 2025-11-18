@@ -139,8 +139,12 @@ export class LinkBrowser extends Window {
 			groupBy: "group",
 			groupByCollapsible: false,
 			groupByRenderer: (groupBy, record, list) => {
-				console.log(record);
-				const l = entities.getLinkConfig(record.toEntity, record.to.filter);
+
+				let l = entities.getLinkConfig(record.toEntity, record.to.filter);
+				if(!l) {
+					// for finance for example
+					l = entities.getLinkConfig(record.toEntity);
+				}
 				if(l) {
 					return `<i class="icon ${l.iconCls}"></i>&nbsp;${l.title.htmlEncode()}`;
 				}
