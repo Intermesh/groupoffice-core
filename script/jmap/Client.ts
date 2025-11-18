@@ -221,7 +221,8 @@ export class Client extends Observable<ClientEventMap> {
 
 
 		userDS.on("change", async ( {target, changes}) => {
-			if(changes.updated && changes.updated.indexOf(this._user!.id)) {
+
+			if(changes.updated && changes.updated.indexOf(this._user!.id) > -1) {
 				const user =  await target.single(this._user!.id);
 				if(user) {
 					this.setUser(user);
@@ -251,22 +252,51 @@ export class Client extends Observable<ClientEventMap> {
 		return !!this._user;
 	}
 
-	private async request(data?: Object) {
+	private nextRequestTimeout:number|undefined;
 
-		const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?'+this.debugParam : ''), {
-			signal: AbortSignal.timeout(this.requestTimeout),
-			method: data ? "POST" : "GET",
-			mode: "cors",
-			credentials: "include", // for cookie auth
-			headers: this.buildHeaders(),
-			body: data ? JSON.stringify(data) : undefined
-		});
+	/**
+	 * Raises the timeout for the next HTTP request. A HTTP requests contains multiple JMAP calls.
+	 *
+	 * @param nextTimeout
+	 */
+	public raiseNextRequestTimeout(nextTimeout:number) {
+		this.nextRequestTimeout = nextTimeout;
+	}
 
-		if (!response.ok) {
-			throw new Error(`Response status: ${response.status}: ${response.statusText}`);
+	private requestsInProgress = 0;
+
+	public isBusy() {
+		return this.requestsInProgress > 0;
+	}
+
+	private async request(data?: Object, tries = 1) : Promise<Response> {
+
+		this.requestsInProgress++;
+		try {
+			const response = await fetch(this.uri + "jmap.php" + (this.debugParam ? '?' + this.debugParam : ''), {
+				signal: AbortSignal.timeout(this.nextRequestTimeout ?? this.requestTimeout),
+				method: data ? "POST" : "GET",
+				mode: "cors",
+				credentials: "include", // for cookie auth
+				headers: this.buildHeaders(),
+				body: data ? JSON.stringify(data) : undefined
+			});
+
+			this.nextRequestTimeout = undefined;
+
+			if (!response.ok) {
+				// network request fails. Try 3 times with 100ms delay
+				if ((response.status === 0 && tries < 4)) {
+					console.log("Retrying request " + tries);
+					return FunctionUtil.delay(100, () => this.request(data, tries + 1))();
+				}
+				throw new Error(`Response status: ${response.status}: ${response.statusText}`);
+			}
+
+			return response;
+		} finally {
+			this.requestsInProgress--;
 		}
-		return response;
-
 	}
 
 	public async logout() {

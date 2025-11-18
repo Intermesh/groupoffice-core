@@ -14,7 +14,7 @@ import {
 	EntityID,
 	t,
 	tbar,
-	Toolbar,
+	Toolbar, translate,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
@@ -83,6 +83,9 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 		this.height = 600;
 		this.maximizable = true;
 		this.resizable = true;
+
+		const e = entities.get(this.entityName);
+		translate.setDefaultModule(e.package, e.module);
 
 		this.items.add(
 			this.form = datasourceform<EntityType>(

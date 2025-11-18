@@ -8,7 +8,10 @@ export interface Entity {
 	supportsCustomFields: boolean,
 	supportsFiles: boolean,
 	links: LinkConfig[],
-	goto: (id:EntityID)=>void
+	goto: (id:EntityID)=>void,
+	module: string
+	package: string
+	title: string
 }
 
 export interface LinkConfig extends EntityLink {
