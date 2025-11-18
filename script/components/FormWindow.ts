@@ -24,6 +24,7 @@ import {CreateLinkButton, createlinkbutton, LinkBrowseButton, linkbrowsebutton} 
 import {Link} from "../model/Link";
 import {customFields} from "../customfields/CustomFields";
 import {FormFieldset} from "../customfields/FormFieldset";
+import {entities} from "../Entities.js";
 
 
 /**
