@@ -8,7 +8,7 @@ export class ExtJSWrapper extends Component {
 
 		proxies.forEach(p => {
 			// @ts-ignore
-			this[p] = extJSComp[p];
+			this[p] = extJSComp[p].bind(extJSComp);
 		})
 		this.on("render", () => {
 			const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {

@@ -17,6 +17,9 @@ export class SelectSearchWindow extends Window<SelectSearchWindowEventMap> {
 		this.width = 800;
 		this.height = 500;
 
+		this.maximizable = true;
+		this.resizable = true;
+
 		this.items.add(
 			this.selectSearchPanel = new SelectSearchPanel(),
 

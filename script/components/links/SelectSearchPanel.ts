@@ -99,6 +99,7 @@ export class SelectSearchPanel extends Component {
 
 	private createTable() {
 		return table({
+			cls: "bg-lowest",
 			headers: false,
 			style: {width: "100%"},
 			rowSelectionConfig: {multiSelect: false},

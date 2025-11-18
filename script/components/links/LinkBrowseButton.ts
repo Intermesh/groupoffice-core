@@ -2,10 +2,11 @@ import {Button, Config, createComponent, EntityID} from "@intermesh/goui";
 import {linkDS} from "../../model/Link";
 import {DetailPanel} from "../DetailPanel";
 import {FormWindow} from "../FormWindow";
+import {LinkBrowser} from "./LinkBrowser";
 
 export class LinkBrowseButton extends Button {
 
-	entity?: string
+	entityName?: string
 	entityId?: EntityID
 	constructor() {
 		super();
@@ -14,14 +15,9 @@ export class LinkBrowseButton extends Button {
 
 		this.handler = ()=> {
 
-			// TODO remove Extjs
-
-			const lb = new go.links.LinkBrowser({
-				entity: this.entity,
-				entityId: this.entityId
-			});
-
+			const lb = new LinkBrowser(this.entityName!, this.entityId!);
 			lb.show();
+
 		}
 
 
@@ -42,15 +38,15 @@ export class LinkBrowseButton extends Button {
 		})
 	}
 
-	setEntity(entity:string, entityId:EntityID) {
-		this.entity = entity;
+	setEntity(entityName:string, entityId:EntityID) {
+		this.entityName = entityName;
 		this.entityId = entityId;
 		this.disabled = false;
 
 		linkDS.query({
 			calculateTotal: true,
 			limit: 1,
-			filter: {entity: this.entity, entityId: this.entityId}
+			filter: {entity: this.entityName, entityId: this.entityId}
 		}).then(r => {
 			this.text =  r.total ? r.total+"" : ""
 		})
