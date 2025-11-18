@@ -114,7 +114,7 @@ export class LinkBrowser extends Window {
 					splitter({resizeComponent: s => s.nextSibling()!}),
 					comp({
 							flex: 1,
-							cls: "scroll"
+							cls: "scroll bg-lowest",
 						},
 						this.table
 					)
@@ -132,7 +132,6 @@ export class LinkBrowser extends Window {
 
 	private createTable() {
 		return table({
-			cls: "bg-lowest",
 			headers: false,
 			style: {width: "100%"},
 			rowSelectionConfig: {multiSelect: false},

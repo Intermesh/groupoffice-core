@@ -88,7 +88,7 @@ export class SelectSearchPanel extends Component {
 					),
 				comp({
 						flex: 1,
-						cls: "scroll"
+						cls: "scroll bg-lowest"
 					},
 					this.resultTable
 				)
@@ -99,7 +99,7 @@ export class SelectSearchPanel extends Component {
 
 	private createTable() {
 		return table({
-			cls: "bg-lowest",
+
 			headers: false,
 			style: {width: "100%"},
 			rowSelectionConfig: {multiSelect: false},
