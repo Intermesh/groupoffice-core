@@ -42,7 +42,6 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	public readonly scroller: Component;
 	private detailView: any;
 	public readonly toolbar: Toolbar;
-	private comments: any;
 
 	public constructor(public entityName:string) {
 		super();

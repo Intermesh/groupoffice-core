@@ -20,6 +20,8 @@ export class SelectSearchPanel extends Component {
 
 	public readonly entityTypeTable
 	public readonly resultTable
+	private searchField: TextField;
+
 	constructor() {
 		super();
 
@@ -57,8 +59,8 @@ export class SelectSearchPanel extends Component {
 			),
 
 			comp({flex: 1, cls: "vbox"},
-				tbar({},
-					textfield({
+				tbar({cls: "border-bottom"},
+					this.searchField = textfield({
 						flex: 1,
 						icon: "search",
 						buttons: [
@@ -95,14 +97,16 @@ export class SelectSearchPanel extends Component {
 			)
 		);
 
+		this.on("focus", () => this.searchField.focus());
+
 	}
 
 	private createTable() {
 		return table({
-
+			scrollLoad: true,
 			headers: false,
 			style: {width: "100%"},
-			rowSelectionConfig: {multiSelect: false},
+			rowSelectionConfig: {multiSelect: true},
 			store: datasourcestore({
 				dataSource: searchDS,
 				sort: [{isAscending:false, property:"modifiedAt"}],

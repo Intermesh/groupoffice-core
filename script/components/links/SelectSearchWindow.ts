@@ -39,6 +39,10 @@ export class SelectSearchWindow extends Window<SelectSearchWindowEventMap> {
 			this.select()
 		})
 
+		this.on('focus', () => {
+			this.selectSearchPanel.focus();
+		});
+
 
 	}
 

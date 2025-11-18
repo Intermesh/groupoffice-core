@@ -132,6 +132,7 @@ export class LinkBrowser extends Window {
 
 	private createTable() {
 		return table({
+			scrollLoad: true,
 			headers: false,
 			style: {width: "100%"},
 			rowSelectionConfig: {multiSelect: false},
@@ -210,7 +211,7 @@ export class LinkBrowser extends Window {
 
 
 			]
-		}).on("rowclick", ({storeIndex}) => {
+		}).on("navigate", ({storeIndex}) => {
 
 			const rec = this.table.store.get(storeIndex);
 			if(!rec) {
@@ -246,8 +247,6 @@ export class LinkBrowser extends Window {
 		}
 
 		const entity = entities.get(entityName);
-
-		this.title = entity.links[0].title;
 
 		cmp = entity.links[0].linkDetail();
 		cmp.flex = 1;
