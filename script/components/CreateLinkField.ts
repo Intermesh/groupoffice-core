@@ -1,17 +1,22 @@
 import {
-	AutocompleteChips, checkbox, checkboxcolumn, checkboxgroup, checkboxselectcolumn,
-	column, comp, Config, createComponent, DataSourceForm,
+	AutocompleteChips,
+	column,
+	comp,
+	Config,
+	createComponent,
+	DataSourceForm,
 	DataSourceStore,
-	datasourcestore, FieldEventMap, Format, ListEventMap, RowSelectConfig, Store, store, t,
+	datasourcestore,
+	Format,
+	menu,
+	t,
 	Table,
-	table, tbar
+	table
 } from "@intermesh/goui";
 import {jmapds} from "../jmap/index";
-import {entities, LinkConfig} from "../Entities";
+import {entities} from "../Entities";
 import {Link} from "../model/Link";
 import {entityttypeable} from "./EntityTypeTable";
-
-
 
 
 export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
@@ -56,37 +61,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 		}));
 
 
-		this.menu.cls = "goui-dropdown hbox";
-		this.menu.height = 400;
 
-		this.menu.items.replace(
-			comp({
-				cls: "hbox fit",
-			},
-				comp({width: 180, cls: "fit scroll border-right"},
-					entityttypeable({
-						rowSelectionConfig: {
-							multiSelect: true,
-							listeners: {
-								selectionchange: ({selected}) => {
-									this.list.store.setFilter("entityType", {entities: selected.map((r) => {
-											return {name: r.record.entity,filter: r.record.filter};
-										})})
-
-									this.list.store.load();
-								}
-							}
-						}
-					})
-				),
-				comp({
-					cls: "fit scroll",
-					flex: 1
-				},
-					this.list
-				)
-			)
-		);
 
 		this.label = t("Create links")
 
@@ -134,6 +109,43 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 
 			}, {unshift: true});
 		})
+	}
+	protected createMenu() {
+
+		return menu({
+				cls: "goui-dropdown hbox",
+				style: {padding: "0"},
+				removeOnClose: false,
+				height: 400
+			},
+
+			comp({
+					cls: "hbox fit",
+				},
+				comp({width: 180, cls: "fit scroll border-right"},
+					entityttypeable({
+						rowSelectionConfig: {
+							multiSelect: true,
+							listeners: {
+								selectionchange: ({selected}) => {
+									this.list.store.setFilter("entityType", {entities: selected.map((r) => {
+											return {name: r.record.entity,filter: r.record.filter};
+										})})
+
+									this.list.store.load();
+								}
+							}
+						}
+					})
+				),
+				comp({
+						cls: "fit scroll",
+						flex: 1
+					},
+					this.list
+				)
+			)
+		);
 	}
 }
 
