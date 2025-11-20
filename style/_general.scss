@@ -25,6 +25,12 @@
 	height: util.dp(46);
 	padding: util.dp(14);
 }
+
+.goui.link-detail {
+	table {
+		cursor: pointer;
+	}
+}
 //@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
 	//.goui-module-panel {
 	//	top : 0;

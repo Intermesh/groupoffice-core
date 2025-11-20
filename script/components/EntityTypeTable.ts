@@ -18,16 +18,17 @@ export class EntityTypeTable extends Table<Store<LinkConfig>> {
 				data: entities.getLinkConfigs()
 			}),
 			[
-				checkboxselectcolumn({
-					id: "selected"
+				column({
+					id: "iconCls",
+					sortable: false,
+					width: 48,
+					htmlEncode: false,
+					renderer: (iconCls, record, td, table1, storeIndex, column1) => {
+						return `<div class="icon ${iconCls}"</div>`;
+					}
 				}),
 				column({
-					id: "title",
-					htmlEncode: false,
-					renderer: (columnValue, record) => {
-						console.log(record, columnValue);
-						return `<div class="icon ${record.iconCls}"></div>&nbsp;${columnValue.htmlEncode()}`;
-					}
+					id: "title"
 				})
 			]
 
@@ -36,12 +37,12 @@ export class EntityTypeTable extends Table<Store<LinkConfig>> {
 		this.style.width = "100%";
 
 		this.headers = false;
-		this.rowSelectionConfig = {multiSelect: true};
+		this.rowSelectionConfig = {multiSelect: true, clickToAdd: true};
 
-		this.on("rowclick", ({storeIndex}) => {
-			this.rowSelection!.clear();
-			this.rowSelection!.selectIndex(storeIndex);
-		})
+		// this.on("rowclick", ({storeIndex}) => {
+		// 	this.rowSelection!.clear();
+		// 	this.rowSelection!.selectIndex(storeIndex);
+		// })
 	}
 }
 
