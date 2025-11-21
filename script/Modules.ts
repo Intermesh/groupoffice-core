@@ -6,7 +6,7 @@ import {
 	t,
 	translate,
 } from "@intermesh/goui";
-import {client, JmapDataSource, jmapds} from "./jmap/index.js";
+import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
 import {DetailPanel} from "./components/index";
@@ -111,12 +111,14 @@ declare global {
 	var go: any;
 	var Ext: any;
 	var BaseHref: string;
+
+	var GOUI: any;
+	var groupofficeCore: any;
 }
 
 let GouiMainPanel : any, GouiSystemSettingsPanel : any, GouiAccountSettingsPanel: any;
 
 if(window.GO) {
-	client.uri = document.location.origin + BaseHref + "api/";
 
 	GO.mainLayout.on("authenticated", () => {
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
@@ -231,10 +233,56 @@ class Modules {
 	private mainPanels: MainPanel[] = [];
 
 
+	private async legacyInit(): Promise<void> {
+
+		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
+
+		// stuff that mainlayout did on boot
+		const goui = "../../../../../../../views/goui/dist/goui/script/index.js?v=" + GO.version,
+			groupofficeCore = "../../../../../../../views/goui/dist/groupoffice-core/script/index.js?v=" + GO.version;
+
+		window.GOUI = await import(goui);
+		window.groupofficeCore = await import(groupofficeCore);
+
+		await go.User.load();
+
+		go.browserStorage.connect().finally(function() {
+			Ext.QuickTips.init();
+			Ext.apply(Ext.QuickTips.getQuickTip(), {
+				dismissDelay: 0,
+				maxWidth: 500
+			});
+		});
+
+
+		//load state
+		if(!GO.util.isMobileOrTablet()) {
+			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+		} else
+		{
+			Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
+			}));
+		}
+		document.documentElement.cls('compact',go.User.theme === 'Compact');
+		window.GOUI.DateTime.staticInit(go.User.language.substring(0,2), go.User.firstWeekday);
+
+		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
+
+		await go.Modules.init();
+		await go.User.loadLegacyModules();
+		await go.customfields.CustomFields.init()
+		await go.Entities.init();
+	}
+
+
 	public async init() {
+
+		await this.legacyInit();
+
 		const serverMods = await moduleDS.get();
 
-		const proms =serverMods.list.map(m => {
+		const proms = serverMods.list.map(m => {
 			if(!m.package) {
 				m.package = "legacy";
 			}
@@ -242,16 +290,26 @@ class Modules {
 
 			this.serverModules[id] = m;
 
-			if(m.package != "core" && m.package != "legacy") {
-				const mod = "../../../../../../../go/modules/" + m.package + "/" + m.name + "/views/goui/dist/Index.js?v=25.0.60";
-				return import(mod).catch((e) => {
-					console.error("Module loading error: ", e);
-				})
-			}
+			// if(m.package != "core" && m.package != "legacy") {
+			// 	const mod = "../../../../../../../go/modules/" + m.package + "/" + m.name + "/views/goui/dist/Index.js?v=" + client.session?.version;
+			// 	return import(mod).catch((e) => {
+			// 		console.error("Module loading error: ", e);
+			// 	});
+			// }
 		})
 
-		await Promise.all(proms);
+		// await Promise.all(proms);
 
+	}
+
+
+	public loadModule(pkg:string, name:string) {
+		const mod = "../../../../../../../go/modules/" + pkg + "/" + name + "/views/goui/dist/Index.js?v=" + client.session?.version;
+		return import(mod).catch((e) => {
+			console.error("Module loading error: ", e);
+		}).then(() => {
+
+		})
 	}
 
 

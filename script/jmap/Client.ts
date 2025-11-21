@@ -4,7 +4,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {DateTime, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {DateTime, EntityID, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
@@ -52,6 +52,20 @@ export type UploadResponse = {
 	subfolder: string | undefined
 }
 
+export type JmapSession = {
+	version: string
+	auth: any[]
+	accounts: any[]
+	capabilities: any[]
+	apiUrl: string
+	downloadUrl: string
+	pageUrl: string
+	uploadUrl: string
+	eventSourceUrl: string
+	userId: EntityID
+	state: any
+}
+
 /**
  * Result reference
  *
@@ -80,7 +94,7 @@ export class Client extends Observable<ClientEventMap> {
 	private _lastCallId?:string;
 	private _requests: [method: string, params: any, callid: string][] = [];
 	private _requestData: any = {};
-	private _session: any;
+	private _session?: JmapSession;
 
 	private debugParam = "";// "XDEBUG_SESSION=1"
 
@@ -91,14 +105,14 @@ export class Client extends Observable<ClientEventMap> {
 	 */
 	public uri = "";
 
-	private CSRFToken = "";
+	public CSRFToken = "";
 
 	/**
 	 * Either a cookie + CSRFToken are used when the API is on the same site. If it's not then an access token can be used
 	 *
 	 * @private
 	 */
-	private accessToken = "";
+	public accessToken = "";
 	private delayedJmap: (...args: any[]) => void;
 	private SSEABortController?: AbortController;
 	private pollInterval?: number;
@@ -116,12 +130,13 @@ export class Client extends Observable<ClientEventMap> {
 	constructor() {
 		super();
 
+
 		this.delayedJmap = FunctionUtil.buffer(0, () => {
 			this.doJmap();
 		})
 	}
 
-	set session(session:any) {
+	set session(session: JmapSession) {
 
 		if(session.accessToken) {
 			this.accessToken = session.accessToken;
@@ -144,7 +159,7 @@ export class Client extends Observable<ClientEventMap> {
 	 *
 	 * this.authenticate() has to be called first.
 	 */
-	get session() {
+	get session(): JmapSession | undefined {
 		return this._session;
 	}
 
@@ -629,7 +644,11 @@ export class Client extends Observable<ClientEventMap> {
 				return false;
 			}
 
-			const session = await this.session;
+			const session = this.session;
+			if(!session)
+			{
+				return;
+			}
 
 			if (!session.eventSourceUrl) {
 				console.debug("Server Sent Events (EventSource) is disabled on the server.");
@@ -719,3 +738,8 @@ export class Client extends Observable<ClientEventMap> {
 }
 
 export const client = new Client();
+
+if(window.GO) {
+	client.uri = document.location.origin + BaseHref + "api/";
+}
+
