@@ -63,7 +63,9 @@ export type JmapSession = {
 	uploadUrl: string
 	eventSourceUrl: string
 	userId: EntityID
-	state: any
+	state: any,
+	accessToken: string,
+	CSRFToken:string
 }
 
 /**
@@ -141,8 +143,7 @@ export class Client extends Observable<ClientEventMap> {
 		if(session.accessToken) {
 			this.accessToken = session.accessToken;
 			sessionStorage.setItem("accessToken", this.accessToken);
-			// don't put this in the session to prevent token theft
-			delete session.accessToken;
+
 		}
 
 		this._session = session;

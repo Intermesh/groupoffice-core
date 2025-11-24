@@ -1,0 +1,15 @@
+@use '../../goui/style/util' as *;
+@use '../../goui/style/config' as *;
+
+.goui-cardmenu.main-menu {
+	background-color: $colorMain;
+	button.goui-button {
+		padding: dp(16) dp(4);
+		color: white;
+		font-weight: normal;
+		opacity: .8;
+		&.active {
+			opacity: 1;
+		}
+	}
+}

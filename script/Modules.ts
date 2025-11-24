@@ -235,6 +235,11 @@ class Modules {
 
 	private async legacyInit(): Promise<void> {
 
+		if(window.GOUI) {
+			// already initialized in old MainLayout.js UI
+			return;
+		}
+
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
 
 		// stuff that mainlayout did on boot
@@ -312,6 +317,12 @@ class Modules {
 		})
 	}
 
+	public loadLegacy() {
+		// go.Modules.all();
+		//TODO
+		debugger
+
+	}
 
 	/**
 	 * Register a module so it's functionally is added to the GUI
