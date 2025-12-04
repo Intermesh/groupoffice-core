@@ -1,0 +1,8 @@
+@forward '../../goui/style/util';
+@use '../../goui/style/util';
+@forward '../../goui/style/config' with (
+	$resourcePath: "../../goui/resources/",
+	$borderWidth: 1px,
+	$baseLineHeight: util.dp(20),
+	$fontSize: util.sp(16)
+);

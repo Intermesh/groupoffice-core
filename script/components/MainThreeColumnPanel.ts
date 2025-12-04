@@ -29,9 +29,12 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		this.center = this.createCenter();
 		this.center.itemId = "center";
-		this.center.flex = 1;
 		if(!this.center.minWidth) {
 			this.center.minWidth = 300;
+		}
+
+		if(!this.center.width) {
+			this.center.width = 500;
 		}
 
 		//center is active by default
@@ -39,6 +42,7 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		this.west = this.createWest();
 		this.west.itemId = "west";
+
 		if(!this.west.minWidth) {
 			this.west.minWidth = 140;
 		}
@@ -48,12 +52,11 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		this.east = this.createEast();
 		this.east.itemId = "east";
+		this.east.flex = 1;
 		if(!this.east.minWidth) {
 			this.east.minWidth = 140;
 		}
-		if(!this.east.width) {
-			this.east.width = 300;
-		}
+
 
 		this.items.add(
 
@@ -67,8 +70,8 @@ export abstract class MainThreeColumnPanel extends Component {
 			this.center,
 
 			splitter({
-				stateId: this.id + "-east-splitter",
-				resizeComponent: this.east
+				stateId: this.id + "-center-splitter",
+				resizeComponent: this.center
 			}),
 
 			this.east
