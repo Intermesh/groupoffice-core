@@ -253,7 +253,7 @@ export class Client extends Observable<ClientEventMap> {
 	/**
 	 * This function is only used up to 6.8. In 6.9 authenticate() is called in mainlayout.js
 	 */
-	public async fireAuth() {
+	public fireAuth() {
 		this.session = go.User.session;
 		this._user = go.User;
 

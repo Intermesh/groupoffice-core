@@ -9,7 +9,7 @@ import {
 import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
-import {DetailPanel} from "./components/index";
+import {DetailPanel, extjswrapper, ExtJSWrapper} from "./components/index";
 
 
 export interface EntityFilter {
@@ -104,6 +104,16 @@ export type MainPanel = {
 	title: string
 	callback: () => Component | Promise<Component>
 }
+
+
+// interface LegacyPanel extends typeof Component {
+// 	cls: string
+// 	id: string
+// 	moduleName: string
+// 	package: string
+// 	sort_order: number
+// 	title: string
+// }
 
 // for using old components in GOUI
 declare global {
@@ -220,7 +230,11 @@ export interface Module extends BaseEntity {
 	settings: Record<string, any>
 	userRights: Record<string, boolean>,
 	version: number,
-	entities: Record<string, Entity>
+	entities: Record<string, Entity>,
+	/**
+	 * goui, extjs3
+	 */
+	views: string[]
 }
 
 export const moduleDS = new JmapDataSource<Module>("Module");
@@ -317,10 +331,38 @@ class Modules {
 		})
 	}
 
-	public loadLegacy() {
-		// go.Modules.all();
-		//TODO
-		debugger
+
+	public async loadAll() {
+
+		GO.moduleManager.getAllPanelConfigs().forEach((m:any) => {
+
+			this.mainPanels.push({
+				package: m.package,
+				module: m.moduleName,
+				id: m.package+"/"+m.moduleName,
+				title: m.title,
+				callback: () => {
+
+					const pnl = GO.moduleManager.getPanel(m.moduleName);
+					pnl.header = false;
+
+					console.log(pnl);
+					return extjswrapper({
+						cls: "fit",
+						title: m.title,
+						comp: Ext.create(pnl)
+					});
+				}
+			});
+
+		})
+
+		return Promise.all(Object.values(this.serverModules).map((m) => {
+			if(m.views.indexOf("goui") > -1) {
+				return this.loadModule(m.package, m.name);
+			}
+		}));
+
 
 	}
 
@@ -331,11 +373,8 @@ class Modules {
 	 */
 	public register(config: ModuleConfig) {
 
-
 		const id = config.package + "/" + config.name;
 
-		console.log(id);
-		// debugger;
 		if(this.clientModules[id]) {
 			return; //already registered
 		}
