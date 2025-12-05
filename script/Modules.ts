@@ -5,6 +5,7 @@ import {
 	MaterialIcon,
 	t,
 	translate,
+	router
 } from "@intermesh/goui";
 import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
@@ -363,7 +364,6 @@ class Modules {
 			}
 		}));
 
-
 	}
 
 	/**
@@ -427,7 +427,6 @@ class Modules {
 			go.Modules.addPanel(proto);
 		}
 
-
 		this.mainPanels.push({
 			package: pkg,
 			module: module,
@@ -435,6 +434,7 @@ class Modules {
 			title,
 			callback
 		})
+
 	}
 
 	public getMainPanels() {
