@@ -1,5 +1,5 @@
 import {EntityLink, modules} from "./Modules.js";
-import {EntityID} from "@intermesh/goui";
+import {EntityID, Filter} from "@intermesh/goui";
 
 export interface Entity {
 	name: string,
@@ -12,7 +12,8 @@ export interface Entity {
 	goto: (id:EntityID)=>void,
 	module: string
 	package: string
-	title: string
+	title: string,
+	filters: Record<string, any>
 }
 
 export interface LinkConfig extends EntityLink {
