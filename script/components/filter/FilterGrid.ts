@@ -1,4 +1,4 @@
-import {btn, checkboxselectcolumn, column, datasourcestore, menu, t, Table} from "@intermesh/goui";
+import {btn, checkboxselectcolumn, column, datasourcestore, menu, menucolumn, t, Table} from "@intermesh/goui";
 import {JmapDataSource} from "../../jmap/index.js";
 import {AclLevel} from "../../auth/index.js";
 import {FilterDialog} from "./FilterDialog.js";
@@ -26,38 +26,39 @@ export class FilterGrid extends Table {
 				id: "name",
 				header: t("Name")
 			}),
-			column({
-				id: "btn",
-				width: 48,
-				sticky: true,
-				renderer: (columnValue: any, record, td, table, rowIndex) => {
-					return btn({
-						icon: "more_vert",
-						menu: menu({},
-							btn({
-								icon: "edit",
-								text: t("Edit"),
-								handler: () => {
-									const entityFilter = table.store.get(rowIndex)!;
+			menucolumn({
+				menu: menu({
+						listeners: {
+							show: ({target}) => {
+								const record = store.get(target.dataSet.rowIndex)!;
 
-									const dlg = new FilterDialog(entityName);
-									dlg.load(entityFilter.id);
-									dlg.show();
-								},
-								disabled: record.permissionLevel < AclLevel.MANAGE
-							}),
-							btn({
-								icon: "delete",
-								text: t("Delete"),
-								handler: () => {
-									const entityFilter = table.store.get(rowIndex)!;
-									EntityFilterDS.confirmDestroy([entityFilter.id]);
-								},
-								disabled: record.permissionLevel < AclLevel.MANAGE
-							})
-						)
+								target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
+								target.findChild("delete")!.disabled = record.permissionLevel < AclLevel.MANAGE;
+							}
+						}
+					},
+					btn({
+						itemId: "edit",
+						icon: "edit",
+						text: t("Edit"),
+						handler: (btn) => {
+							const entityFilter = store.get(btn.parent!.dataSet.rowIndex)!;
+
+							const dlg = new FilterDialog(entityName);
+							dlg.load(entityFilter.id);
+							dlg.show();
+						},
+					}),
+					btn({
+						itemId: "delete",
+						icon: "delete",
+						text: t("Delete"),
+						handler: (btn) => {
+							const entityFilter = store.get(btn.parent!.dataSet.rowIndex)!;
+							EntityFilterDS.confirmDestroy([entityFilter.id]);
+						},
 					})
-				}
+				)
 			})
 		];
 
