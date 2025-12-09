@@ -11,6 +11,7 @@ import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
 import {DetailPanel, extjswrapper, ExtJSWrapper} from "./components/index";
+import {Main} from "../../../../go/modules/community/tasks/views/goui/script/Main.js";
 
 
 export interface EntityFilter {
@@ -245,7 +246,7 @@ class Modules {
 	private clientModules: Record<string, ModuleConfig> = {};
 	private serverModules: Record<string, Module> = {};
 
-	private mainPanels: MainPanel[] = [];
+	private mainPanels: Record<string,MainPanel> = {};
 
 
 	private async legacyInit(): Promise<void> {
@@ -333,28 +334,34 @@ class Modules {
 	}
 
 
+	public getPanelById(id:string) : MainPanel|undefined {
+		return this.mainPanels[id] ?? undefined;
+	}
+
+
 	public async loadAll() {
 
 		GO.moduleManager.getAllPanelConfigs().forEach((m:any) => {
 
-			this.mainPanels.push({
+			const id = m.package+"/"+m.moduleName;
+
+			this.mainPanels[id] = {
 				package: m.package,
 				module: m.moduleName,
-				id: m.package+"/"+m.moduleName,
+				id: id,
 				title: m.title,
 				callback: () => {
 
 					const pnl = GO.moduleManager.getPanel(m.moduleName);
 					pnl.header = false;
 
-					console.log(pnl);
 					return extjswrapper({
 						cls: "fit",
 						title: m.title,
 						comp: Ext.create(pnl)
 					});
 				}
-			});
+			};
 
 		})
 
@@ -427,18 +434,18 @@ class Modules {
 			go.Modules.addPanel(proto);
 		}
 
-		this.mainPanels.push({
+		this.mainPanels[id] ={
 			package: pkg,
 			module: module,
 			id,
 			title,
 			callback
-		})
+		};
 
 	}
 
 	public getMainPanels() {
-		return this.mainPanels;
+		return Object.values(this.mainPanels);
 	}
 
 
@@ -508,7 +515,12 @@ class Modules {
 	 * @param id
 	 */
 	public openMainPanel(id: string) {
-		GO.mainLayout.openModule(id);
+		// old extjs mainlayout
+		if(window.GOUI) {
+			GO.mainLayout.openModule(id);
+		} else {
+
+		}
 	}
 
 	private registerInExtjs(config: ModuleConfig) {

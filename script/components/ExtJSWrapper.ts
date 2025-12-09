@@ -1,7 +1,7 @@
 import {Component, createComponent, FunctionUtil, Config} from "@intermesh/goui";
 
 export class ExtJSWrapper extends Component {
-	constructor(protected extJSComp:any, proxies : string[] = []) {
+	constructor(public readonly extJSComp:any, proxies : string[] = []) {
 		super();
 
 		this.items.add(extJSComp);
@@ -22,11 +22,6 @@ export class ExtJSWrapper extends Component {
 
 			ro.observe(this.el);
 		})
-	}
-
-
-	public static isExtJSComp(comp:any) {
-
 	}
 }
 
