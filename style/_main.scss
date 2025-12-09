@@ -1,14 +1,26 @@
 @use '../../goui/style/util' as *;
 @use '../../goui/style/config' as *;
 
-.goui-cardmenu.main-menu {
-	background-color: $colorMain;
-	button.goui-button {
-		color: white;
-		font-weight: normal;
-		opacity: .8;
-		&.active {
-			opacity: 1;
+.main-container {
+	.header {
+		background-color: $colorMain;
+
+		button.goui-button {
+			color: white;
 		}
 	}
+
+	menu.goui-toolbar.goui-cardmenu.main-menu {
+
+		button.goui-button {
+			color: white;
+			font-weight: normal;
+			opacity: .8;
+
+			&.active {
+				opacity: 1;
+			}
+		}
+	}
+
 }
