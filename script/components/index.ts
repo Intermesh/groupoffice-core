@@ -11,4 +11,3 @@ export * from './picker/RecurrencePicker.js';
 export * from './EntityTypeTable.js';
 export * from './links';
 export * from './ExtJSWrapper.js';
-export * from './Main.js';

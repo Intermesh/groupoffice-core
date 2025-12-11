@@ -1,7 +1,7 @@
 import {avatar, btn, cardmenu, cards, comp, Component, searchbtn, tbar} from "@intermesh/goui";
 import {modules} from "../Modules.js";
 import {entities} from "../Entities.js";
-import {ExtJSWrapper} from "./ExtJSWrapper.js";
+import {ExtJSWrapper} from "../components/ExtJSWrapper.js";
 import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";

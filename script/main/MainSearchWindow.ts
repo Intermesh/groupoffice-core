@@ -1,5 +1,5 @@
 import {t, Window} from "@intermesh/goui";
-import {SelectSearchPanel} from "./links/index.js";
+import {SelectSearchPanel} from "../components/links/index.js";
 import {entities} from "../Entities.js";
 
 

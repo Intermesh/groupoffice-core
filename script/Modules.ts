@@ -2,7 +2,8 @@ import {BaseEntity, Component, EntityID, MaterialIcon, t, translate} from "@inte
 import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
-import {DetailPanel, extjswrapper, main} from "./components/index";
+import {DetailPanel, extjswrapper} from "./components/index";
+import {main} from "./main/index.js";
 
 
 export interface EntityFilter {
