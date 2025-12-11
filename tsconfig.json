@@ -18,7 +18,7 @@
 
     "paths": {
       "@intermesh/goui": [
-        "../dist/goui/script/index.d.ts"
+        "../goui/script/index.ts"
       ]
     }
   },
