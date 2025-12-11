@@ -4,9 +4,32 @@
 .main-container {
 	.header {
 		background-color: $colorMain;
+		position:relative;
 
 		button.goui-button {
 			color: white;
+		}
+
+		.overlay {
+			background-color: $colorMain;
+
+			.goui-form-field .wrap {
+				background-color: rgba(255,255,255,0.1);
+				.goui-button {
+					i.icon {
+						color: white;
+					}
+				}
+			}
+			 .goui-form-field input.control {
+			background-color: transparent;
+				color: white;
+
+				&::placeholder {
+					color: #dedede;
+					font-style: italic;
+				}
+			}
 		}
 	}
 

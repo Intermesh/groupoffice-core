@@ -41,6 +41,9 @@ class Main extends Component {
 						icon: "notifications"
 					}),
 					searchbtn({
+						overlayComponent: (btn) => {
+							return btn.parent!.parent!;
+						},
 						icon: "search"
 					}),
 					btn({
