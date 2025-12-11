@@ -15,7 +15,7 @@
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --style=compressed ./style:./dist",
     "build:ts": "npx tsc",
-
+    "test:ts": "tsc --noEmit",
 
 
     "prepublishOnly": "npm run build"

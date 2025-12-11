@@ -1,17 +1,8 @@
-import {
-	BaseEntity,
-	Component,
-	EntityID,
-	MaterialIcon,
-	t,
-	translate,
-	router
-} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, t, translate} from "@intermesh/goui";
 import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
-import {DetailPanel, extjswrapper, ExtJSWrapper} from "./components/index";
-import {Main} from "../../../../go/modules/community/tasks/views/goui/script/Main.js";
+import {DetailPanel, extjswrapper, main} from "./components/index";
 
 
 export interface EntityFilter {
@@ -292,10 +283,10 @@ class Modules {
 
 		await go.Modules.init();
 		await go.User.loadLegacyModules();
+		await go.User.loadLegacyModuleScripts();
 		await go.customfields.CustomFields.init()
 		await go.Entities.init();
 	}
-
 
 	public async init() {
 
@@ -338,6 +329,9 @@ class Modules {
 		return this.mainPanels[id] ?? undefined;
 	}
 
+	/**
+	 * Loads all panels including legacy extjs3 panels
+	 */
 
 	public async loadAll() {
 
@@ -381,6 +375,8 @@ class Modules {
 	public register(config: ModuleConfig) {
 
 		const id = config.package + "/" + config.name;
+
+		// console.log(id); // why no legacy modules?????
 
 		if(this.clientModules[id]) {
 			return; //already registered
@@ -513,13 +509,14 @@ class Modules {
 	 * Open a main panel
 	 *
 	 * @param id
+	 * @deprecated use main.openPanel()
 	 */
 	public openMainPanel(id: string) {
 		// old extjs mainlayout
-		if(window.GOUI) {
+		if(!main.rendered) {
 			GO.mainLayout.openModule(id);
 		} else {
-
+			return main.openPanel(id);
 		}
 	}
 
