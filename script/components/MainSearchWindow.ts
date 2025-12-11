@@ -1,4 +1,4 @@
-import {btn, Component, ComponentEventMap, t, tbar, TextField, textfield, Toolbar, Window} from "@intermesh/goui";
+import {t, Window} from "@intermesh/goui";
 import {SelectSearchPanel} from "./links/index.js";
 import {entities} from "../Entities.js";
 
