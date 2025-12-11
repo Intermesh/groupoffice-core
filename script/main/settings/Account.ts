@@ -1,7 +1,7 @@
-import {avatar, Component, fieldset, form, t, textfield} from "@intermesh/goui";
+import {fieldset, form, t, textfield} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {settingsPanels} from "./SettingsWindow.js";
-import {filesbutton} from "../../components/index.js";
+import {imagefield} from "../../components/index.js";
 import {client} from "../../jmap/index.js";
 
 class Account extends AbstractSettingsPanel {
@@ -13,8 +13,10 @@ class Account extends AbstractSettingsPanel {
 
 				fieldset({legend: t("User")},
 
-
-
+					imagefield({
+						name: "avatarId",
+						value: client.user.avatarId
+					}),
 					textfield({
 						label: t("Username"),
 						name: "username",

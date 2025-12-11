@@ -39,3 +39,20 @@
 	//	margin-right: util.dp(240);
 	//}
 //}
+
+
+.image-field {
+
+	align-items: start;
+
+	.image-field-container{
+
+	}
+
+	.goui-avatar {
+		margin: 0 auto;
+	}
+	.goui-toolbar {
+		margin: 0;
+	}
+}
