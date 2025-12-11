@@ -3,32 +3,61 @@ import {
 	checkbox,
 	column,
 	comp,
-	Component,
+	Component, ComponentEventMap,
 	datasourcestore,
 	Format,
 	t,
 	table,
 	tbar,
 	TextField,
-	textfield
+	textfield, WindowEventMap
 } from "@intermesh/goui";
 import {entityttypeable} from "../EntityTypeTable";
-import {searchDS} from "../../model/Link";
+import {Search, searchDS} from "../../model/Link";
 import {entities} from "../../Entities";
 
-export class SelectSearchPanel extends Component {
+
+export  interface SelectSearchPanelEventMap extends ComponentEventMap {
+	select: {
+		record: Search
+	}
+}
+
+export class SelectSearchPanel extends Component<SelectSearchPanelEventMap> {
 
 	public readonly entityTypeTable
 	public readonly resultTable
 	private searchField: TextField;
 
-	constructor() {
+	constructor(protected multiSelect = true) {
 		super();
 
 		this.cls = "hbox";
 		this.flex = 1;
 
 		this.resultTable = this.createTable();
+
+		this.resultTable.store.on("load", ({records}) => {
+			if(records.length) {
+				this.resultTable.rowSelection!.selectIndex(0);
+			}
+		})
+
+		if(this.multiSelect) {
+			this.resultTable.on("rowdblclick", ({storeIndex}) => {
+				const record = this.resultTable.store.get(storeIndex);
+				if(record) {
+					this.fire("select", {record})
+				}
+			})
+		} else {
+			this.resultTable.on("rowclick", ({storeIndex}) => {
+				const record = this.resultTable.store.get(storeIndex);
+				if(record) {
+					this.fire("select", {record})
+				}
+			})
+		}
 
 		this.items.add(
 			comp({cls: "vbox border-right"},
@@ -82,6 +111,16 @@ export class SelectSearchPanel extends Component {
 							target.el.addEventListener("keydown", (ev) => {
 								if(ev.key == "ArrowDown") {
 									this.resultTable.focus();
+									ev.preventDefault();
+									ev.stopPropagation();
+								}
+								if(ev.key == "Enter") {
+									const record = this.resultTable.store.get(0);
+									if(record) {
+										this.fire("select", {record})
+									}
+									ev.preventDefault();
+									ev.stopPropagation();
 								}
 
 							})
@@ -106,7 +145,7 @@ export class SelectSearchPanel extends Component {
 			scrollLoad: true,
 			headers: false,
 			style: {width: "100%"},
-			rowSelectionConfig: {multiSelect: true},
+			rowSelectionConfig: {multiSelect: this.multiSelect},
 			store: datasourcestore({
 				dataSource: searchDS,
 				sort: [{isAscending:false, property:"modifiedAt"}],
