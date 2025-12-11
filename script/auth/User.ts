@@ -2,10 +2,10 @@ import {BaseEntity, DefaultEntity, EntityID} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index";
 
 export interface User extends AclOwnerEntity {
-	username?: string,
-	displayName?: string,
+	username: string,
+	displayName: string,
 	profile?: any,
-	email?: string,
+	email: string,
 	dateFormat:string,
 	timeFormat:string,
 	timezone:string,

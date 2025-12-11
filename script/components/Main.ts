@@ -1,9 +1,10 @@
-import {btn, cardmenu, cards, comp, Component, searchbtn, tbar} from "@intermesh/goui";
+import {avatar, btn, cardmenu, cards, comp, Component, searchbtn, tbar} from "@intermesh/goui";
 import {modules} from "../Modules.js";
 import {entities} from "../Entities.js";
 import {ExtJSWrapper} from "./ExtJSWrapper.js";
 import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
+import {client} from "../jmap/index.js";
 
 router.newMainLayout = true;
 
@@ -49,9 +50,23 @@ class Main extends Component {
 						}
 
 					}),
-					btn({
-						icon: "settings"
+
+					avatar({
+						style: {cursor: "pointer"},
+						listeners: {
+							render: ({target}) => {
+								target.displayName = client.user.displayName
+								if(client.user.avatarId) {
+									target.backgroundImage = client.downloadUrl(client.user.avatarId);
+								}
+								target.el.on("click", () => {
+									router.goto("settings");
+								})
+							}
+
+						}
 					})
+
 				)
 			),
 			this.container
