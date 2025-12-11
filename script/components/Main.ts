@@ -3,6 +3,7 @@ import {modules} from "../Modules.js";
 import {entities} from "../Entities.js";
 import {ExtJSWrapper} from "./ExtJSWrapper.js";
 import {router} from "../Router.js";
+import {MainSearchWindow} from "./MainSearchWindow.js";
 
 router.newMainLayout = true;
 
@@ -40,11 +41,13 @@ class Main extends Component {
 					btn({
 						icon: "notifications"
 					}),
-					searchbtn({
-						overlayComponent: (btn) => {
-							return btn.parent!.parent!;
-						},
-						icon: "search"
+					btn({
+						icon: "search",
+						handler: () => {
+							const m = new MainSearchWindow();
+							m.show();
+						}
+
 					}),
 					btn({
 						icon: "settings"
