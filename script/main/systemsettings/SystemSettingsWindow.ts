@@ -1,15 +1,17 @@
 import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window} from "@intermesh/goui";
 import {router} from "../../Router.js";
-import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
+import {settingsPanels} from "../settings/index.js";
 
-class SettingsWindow extends Window {
+class SystemSettingsWindow extends Window {
 
 	private cards: CardContainer;
 	constructor(selectedItemId:string|undefined, user:User = client.user) {
 		super();
-		this.title = t("Settings");
+		this.title = t("System settings");
+
 		this.maximized = true;
 		this.maximizable = false;
 
@@ -19,12 +21,12 @@ class SettingsWindow extends Window {
 
 		const pnls : Component[] = [];
 
-		for(const p of settingsPanels.getPanels()) {
+		for(const p of systemSettingsPanels.getPanels()) {
 			const panel = new p;
 
 			panel.on("show", ({target}) => {
 				if (target.itemId) {
-					router.setPath("settings/" + target.itemId);
+					router.setPath("systemsettings/" + target.itemId);
 				}
 			})
 			pnls.push(panel);
@@ -73,7 +75,7 @@ class SettingsWindow extends Window {
 	public async save() {
 		try {
 			this.mask();
-			await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
+			await Promise.all(this.findChildrenByType(AbstractSystemSettingsPanel).map((i) => i.save()))
 		} finally {
 			this.unmask();
 		}
@@ -82,7 +84,7 @@ class SettingsWindow extends Window {
 	public async load(user:User) {
 		try {
 			this.mask();
-			return Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.load(user)))
+			return Promise.all(this.findChildrenByType(AbstractSystemSettingsPanel).map((i) => i.load()))
 		} finally {
 			this.unmask();
 		}
@@ -91,7 +93,7 @@ class SettingsWindow extends Window {
 
 }
 
-class SettingsPanels  {
+class SystemSettingsPanels  {
 	private panels: typeof Component<any>[] = [];
 
 	public add(cmp: typeof Component<any>) {
@@ -104,9 +106,9 @@ class SettingsPanels  {
 	}
 }
 
-export const settingsPanels = new SettingsPanels();
+export const systemSettingsPanels = new SystemSettingsPanels();
 
-router.add(/^settings\/?([^\/]+)?/, (selectedItemId) => {
-	const s = new SettingsWindow(selectedItemId);
+router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
+	const s = new SystemSettingsWindow(selectedItemId);
 	s.show();
 });
