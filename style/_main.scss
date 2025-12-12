@@ -1,5 +1,6 @@
 @use '../../goui/style/util' as *;
 @use '../../goui/style/config' as *;
+@use '../../goui/style/layout';
 
 .main-container {
 	.header {
@@ -46,4 +47,9 @@
 		}
 	}
 
+}
+
+
+.app-settings-panel {
+	@extend .card;
 }
