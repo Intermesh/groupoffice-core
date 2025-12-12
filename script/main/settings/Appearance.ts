@@ -9,4 +9,4 @@ class Appearance extends AbstractSettingsPanel {
 	}
 }
 
-settingsPanels.addPanel(Appearance);
+settingsPanels.add(Appearance);

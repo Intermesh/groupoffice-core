@@ -15,11 +15,13 @@ import {
 } from "@intermesh/goui";
 import {router} from "../../Router.js";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
+import {User} from "../../auth/index.js";
+import {client} from "../../jmap/index.js";
 
 class SettingsWindow extends Window {
 
 	private cards: CardContainer;
-	constructor(selectedItemId:string|undefined) {
+	constructor(selectedItemId:string|undefined, user:User = client.user) {
 		super();
 		this.title = t("Settings");
 		this.maximized = true;
@@ -28,8 +30,6 @@ class SettingsWindow extends Window {
 		this.on("close", () => {
 			router.setPath("");
 		})
-
-		this.cls = "hbox fit";
 
 		const pnls : Component[] = [];
 
@@ -42,8 +42,8 @@ class SettingsWindow extends Window {
 				}
 			})
 			pnls.push(panel);
-
 		}
+
 
 		this.items.add(
 
@@ -63,13 +63,8 @@ class SettingsWindow extends Window {
 							cls: "filled primary",
 							text: t("Save"),
 							handler: async () => {
-								try {
-									this.mask();
-									await this.save();
-									this.close();
-								} finally {
-									this.unmask();
-								}
+								await this.save();
+								this.close();
 							}
 						})
 					)
@@ -83,10 +78,28 @@ class SettingsWindow extends Window {
 				this.cards.activeItem = active;
 			}
 		}
+
+		this.on("render", () => {
+			void this.load(user);
+		})
 	}
 
 	public async save() {
-		return Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
+		try {
+			this.mask();
+			await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
+		} finally {
+			this.unmask();
+		}
+	}
+
+	public async load(user:User) {
+		try {
+			this.mask();
+			return Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.load(user)))
+		} finally {
+			this.unmask();
+		}
 	}
 
 
@@ -95,7 +108,7 @@ class SettingsWindow extends Window {
 class SettingsPanels  {
 	private panels: typeof Component<any>[] = [];
 
-	public addPanel(cmp: typeof Component<any>) {
+	public add(cmp: typeof Component<any>) {
 
 		this.panels.push(cmp);
 	}

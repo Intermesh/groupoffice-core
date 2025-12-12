@@ -1,4 +1,5 @@
 import {Component} from "@intermesh/goui";
+import {User} from "../../auth/index.js";
 
 export abstract class AbstractSettingsPanel extends Component {
 
@@ -10,6 +11,10 @@ export abstract class AbstractSettingsPanel extends Component {
 	}
 
 	public async save() : Promise<any> {
+		return Promise.resolve();
+	}
+
+	public async load(user:User) :Promise<any> {
 		return Promise.resolve();
 	}
 }

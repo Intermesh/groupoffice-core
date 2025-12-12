@@ -3,7 +3,7 @@ import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {settingsPanels} from "./SettingsWindow.js";
 import {imagefield} from "../../components/index.js";
 import {client} from "../../jmap/index.js";
-import {userDS} from "../../auth/index.js";
+import {User, userDS} from "../../auth/index.js";
 
 class Account extends AbstractSettingsPanel {
 	private form;
@@ -17,7 +17,6 @@ class Account extends AbstractSettingsPanel {
 
 					imagefield({
 						name: "avatarId",
-						value: client.user.avatarId,
 						width: 200
 					}),
 
@@ -25,22 +24,19 @@ class Account extends AbstractSettingsPanel {
 						textfield({
 							label: t("Username"),
 							name: "username",
-							required: true,
-							value: client.user.username
+							required: true
 						}),
 
 						textfield({
 							label: t("E-mail"),
-							name: "username",
-							required: true,
-							value: client.user.email
+							name: "email",
+							required: true
 						}),
 
 						textfield({
 							label: t("Recovery e-mail"),
 							name: "recoveryEmail",
-							required: true,
-							value: client.user.recoveryEmail
+							required: true
 						})
 					)
 				)
@@ -50,8 +46,12 @@ class Account extends AbstractSettingsPanel {
 	}
 
 	async save(){
-		return userDS.update(client.user.id, this.form.value);
+		return this.form.isModified() ? userDS.update(client.user.id, this.form.modified) : undefined;
+	}
+
+	async load(user: User): Promise<any> {
+		this.form.value = user;
 	}
 }
 
-settingsPanels.addPanel(Account);
+settingsPanels.add(Account);

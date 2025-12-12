@@ -5,7 +5,6 @@ import {User} from "./auth";
 import {DetailPanel, extjswrapper} from "./components/index";
 import {main} from "./main/index.js";
 
-
 export interface EntityFilter {
 	name: string,
 	type: string,
@@ -487,11 +486,7 @@ class Modules {
 	 * @param callback
 	 */
 	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component) {
-		if(!window.go) {
 
-			//todo
-			return;
-		}
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
 
@@ -499,11 +494,12 @@ class Modules {
 		const proto = new GouiAccountSettingsPanel({
 			callback: callback,
 			title: title,
-			iconCls: "ic-"+icon.replace('_', '-'),
+			iconCls: "ic-" + icon.replace('_', '-'),
 			itemId: id
 		});
 
 		GO.userSettingsPanels.push(proto);
+
 	}
 
 	/**
