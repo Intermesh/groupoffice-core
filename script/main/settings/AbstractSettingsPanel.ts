@@ -9,7 +9,7 @@ export abstract class AbstractSettingsPanel extends Component {
 		this.title = title;
 	}
 
-	public async save() {
+	public async save() : Promise<any> {
 		return Promise.resolve();
 	}
 }

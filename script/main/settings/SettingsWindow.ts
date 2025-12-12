@@ -26,7 +26,7 @@ class SettingsWindow extends Window {
 		this.maximizable = false;
 
 		this.on("close", () => {
-			history.back()
+			router.setPath("");
 		})
 
 		this.cls = "hbox fit";
@@ -47,31 +47,33 @@ class SettingsWindow extends Window {
 
 		this.items.add(
 
-			comp({cls: "hbox", flex: 1},
+			comp({cls: "hbox border-top", flex: 1},
 				cardmenu({
 					tagName: "aside",
 					cls:'bg-high scroll',
 					width: 300
 				}),
-				this.cards = cards({flex:1},
-					...pnls
+				comp({flex:1, cls: "vbox"},
+					this.cards = cards({flex:1},
+						...pnls
+					),
+					tbar({cls : "border-top"},
+						"->",
+						btn({
+							cls: "filled primary",
+							text: t("Save"),
+							handler: async () => {
+								try {
+									this.mask();
+									await this.save();
+									this.close();
+								} finally {
+									this.unmask();
+								}
+							}
+						})
+					)
 				)
-			),
-			tbar({},
-				"->",
-				btn({
-					text: t("Save"),
-					handler: async () => {
-						try {
-							this.mask();
-							await this.save();
-							this.close();
-						} finally {
-							this.unmask();
-						}
-
-					}
-				})
 			)
 		)
 
