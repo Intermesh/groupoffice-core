@@ -27,9 +27,9 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 				// 		cls: "go-settings-logo",
 				// 		height: 72,
 				// 		listeners: {
-				// 			change: (field, value) => {
-				// 				if (value) {
-				// 					field.el.style.backgroundImage = `url(${downloadUrl(value)})`;
+				// 			change: ({newValue}) => {
+				// 				if (newValue) {
+				// 					field.el.style.backgroundImage = `url(${downloadUrl(newValue)})`;
 				// 				} else {
 				// 					field.el.style.removeProperty("background-image");
 				// 				}
@@ -67,9 +67,9 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 				// 		cls: "go-settings-logo",
 				// 		height: 72,
 				// 		listeners: {
-				// 			change: (field, value) => {
-				// 				if (value) {
-				// 					field.el.style.backgroundImage = `url(${downloadUrl(value)})`;
+				// 			change: ({newValue}) => {
+				// 				if (newValue) {
+				// 					field.el.style.backgroundImage = `url(${downloadUrl(newValue)})`;
 				// 				} else {
 				// 					field.el.style.removeProperty("background-image");
 				// 				}
@@ -98,7 +98,7 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 			name: name,
 			label: t(label),
 			listeners: {
-				change: ({target, newValue}) => {
+				change: ({newValue}) => {
 					document.body.style.setProperty(property, '#' + (newValue || defaultColor));
 				}
 			}

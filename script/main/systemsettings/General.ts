@@ -4,11 +4,21 @@ import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 
 class General extends AbstractModuleSystemSettingsPanel {
 
+	private loginMessageField?: Component;
+
 	constructor() {
 		super("general", t("General"), "core", "core");
 	}
 
 	protected formItems(): Component[] {
+		this.loginMessageField = htmlfield({
+			name: "loginMessage",
+			label: t("Login message"),
+			hint: t("This message will show on the login screen"),
+			disabled: true,
+			height: 200
+		});
+
 		return [
 			fieldset({},
 				textfield({
@@ -38,22 +48,15 @@ class General extends AbstractModuleSystemSettingsPanel {
 					name: "loginMessageEnabled",
 					label: t("Enable login message"),
 					listeners: {
-						change: ({target, newValue}) => {
-							const loginMsgField = target.nextSibling();
-							if (loginMsgField) {
-								loginMsgField.disabled = !newValue;
+						change: ({newValue}) => {
+							if (this.loginMessageField) {
+								this.loginMessageField.disabled = !newValue;
 							}
 						}
 					}
 				}),
 
-				htmlfield({
-					name: "loginMessage",
-					label: t("Login message"),
-					hint: t("This message will show on the login screen"),
-					disabled: true,
-					height: 200
-				})
+				this.loginMessageField
 			)
 		];
 	}

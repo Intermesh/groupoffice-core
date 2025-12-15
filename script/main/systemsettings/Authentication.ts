@@ -1,0 +1,106 @@
+import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
+import {checkbox, comp, Component, fieldset, numberfield, t, textfield} from "@intermesh/goui";
+import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+
+class Authentication extends AbstractModuleSystemSettingsPanel {
+
+	constructor() {
+		super("authentication", t("Authentication"), "core", "core");
+	}
+
+	protected formItems(): Component[] {
+		return [
+			fieldset({
+					title: t("Password")
+				},
+
+				numberfield({
+					name: "passwordMinLength",
+					label: t("Minimum length"),
+					value: 6,
+					decimals: 0
+				}),
+
+				// TODO: Domain combo - needs to be implemented
+				// combobox({
+				// 	name: "defaultAuthenticationDomain",
+				// 	label: t("Default domain"),
+				// 	hint: t("Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence."),
+				// 	dataSource: authenticationDomainsDS
+				// }),
+
+				numberfield({
+					name: "logoutWhenInactive",
+					label: t("Logout when inactive"),
+					hint: t("Logout users when inactive for more than this number of seconds. This will also disable the 'Remember my login' checkbox in the login dialog. 0 disables this setting."),
+					value: 0,
+					decimals: 0
+				}),
+
+				textfield({
+					name: "lostPasswordURL",
+					label: t("Lost password URL"),
+					hint: t("You can set an URL to handle lost passwords in an alternative way")
+				})
+			),
+
+			fieldset({
+					title: t("Allowed groups")
+				},
+
+				comp({
+					tagName: "p",
+					text: t("Define which groups are allowed to login from which IP addresses. You can use '*' to match any charachters and '?'" +
+						" to match any single character. eg. '192.168.1?.*'. Be careful, You can lock yourself out!")
+				})
+
+				// TODO: AuthAllowGroupGrid - needs to be implemented
+				// authAllowGroupGrid({})
+			),
+
+			fieldset({
+					title: t("Synchronization")
+				},
+
+				checkbox({
+					name: "activeSyncEnable2FA",
+					label: t("Enable 2-Factor authentication for ActiveSync devices")
+				}),
+
+				checkbox({
+					name: "activeSyncCanConnect",
+					label: t("ActiveSync devices can connect by default."),
+					hint: t("When disabled the administrator has to allow each new device manually")
+				})
+			),
+
+			fieldset({
+					title: t("API settings")
+				},
+
+				comp({
+					tagName: "p",
+					text: t("Allow Cross Origin Requests from these origins")
+				}),
+
+				// TODO: FormGroup for multiple CORS origins - needs to be implemented
+				// This was a formgroup that allows adding multiple text fields dynamically
+				// formgroup({
+				// 	name: "corsAllowOrigin",
+				// 	label: t("CORS origins"),
+				// 	itemConfig: {
+				// 		placeholder: 'eg. https://example.com'
+				// 	}
+				// }),
+
+				checkbox({
+					name: "allowRegistration",
+					label: t("Allow creation of users through the API"),
+					hint: t("When enabled, you should restrict access for the 'Everyone' group as much as possible. Use with caution.")
+				})
+			)
+		];
+	}
+}
+
+systemSettingsPanels.add(Authentication);
