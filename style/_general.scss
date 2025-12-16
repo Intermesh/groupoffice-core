@@ -31,6 +31,22 @@
 		cursor: pointer;
 	}
 }
+
+.list.checkbox-list {
+	padding-bottom: util.dp(16);
+	li {
+		padding-left: util.dp(16);
+		.goui-form-field.check {
+			.control {
+				.box-label {
+					padding-top: util.dp(4);
+					padding-bottom: util.dp(4);
+				}
+			}
+		}
+	}
+}
+
 //@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
 	//.goui-module-panel {
 	//	top : 0;
