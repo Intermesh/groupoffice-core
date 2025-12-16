@@ -1,4 +1,18 @@
-import {avatar, btn, cardmenu, cards, comp, Component, searchbtn, tbar} from "@intermesh/goui";
+import {
+	avatar,
+	btn,
+	cardmenu,
+	cards,
+	comp,
+	Component,
+	h4,
+	Menu,
+	menu,
+	searchbtn,
+	t,
+	tbar,
+	Window
+} from "@intermesh/goui";
 import {modules} from "../Modules.js";
 import {entities} from "../Entities.js";
 import {ExtJSWrapper} from "../components/ExtJSWrapper.js";
@@ -27,6 +41,66 @@ class Main extends Component {
 			overflowMenu: true,
 			cardContainer: this.container
 		});
+	}
+
+	private accountMenu?: Menu;
+
+
+	private createAccountMenu() {
+		return menu({
+			isDropdown: true,
+			removeOnClose: false
+		},
+
+			h4(client.user.displayName),
+
+			"-",
+
+			btn({
+				icon: "account_circle",
+				text: t("Account settings"),
+				handler: () => {
+					void router.goto("settings");
+				}
+			}),
+
+			btn({
+				icon: "settings",
+				text: t("System settings"),
+				handler: () => {
+					void router.goto("systemsettings");
+				}
+			}),
+
+			"-",
+
+			btn({
+				icon: "info",
+				text: t("About"),
+				handler: () => {
+					void Window.alert(t("About"), "TODO")
+				}
+			}),
+
+			btn({
+				icon: "help",
+				text: t("Documentation"),
+				handler: () => {
+					window.open("https://www.group-office.com/documentation.html", "_blank");
+				}
+			}),
+
+			"-",
+
+			btn({
+				icon: "exit_to_app",
+				text: t("Logout"),
+				handler: async () => {
+					await client.logout();
+					document.location.reload();
+				}
+			})
+			)
 	}
 
 	/**
@@ -60,7 +134,14 @@ class Main extends Component {
 									target.backgroundImage = client.downloadUrl(client.user.avatarId);
 								}
 								target.el.on("click", () => {
-									router.goto("settings");
+									if(!this.accountMenu) {
+										this.accountMenu = this.createAccountMenu();
+										this.accountMenu.alignTo = target.el;
+									}
+
+									this.accountMenu.show();
+
+
 								})
 							}
 
