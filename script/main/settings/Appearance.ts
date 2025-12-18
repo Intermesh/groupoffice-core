@@ -4,7 +4,7 @@ import {settingsPanels} from "./SettingsWindow.js";
 
 class Appearance extends AbstractSettingsPanel {
 	constructor() {
-		super("appearance", t("Appearance"));
+		super("appearance", t("Appearance"), "palette");
 
 	}
 }

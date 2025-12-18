@@ -20,9 +20,6 @@ import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 
-router.newMainLayout = true;
-
-
 class Main extends Component {
 	private readonly menu;
 	private readonly container;
@@ -40,6 +37,14 @@ class Main extends Component {
 			cls: "main-menu",
 			overflowMenu: true,
 			cardContainer: this.container
+		});
+
+
+		// default route opens first module
+		router.add(() => {
+			const firstId = this.menu.items!.first()!.itemId + "";
+			router.setPath(firstId);
+			this.openPanel(firstId);
 		});
 	}
 
@@ -240,3 +245,4 @@ class Main extends Component {
 }
 
 export const main = new Main();
+

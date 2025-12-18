@@ -6,7 +6,7 @@ import {AppSettingsPanel} from "../settings/index.js";
 
 class SystemSettingsApps extends AbstractSystemSettingsPanel {
 	constructor() {
-		super("apps", t("Apps"));
+		super("apps", t("Apps"), "apps");
 
 		this.cls = "fit scroll";
 

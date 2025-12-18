@@ -2,6 +2,7 @@ import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsP
 import {btn, checkbox, Component, fieldset, numberfield, select, t, TextField, textfield, tbar} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
 class Notifications extends AbstractModuleSystemSettingsPanel {
 
@@ -9,7 +10,7 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 	private systemEmailField?: TextField;
 
 	constructor() {
-		super("notifications", t("Notifications"), "core", "core");
+		super("notifications", t("Notifications"),  "core", "core","notifications");
 	}
 
 	protected formItems(): Component[] {

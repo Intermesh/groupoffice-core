@@ -8,7 +8,7 @@ import {User, userDS} from "../../auth/index.js";
 class Account extends AbstractSettingsPanel {
 	private form;
 	constructor() {
-		super("account", t("Account"));
+		super("account", t("Account"), "account_box");
 
 		this.items.add(
 			this.form = form({},

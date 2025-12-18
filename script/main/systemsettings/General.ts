@@ -1,13 +1,14 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
 import {checkbox, Component, fieldset, htmlfield, t, textfield} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
 class General extends AbstractModuleSystemSettingsPanel {
 
 	private loginMessageField?: Component;
 
 	constructor() {
-		super("general", t("General"), "core", "core");
+		super("general", t("General"), "core", "core", "description");
 	}
 
 	protected formItems(): Component[] {

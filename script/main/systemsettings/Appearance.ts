@@ -1,49 +1,29 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
 import {btn, colorfield, Component, comp, fieldset, t} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
+import {imagefield} from "../../components/index.js";
 
 class Appearance extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
-		super("appearance", t("Appearance"), "core", "core");
+		super("appearance", t("Appearance"),"core", "core", "palette");
 		this.cls = "hbox";
 	}
 
 	protected formItems(): Component[] {
 		return [
 			// Light theme fieldset
-			fieldset({},
+			fieldset({flex: 1},
 				comp({
 					tagName: "label",
 					text: t("Light")
 				}),
 
-				// TODO: Logo upload field
-				// comp({cls: "hbox"},
-				// 	filefield({
-				// 		name: "logoId",
-				// 		buttonOnly: true,
-				// 		accept: "image/*",
-				// 		cls: "go-settings-logo",
-				// 		height: 72,
-				// 		listeners: {
-				// 			change: ({newValue}) => {
-				// 				if (newValue) {
-				// 					field.el.style.backgroundImage = `url(${downloadUrl(newValue)})`;
-				// 				} else {
-				// 					field.el.style.removeProperty("background-image");
-				// 				}
-				// 			}
-				// 		}
-				// 	}),
-				// 	btn({
-				// 		icon: "delete",
-				// 		title: t("Reset"),
-				// 		handler: () => {
-				// 			// Reset logo
-				// 		}
-				// 	})
-				// ),
+				imagefield({
+					name: "logoId",
+					width: 200
+				}),
 
 				this.createColorField("primaryColor", "Primary color", "--fg-main", "1652A1"),
 				this.createColorField("secondaryColor", "Secondary color", "--c-primary", "00B0AD"),
@@ -52,38 +32,16 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 			),
 
 			// Dark theme fieldset
-			fieldset({},
+			fieldset({flex: 1},
 				comp({
 					tagName: "label",
 					text: t("Dark")
 				}),
 
-				// TODO: Logo upload field for dark theme
-				// comp({cls: "hbox"},
-				// 	filefield({
-				// 		name: "logoIdDark",
-				// 		buttonOnly: true,
-				// 		accept: "image/*",
-				// 		cls: "go-settings-logo",
-				// 		height: 72,
-				// 		listeners: {
-				// 			change: ({newValue}) => {
-				// 				if (newValue) {
-				// 					field.el.style.backgroundImage = `url(${downloadUrl(newValue)})`;
-				// 				} else {
-				// 					field.el.style.removeProperty("background-image");
-				// 				}
-				// 			}
-				// 		}
-				// 	}),
-				// 	btn({
-				// 		icon: "delete",
-				// 		title: t("Reset"),
-				// 		handler: () => {
-				// 			// Reset logo
-				// 		}
-				// 	})
-				// ),
+				imagefield({
+					name: "logoIdDark",
+					width: 200
+				}),
 
 				this.createColorField("primaryDark", "Primary color", "--fg-main", "1652A1"),
 				this.createColorField("secondaryDark", "Secondary color", "--c-primary", "00B0AD"),

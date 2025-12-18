@@ -1,11 +1,12 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
 import {checkbox, comp, Component, fieldset, numberfield, t, textfield} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
 class Authentication extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
-		super("authentication", t("Authentication"), "core", "core");
+		super("authentication", t("Authentication"), "core", "core", "lock");
 	}
 
 	protected formItems(): Component[] {

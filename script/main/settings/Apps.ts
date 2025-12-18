@@ -5,7 +5,7 @@ import {User} from "../../auth/index.js";
 
 class Apps extends AbstractSettingsPanel {
 	constructor() {
-		super("apps", t("Apps"));
+		super("apps", t("Apps"), "apps");
 
 		this.cls = "fit scroll";
 

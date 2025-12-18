@@ -94,21 +94,23 @@ class SystemSettingsWindow extends Window {
 }
 
 class SystemSettingsPanels  {
-	private panels: typeof Component<any>[] = [];
+	private panels: (new () => AbstractSystemSettingsPanel)[] = [];
 
-	public add(cmp: typeof Component<any>) {
+	public add(cmp: (new () => AbstractSystemSettingsPanel)) {
 
 		this.panels.push(cmp);
 	}
 
-	public getPanels() {
+	public getPanels()   {
 		return this.panels;
 	}
 }
 
 export const systemSettingsPanels = new SystemSettingsPanels();
 
-router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
-	const s = new SystemSettingsWindow(selectedItemId);
-	s.show();
-});
+if(router.newMainLayout) {
+	router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
+		const s = new SystemSettingsWindow(selectedItemId);
+		s.show();
+	});
+}

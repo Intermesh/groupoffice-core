@@ -1,18 +1,23 @@
-import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
-import {Component, containerfield, datasourceform} from "@intermesh/goui";
+import {Component, containerfield, datasourceform, MaterialIcon, ObjectUtil} from "@intermesh/goui";
 import {moduleDS, modules} from "../../Modules.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
 export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPanel {
 	private form;
 
-	constructor( itemId:string,  title:string, protected modulePackage:string, protected moduleName:string) {
-		super(itemId, title);
+	constructor( itemId:string,  title:string, protected modulePackage:string, protected moduleName:string, icon:MaterialIcon) {
+		super(itemId, title, icon);
+
+		this.itemId = itemId;
+		this.title = title;
 
 		this.form = datasourceform({
-				dataSource: moduleDS
+				dataSource: moduleDS,
+				patchMode: true
 			},
 			containerfield({
-					name: "settings"
+					name: "settings",
+					keepUnknownValues: false
 				},
 				...this.formItems()
 			)
@@ -24,6 +29,7 @@ export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPan
 		const mod = modules.get(this.modulePackage, this.moduleName);
 		if (mod) {
 			this.form.value = mod;
+			this.form.trackReset();
 
 			this.form.currentId = mod.id;
 		}

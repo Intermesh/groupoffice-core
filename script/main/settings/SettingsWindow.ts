@@ -3,6 +3,7 @@ import {router} from "../../Router.js";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
+import {AbstractModuleSystemSettingsPanel, AbstractSystemSettingsPanel} from "../systemsettings/index.js";
 
 class SettingsWindow extends Window {
 
@@ -92,9 +93,9 @@ class SettingsWindow extends Window {
 }
 
 class SettingsPanels  {
-	private panels: typeof Component<any>[] = [];
+	private panels: (new () => AbstractSettingsPanel)[] = [];
 
-	public add(cmp: typeof Component<any>) {
+	public add(cmp: (new () => AbstractSettingsPanel)) {
 
 		this.panels.push(cmp);
 	}
@@ -106,7 +107,9 @@ class SettingsPanels  {
 
 export const settingsPanels = new SettingsPanels();
 
-router.add(/^settings\/?([^\/]+)?/, (selectedItemId) => {
-	const s = new SettingsWindow(selectedItemId);
-	s.show();
-});
+if(router.newMainLayout) {
+	router.add(/^settings\/?([^\/]+)?/, (selectedItemId) => {
+		const s = new SettingsWindow(selectedItemId);
+		s.show();
+	});
+}
