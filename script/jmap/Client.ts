@@ -54,7 +54,7 @@ export type UploadResponse = {
 
 export type JmapSession = {
 	version: string
-	auth: any[]
+	auth: any
 	accounts: any[]
 	capabilities: any[]
 	apiUrl: string

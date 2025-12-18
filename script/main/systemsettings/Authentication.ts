@@ -1,7 +1,8 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
-import {checkbox, comp, Component, fieldset, numberfield, t, textfield} from "@intermesh/goui";
+import {arrayfield, checkbox, chips, comp, Component, fieldset, numberfield, t, textfield} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
+import {domaincombo} from "../../auth/index.js";
 
 class Authentication extends AbstractModuleSystemSettingsPanel {
 
@@ -22,13 +23,11 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 					decimals: 0
 				}),
 
-				// TODO: Domain combo - needs to be implemented
-				// combobox({
-				// 	name: "defaultAuthenticationDomain",
-				// 	label: t("Default domain"),
-				// 	hint: t("Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence."),
-				// 	dataSource: authenticationDomainsDS
-				// }),
+				domaincombo({
+					name: "defaultAuthenticationDomain",
+					label: t("Default domain"),
+					hint: t("Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence."),
+				}),
 
 				numberfield({
 					name: "logoutWhenInactive",
@@ -53,7 +52,8 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 					tagName: "p",
 					text: t("Define which groups are allowed to login from which IP addresses. You can use '*' to match any charachters and '?'" +
 						" to match any single character. eg. '192.168.1?.*'. Be careful, You can lock yourself out!")
-				})
+				}),
+
 
 				// TODO: AuthAllowGroupGrid - needs to be implemented
 				// authAllowGroupGrid({})
@@ -84,15 +84,11 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 					text: t("Allow Cross Origin Requests from these origins")
 				}),
 
-				// TODO: FormGroup for multiple CORS origins - needs to be implemented
-				// This was a formgroup that allows adding multiple text fields dynamically
-				// formgroup({
-				// 	name: "corsAllowOrigin",
-				// 	label: t("CORS origins"),
-				// 	itemConfig: {
-				// 		placeholder: 'eg. https://example.com'
-				// 	}
-				// }),
+				chips({
+					name: "corsAllowOrigin",
+					label: t("CORS origins"),
+					hint: "eg. https://example.com"
+				}),
 
 				checkbox({
 					name: "allowRegistration",

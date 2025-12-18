@@ -11,6 +11,8 @@ export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPan
 		this.itemId = itemId;
 		this.title = title;
 
+		this.cls = "fit scroll";
+
 		this.form = datasourceform({
 				dataSource: moduleDS,
 				patchMode: true
