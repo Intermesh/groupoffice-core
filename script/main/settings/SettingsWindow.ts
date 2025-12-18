@@ -3,7 +3,6 @@ import {router} from "../../Router.js";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
-import {AbstractModuleSystemSettingsPanel, AbstractSystemSettingsPanel} from "../systemsettings/index.js";
 
 class SettingsWindow extends Window {
 

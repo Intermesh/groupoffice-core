@@ -3,7 +3,7 @@ import {moduleDS, modules} from "../../Modules.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
 export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPanel {
-	private form;
+	protected form;
 
 	constructor( itemId:string,  title:string, protected modulePackage:string, protected moduleName:string, icon:MaterialIcon) {
 		super(itemId, title, icon);

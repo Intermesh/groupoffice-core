@@ -1,5 +1,17 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
-import {btn, checkbox, Component, fieldset, numberfield, select, t, TextField, textfield, tbar} from "@intermesh/goui";
+import {
+	btn,
+	checkbox,
+	Component,
+	fieldset,
+	numberfield,
+	select,
+	t,
+	TextField,
+	textfield,
+	tbar,
+	Window
+} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
@@ -101,21 +113,19 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 	}
 
 	private async sendTestMessage() {
-		this.mask(t("Sending..."));
+		this.mask();
 		try {
-			// TODO: Get form values properly from datasourceform
-			const formValues = {}; // this.getFormValues();
-			const response = await client.jmap("core/Settings/sendTestMessage", formValues);
+
+			const response = await client.jmap("core/Settings/sendTestMessage", this.form.value.settings);
 
 			if (!response.success) {
 				throw response;
 			}
 
-			// TODO: Use proper alert/confirm dialogs when available
-			alert(t("A message was sent successfully to {email}").replace('{email}', this.systemEmailField?.value || ""));
+			void Window.alert(t("A message was sent successfully to {email}").replace('{email}', this.systemEmailField?.value || ""));
 		} catch (error: any) {
 			const errorMsg = error.message ? "\n\n" + error.message : "";
-			alert(t("Failed to send message to {email}").replace('{email}', this.systemEmailField?.value || "") + errorMsg);
+			void Window.alert(t("Failed to send message to {email}").replace('{email}', this.systemEmailField?.value || "") + errorMsg);
 		} finally {
 			this.unmask();
 		}
