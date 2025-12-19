@@ -63,18 +63,18 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 	/**
 	 * The ID to use when committing
 	 */
-	protected _nextCallId = 1;
+	protected static _nextCallId = 1;
 
 	/**
 	 * The call ID of the next JMAP method call. Useful for result references.
 	 */
 	get nextCallId() {
-		return this.id + "_" + this._nextCallId;
+		return this.id + "_" + JmapDataSource._nextCallId;
 	}
 
 	private useCallId() {
 		const callId  = this.nextCallId;
-		this._nextCallId++;
+		JmapDataSource._nextCallId++;
 
 		return callId;
 	}
