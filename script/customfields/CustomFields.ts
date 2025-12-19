@@ -79,21 +79,25 @@ class CustomFields {
 
 
 	public async init() {
-		const fs = await fieldSetDS.get();
-		fs.list.forEach(fs => {
-			if (!this.fieldSets[fs.entity])
-				this.fieldSets[fs.entity] = [];
+		return Promise.all([
+			fieldSetDS.get().then(fs => {
+				fs.list.forEach(fs => {
+					if (!this.fieldSets[fs.entity])
+						this.fieldSets[fs.entity] = [];
 
-			this.fieldSets[fs.entity].push(fs);
-		})
+					this.fieldSets[fs.entity].push(fs);
+				})
+			}),
 
-		const f = await fieldDS.get();
-		f.list.forEach(f => {
-			if (!this.fields[f.fieldSetId])
-				this.fields[f.fieldSetId] = [];
+			fieldDS.get().then(f => {
+				f.list.forEach(f => {
+					if (!this.fields[f.fieldSetId])
+						this.fields[f.fieldSetId] = [];
 
-			this.fields[f.fieldSetId].push(f);
-		})
+					this.fields[f.fieldSetId].push(f);
+				})
+			})
+		])
 	}
 
 	getEntityFields(entity: string) {

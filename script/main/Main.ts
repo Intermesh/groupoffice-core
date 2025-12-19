@@ -145,8 +145,6 @@ class Main extends Component {
 									}
 
 									this.accountMenu.show();
-
-
 								})
 							}
 

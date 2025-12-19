@@ -209,17 +209,11 @@ export class Client extends Observable<ClientEventMap> {
 		// make sure we update user
 		await userDS.reset();
 
-		const user =  await userDS.single(this._session.userId);
-
-		if(!user) {
-			return false;
-		}
-
-		this.setUser(user);
-
-		await customFields.init();
-
-		await modules.init();
+		await Promise.all([
+			userDS.single(this._session.userId).then(user => {
+				this.setUser(user);
+			})
+			])
 
 		this.fire("authenticated", {session: this._session});
 
@@ -254,8 +248,8 @@ export class Client extends Observable<ClientEventMap> {
 	 * This function is only used up to 6.8. In 6.9 authenticate() is called in mainlayout.js
 	 */
 	public fireAuth() {
-		this.session = go.User.session;
-		this._user = go.User;
+		// this.session = go.User.session;
+		// this._user = go.User;
 
 		this.fire("authenticated", {session: this._session});
 	}
@@ -515,7 +509,7 @@ export class Client extends Observable<ClientEventMap> {
 	 *
 	 * @param method
 	 * @param params
-	 * @param callId
+	 * @param callId Make sure this ID is unique if you pass it
 	 */
 	public jmap(method: string, params: Object = {}, callId: string|undefined = undefined): Promise<any> {
 		if(callId === undefined) {
@@ -558,7 +552,7 @@ export class Client extends Observable<ClientEventMap> {
 
 					if (!this._requestData[callId]) {
 						//aborted
-						console.debug("Aborted");
+						console.debug("Aborted", callId, response);
 						return true;
 					}
 

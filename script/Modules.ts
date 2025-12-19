@@ -240,7 +240,7 @@ class Modules {
 	private mainPanels: Record<string,MainPanel> = {};
 
 
-	private async legacyInit(): Promise<void> {
+	private async legacyInit(): Promise<any> {
 
 		if(window.GOUI) {
 			// already initialized in old MainLayout.js UI
@@ -256,7 +256,7 @@ class Modules {
 		window.GOUI = await import(goui);
 		window.groupofficeCore = await import(groupofficeCore);
 
-		await go.User.load();
+		await go.User.onLoad(client.session);
 
 		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
@@ -281,59 +281,45 @@ class Modules {
 
 		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
-		await go.Modules.init();
-		await go.User.loadLegacyModules();
-		await go.User.loadLegacyModuleScripts();
-		await go.customfields.CustomFields.init()
-		await go.Entities.init();
-	}
 
-	public async init() {
-
-		await this.legacyInit();
-
-		const serverMods = await moduleDS.get();
-
-		const proms = serverMods.list.map(m => {
-			if(!m.package) {
-				m.package = "legacy";
-			}
-			const id = m.package + "/" + m.name;
-
-			this.serverModules[id] = m;
-
-			// if(m.package != "core" && m.package != "legacy") {
-			// 	const mod = "../../../../../../../go/modules/" + m.package + "/" + m.name + "/views/goui/dist/Index.js?v=" + client.session?.version;
-			// 	return import(mod).catch((e) => {
-			// 		console.error("Module loading error: ", e);
-			// 	});
-			// }
-		})
-
-		// await Promise.all(proms);
-
-	}
-
-
-	public loadModule(pkg:string, name:string) {
-		const mod = "../../../../../../../go/modules/" + pkg + "/" + name + "/views/goui/dist/Index.js?v=" + client.session?.version;
-		return import(mod).catch((e) => {
-			console.error("Module loading error: ", e);
-		}).then(() => {
-
-		})
-	}
-
-
-	public getPanelById(id:string) : MainPanel|undefined {
-		return this.mainPanels[id] ?? undefined;
+		// TODO make these load from new framework to reduce network requests
+		return Promise.all([
+			go.Modules.init(),
+			go.User.loadLegacyModules(),
+			go.User.loadLegacyModuleScripts(),
+			go.customfields.CustomFields.init(),
+			go.Entities.init()
+		]);
 	}
 
 	/**
-	 * Loads all panels including legacy extjs3 panels
+	 * Loads module script before being authenticated
 	 */
+	public async loadUI() {
 
-	public async loadAll() {
+		const r =  await fetch("/go/modules/community/main/modules.php")
+		const mods = await r.json();
+
+		return Promise.all(
+			mods.filter((m:any) => {
+				return m.entry;
+			}).map((m:any) => {
+					return import(m.entry).catch((e) => {
+						console.error("Module loading error: ", e);
+					})
+			})
+		);
+	}
+
+
+	/**
+	 * The legacyscript.php is loaded by index.html. We transform the old modules into GOUI wrapped panels here.
+	 *
+	 * the user must be authenticated at this point in contrast to the new goui modules
+	 *
+	 * @private
+	 */
+	public loadLegacyUI() {
 
 		GO.moduleManager.getAllPanelConfigs().forEach((m:any) => {
 
@@ -358,13 +344,35 @@ class Modules {
 			};
 
 		})
+	}
 
-		return Promise.all(Object.values(this.serverModules).map((m) => {
-			if(m.views.indexOf("goui") > -1) {
-				return this.loadModule(m.package, m.name);
-			}
-		}));
+	/**
+	 * Initializes after the user is authenticated.
+	 *
+	 * It populates the serverModules entities from the JMAP server.
+	 */
+	public async init() {
 
+		return Promise.all([
+
+			// TODO: A duplicate module query is done for the legacy init
+			this.legacyInit(),
+
+			moduleDS.get().then( serverMods => {
+				serverMods.list.map(m => {
+					if (!m.package) {
+						m.package = "legacy";
+					}
+					const id = m.package + "/" + m.name;
+					this.serverModules[id] = m;
+				})
+
+			})
+		]);
+	}
+
+	public getPanelById(id:string) : MainPanel|undefined {
+		return this.mainPanels[id] ?? undefined;
 	}
 
 	/**
