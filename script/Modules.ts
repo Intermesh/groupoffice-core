@@ -284,7 +284,7 @@ class Modules {
 
 		// TODO make these load from new framework to reduce network requests
 		return Promise.all([
-			go.Modules.init(),
+			go.Modules.init(), // TODO jmapds() and userDS two separate stores??
 			go.User.loadLegacyModules(),
 			go.User.loadLegacyModuleScripts(),
 			go.customfields.CustomFields.init(),
@@ -356,6 +356,8 @@ class Modules {
 		return Promise.all([
 
 			// TODO: A duplicate module query is done for the legacy init
+
+
 			this.legacyInit(),
 
 			moduleDS.get().then( serverMods => {
