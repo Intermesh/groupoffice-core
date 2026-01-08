@@ -9,7 +9,7 @@ import {
 	t,
 	textfield
 } from "@intermesh/goui";
-import {fieldSetDS} from "../CustomFields.js";
+import {fieldSetDS} from "./CustomFields.js";
 
 export class FieldSetDialog extends FormWindow {
 	private readonly fieldSetCombo: ComboBox

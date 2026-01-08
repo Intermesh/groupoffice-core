@@ -1,22 +1,7 @@
 import {EntityID, TableColumn} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index.js";
 import {AclItemEntity, AclOwnerEntity} from "../auth/index.js";
-import {
-	AbstractCustomField, CheckboxCustomField,
-	ContactCustomField,
-	DateCustomField,
-	DateTimeCustomField, FileCustomField, FunctionCustomField,
-	GroupCustomField,
-	HtmlCustomField, MultiContactCustomField,
-	MultiSelectCustomField, NotesCustomField,
-	NumberCustomField,
-	ProjectCustomField,
-	SelectCustomField, TemplateCustomField,
-	TextAreaCustomField,
-	TextCustomField,
-	UserCustomField,
-	YesNoCustomField
-} from "./Types.js";
+import {Type} from "./type/index.js";
 
 
 export interface FieldSet extends AclOwnerEntity {
@@ -26,7 +11,9 @@ export interface FieldSet extends AclOwnerEntity {
 	isTab: boolean,
 	collapseIfEmpty: boolean,
 	parentFieldSetId: EntityID|undefined,
-	columns: number
+	columns: number,
+	sortOrder: number,
+	aclId: number
 }
 
 export type SelectOption = {
@@ -68,7 +55,7 @@ export const fieldDS = new JmapDataSource<Field>("Field");
 
 
 type ConstructableAbstractCustomField = {
-	new (...args: ConstructorParameters<typeof AbstractCustomField>): AbstractCustomField;
+	new (...args: ConstructorParameters<typeof Type>): Type;
 };
 
 
@@ -125,45 +112,29 @@ class CustomFields {
 	}
 
 	private types: Record<string, ConstructableAbstractCustomField> = {
-		Date: DateCustomField,
-		DateTime: DateTimeCustomField,
-		YesNo: YesNoCustomField,
-		Checkbox: CheckboxCustomField,
-		Select: SelectCustomField,
-		MultiSelect: MultiSelectCustomField,
-		User: UserCustomField,
-		Number: NumberCustomField,
-		FunctionField: FunctionCustomField,
-		Group: GroupCustomField,
-		Html: HtmlCustomField,
-		TextArea: TextAreaCustomField,
-		Text: TextCustomField,
-		Notes: NotesCustomField,
-		Template: TemplateCustomField,
 
-		// Todo, these should be added by the modules using registerTableColumnCreator
-		Project: ProjectCustomField,
-		Contact: ContactCustomField,
-		MultiContact: MultiContactCustomField,
-		File: FileCustomField
 	}
 
 
-	public registerType(type: string, cf: ConstructableAbstractCustomField) {
-		this.types[type] = cf;
+	public registerType(cf: ConstructableAbstractCustomField) {
+		this.types[cf.name] = cf;
+	}
+
+	public getTypes() {
+		return Object.keys(this.types);
 	}
 
 
-	public getType(f: Field) {
+	public getType(type: string) {
 
-		return this.types[f.type]
-			? new this.types[f.type](f)
-			: new this.types["Text"](f)
+		return this.types[type]
+			? new this.types[type]()
+			: new this.types["Text"]()
 	}
 
 	public getTableColumns(entity: string): TableColumn[] {
 		return this.getEntityFields(entity).map(f => {
-			return this.getType(f).createTableColumn();
+			return this.getType(f.type).createTableColumn(f);
 		}).filter(c => c !== undefined);
 	}
 

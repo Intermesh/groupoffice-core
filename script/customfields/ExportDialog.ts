@@ -11,7 +11,7 @@ import {
 } from "@intermesh/goui";
 import {client} from "../jmap/index.js";
 import {entities, Entity} from "../Entities.js";
-import {fieldSetDS} from "../CustomFields.js";
+import {fieldSetDS} from "./CustomFields.js";
 
 export class ExportDialog extends Window {
 	private entity!: Entity;

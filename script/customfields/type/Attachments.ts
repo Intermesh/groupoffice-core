@@ -2,6 +2,7 @@ import {Type} from "./Type.js";
 import {t} from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
 import {AttachmentsDialog} from "./AttachmentsDialog.js";
+import {customFields} from "../CustomFields.js";
 
 export class Attachments extends Type {
 	constructor() {
@@ -16,3 +17,5 @@ export class Attachments extends Type {
 		return new AttachmentsDialog();
 	}
 }
+
+customFields.registerType(Attachments);

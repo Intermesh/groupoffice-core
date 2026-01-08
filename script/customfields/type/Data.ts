@@ -1,6 +1,8 @@
 import {Type} from "./Type.js";
 import {t} from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
+import {customFields} from "../CustomFields.js";
+import {Checkbox} from "./Checkbox.js";
 
 export class Data extends Type {
 	constructor() {
@@ -15,3 +17,6 @@ export class Data extends Type {
 		return new FieldDialog();
 	}
 }
+
+
+customFields.registerType(Data);

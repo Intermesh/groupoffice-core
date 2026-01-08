@@ -2,6 +2,7 @@ import {Type} from "./Type.js";
 import {t} from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
 import {TemplateFieldDialog} from "./TemplateFieldDialog.js";
+import {customFields} from "../CustomFields.js";
 
 export class TemplateField extends Type {
 	constructor() {
@@ -16,3 +17,5 @@ export class TemplateField extends Type {
 		return new TemplateFieldDialog();
 	}
 }
+
+customFields.registerType(TemplateField);

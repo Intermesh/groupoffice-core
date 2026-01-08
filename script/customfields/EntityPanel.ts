@@ -18,7 +18,7 @@ import {
 import {client, JmapDataSource} from "../jmap/index.js";
 import {FieldSetDialog} from "./FieldSetDialog.js";
 import {ExportDialog} from "./ExportDialog.js";
-import {fieldSetDS} from "../CustomFields.js";
+import {customFields, fieldSetDS} from "./CustomFields.js";
 import {fieldDS} from "./index.js";
 
 interface StoreEntity {
@@ -29,7 +29,7 @@ interface StoreEntity {
 	fieldSetId?: EntityID,
 	isFieldSet: boolean,
 	sortOrder: number,
-	aclId?: EntityID,
+	// aclId?: EntityID,
 	permissionLevel: number
 }
 
@@ -97,7 +97,7 @@ export class EntityPanel extends Component {
 											void dlg.load(record.fieldSetId);
 											dlg.show();
 										} else {
-											const type = eval(`new ${record.type}()`);
+											const type = customFields.getType(record.type)
 
 											const dlg = type.getDialog();
 
@@ -201,7 +201,7 @@ export class EntityPanel extends Component {
 				fieldSetId: fieldset.id,
 				isFieldSet: true,
 				sortOrder: fieldset.sortOrder,
-				aclId: fieldset.aclId,
+				// aclId: fieldset.aclId,
 				permissionLevel: fieldset.permissionLevel
 			};
 
@@ -219,7 +219,7 @@ export class EntityPanel extends Component {
 					fieldSetId: undefined,
 					isFieldSet: false,
 					sortOrder: field.sortOrder,
-					aclId: undefined,
+					// aclId: undefined,
 					permissionLevel: fieldset.permissionLevel
 				}
 
@@ -231,64 +231,37 @@ export class EntityPanel extends Component {
 		this.store.loadData(tableData);
 	}
 
-	// TODO: replace with proper handling
 
-	// Temporary function for building menu with all available customfield types
 	private async getTypeMenuButtons(record: StoreEntity): Promise<Button[]> {
-		const typeNames: string[] = [
-			"Attachments",
-			"Checkbox",
-			"Data",
-			"Date",
-			"DateTime",
-			"EncryptedText",
-			"FunctionField",
-			"Group",
-			"Html",
-			"MultiSelect",
-			"Notes",
-			"Number",
-			"Select",
-			"TemplateField",
-			"Text",
-			"TextArea",
-			"TreeSelectField",
-			"User",
-			"YesNo"
-		];
 
 		const availableTypeButtons: Button[] = [];
 
-		for (const typeName of typeNames) {
-			try {
-				const typeClass = await import(`./type/${typeName}.ts`);
+		for (const typeName of customFields.getTypes()) {
 
-				if (typeClass[typeName]) {
-					const type = new typeClass[typeName]();
+			const type = customFields.getType(typeName);
 
-					availableTypeButtons.push(
-						btn({
-							icon: type.icon,
-							text: t(type.label),
-							handler: () => {
-								const fieldDlg = type.getDialog();
+			availableTypeButtons.push(
+				btn({
+					icon: type.icon,
+					text: type.label,
+					handler: () => {
+						const fieldDlg = type.getDialog();
 
-								fieldDlg.form.value = {
-									fieldSetId: record.fieldSetId,
-									type: typeName
-								}
+						fieldDlg.form.value = {
+							fieldSetId: record.fieldSetId,
+							type: typeName
+						}
 
-								fieldDlg.show();
+						fieldDlg.show();
 
-								fieldDlg.on("close", () => {
-									void this.load();
-								});
-							}
-						})
-					)
-				}
-			} catch (e) {
-			}
+						fieldDlg.on("close", () => {
+							void this.load();
+						});
+					}
+				})
+			)
+
+
 		}
 
 		return availableTypeButtons

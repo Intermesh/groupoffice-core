@@ -56,7 +56,7 @@ export class FormFieldset extends Fieldset {
 	}
 
 	private createFormField(f: Field) : Component|undefined {
-		const cmp = customFields.getType(f).createFormField();
+		const cmp = customFields.getType(f.type).createFormField(f);
 		if(!cmp) {
 			return undefined;
 		}

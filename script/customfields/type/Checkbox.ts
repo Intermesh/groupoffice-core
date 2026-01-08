@@ -1,7 +1,8 @@
 import {Type} from "./Type.js";
-import {t} from "@intermesh/goui";
+import {boolcolumn, checkbox, displaycheckboxfield, t} from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
 import {CheckboxDialog} from "./CheckboxDialog.js";
+import {customFields, Field} from "../CustomFields.js";
 
 export class Checkbox extends Type {
 	constructor() {
@@ -15,4 +16,18 @@ export class Checkbox extends Type {
 	getDialog(): FieldDialog {
 		return new CheckboxDialog();
 	}
+
+	createTableColumField(field:Field) {
+		return boolcolumn(this.getColumnConfig(field));
+	}
+
+	public createFormField(field:Field) {
+		return checkbox(this.getFormFieldConfig(field))
+	}
+
+	createDetailField(field:Field) {
+		return displaycheckboxfield(this.getDetailFieldConfig(field));
+	}
 }
+
+customFields.registerType(Checkbox);
