@@ -10,6 +10,7 @@ export * from './components/index.js';
 export * from "chart.js/auto";
 export * from "./chart/index.js";
 export * from "./util/Recurrence.js";
+export * from "./customfields/index.js";
 export * from "./Entities.js";
 export * from "./customfields/Types.js";
 export * from "./customfields/CustomFields.js";
