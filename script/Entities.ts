@@ -4,6 +4,7 @@ import {EntityID} from "@intermesh/goui";
 export interface Entity {
 	name: string,
 	defaultAcl: Record<string, number>,
+	defaultAclId: EntityID,
 	isAclOwner: boolean,
 	supportsCustomFields: boolean,
 	supportsFiles: boolean,
