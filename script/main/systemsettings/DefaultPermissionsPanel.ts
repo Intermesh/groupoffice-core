@@ -1,4 +1,18 @@
-import {btn, column, comp, containerfield, p, store, Store, t, Table, tbar, win, Window} from "@intermesh/goui";
+import {
+	ArrayUtil,
+	btn,
+	column,
+	comp,
+	containerfield,
+	p,
+	store,
+	Store,
+	t,
+	Table,
+	tbar,
+	win,
+	Window
+} from "@intermesh/goui";
 import {moduleDS, modules} from "../../Modules.js";
 import {SharePanel} from "../../permissions/index.js";
 import {entities, Entity} from "../../Entities.js";
@@ -29,11 +43,9 @@ export class DefaultPermissionsTable extends Table<Store<Record>> {
 				};
 			});
 
-		console.log(data);
 
 		const entityStore = store<Record>({
-			data: data,
-			sort: [{property: 'title', isAscending: true}]
+			data: ArrayUtil.multiSort(data, [{property: 'title', isAscending: true}])
 		});
 
 		const columns = [
