@@ -1,10 +1,25 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
-import {arrayfield, checkbox, chips, comp, Component, fieldset, numberfield, t, textfield} from "@intermesh/goui";
+import {
+	arrayfield,
+	btn,
+	checkbox,
+	chips,
+	comp,
+	Component,
+	fieldset,
+	numberfield,
+	t,
+	tbar,
+	textfield
+} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {domaincombo} from "../../auth/index.js";
+import {authallowgroupgrid} from "./AuthAllowGroupGrid.js";
 
 class Authentication extends AbstractModuleSystemSettingsPanel {
+
+	private authAllowGroupGrid?: ReturnType<typeof authallowgroupgrid>;
 
 	constructor() {
 		super("authentication", t("Authentication"), "core", "core", "lock");
@@ -46,7 +61,8 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 			),
 
 			fieldset({
-					legend: t("Allowed groups")
+					legend: t("Allowed groups"),
+
 				},
 
 				comp({
@@ -55,9 +71,22 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 						" to match any single character. eg. '192.168.1?.*'. Be careful, You can lock yourself out!")
 				}),
 
+				comp({cls: "frame"},
+					tbar({
+						cls: "bg-low border-bottom"
+					},
+						"->",
+						btn({
+							icon: "add",
+							text: t("Add"),
+							handler: () => {
+								this.authAllowGroupGrid?.addNew();
+							}
+						})
+					),
 
-				// TODO: AuthAllowGroupGrid - needs to be implemented
-				// authAllowGroupGrid({})
+					this.authAllowGroupGrid = authallowgroupgrid()
+				)
 			),
 
 			fieldset({
