@@ -1,4 +1,5 @@
 import {
+	ArrayUtil,
 	browser,
 	btn,
 	Button,
@@ -15,7 +16,7 @@ import {
 	table,
 	tbar
 } from "@intermesh/goui";
-import {client, JmapDataSource} from "../jmap/index.js";
+import {client} from "../jmap/index.js";
 import {FieldSetDialog} from "./FieldSetDialog.js";
 import {ExportDialog} from "./ExportDialog.js";
 import {customFields, fieldSetDS} from "./CustomFields.js";
@@ -77,7 +78,7 @@ export class EntityPanel extends Component {
 							style: {float: "left"},
 							// temporary code for menu handling
 							menu: menu({
-									isDropdown: true
+									// isDropdown: true
 								},
 								...menuButtons
 							)
@@ -236,7 +237,7 @@ export class EntityPanel extends Component {
 
 		const availableTypeButtons: Button[] = [];
 
-		for (const typeName of customFields.getTypes()) {
+		for (const typeName of customFields.getTypes().sort()) {
 
 			const type = customFields.getType(typeName);
 
@@ -264,6 +265,6 @@ export class EntityPanel extends Component {
 
 		}
 
-		return availableTypeButtons
+		return ArrayUtil.multiSort(availableTypeButtons, [{property: "text"}]);
 	}
 }

@@ -1,5 +1,5 @@
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
-import {btn, column, store, Store, t, table} from "@intermesh/goui";
+import {ArrayUtil, btn, column, store, Store, t, table} from "@intermesh/goui";
 import {EntityDialog} from "../../customfields/index.js";
 import {modules} from "../../Modules.js";
 import {entities} from "../../Entities.js";
@@ -21,7 +21,7 @@ class CustomFields extends AbstractSystemSettingsPanel {
 		this.store = store<EntityWithCustomfields>({});
 
 		this.title = t("Custom fields");
-		this.stateId = "customfields";
+		// this.stateId = "customfields";
 
 		this.cls = "scroll fit";
 
@@ -44,15 +44,19 @@ class CustomFields extends AbstractSystemSettingsPanel {
 					column({
 						id: "entityName",
 						header: t("Name"),
-						hidable: false
+						hidable: false,
+						sortable: false
 					}),
 					column({
 						id: "moduleTitle",
-						header: t("Module")
+						header: t("Module"),
+						sortable: false,
+						width: 200
 					}),
 					column({
 						id: "edit",
 						sticky: true,
+						sortable: false,
 						width: 50,
 						renderer: (columnValue, record, td, table1, storeIndex) => {
 							return btn({
@@ -95,7 +99,7 @@ class CustomFields extends AbstractSystemSettingsPanel {
 				}
 			}
 		}
-		this.store.loadData(tableData);
+		this.store.loadData(ArrayUtil.multiSort(tableData, [{property: "entityName"}, {property: "moduleTitle"}]));
 	}
 
 }
