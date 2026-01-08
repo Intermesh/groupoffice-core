@@ -217,6 +217,8 @@ if(window.GO) {
 
 
 export interface Module extends BaseEntity {
+	id: EntityID
+	title: string
 	name: string,
 	package: string,
 	rights: string[],
@@ -224,6 +226,7 @@ export interface Module extends BaseEntity {
 	userRights: Record<string, boolean>,
 	version: number,
 	entities: Record<string, Entity>,
+	enabled: boolean
 	/**
 	 * goui, extjs3
 	 */
@@ -281,15 +284,15 @@ class Modules {
 
 		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
-
-		// TODO make these load from new framework to reduce network requests
 		return Promise.all([
 			go.Modules.init(), // TODO jmapds() and userDS two separate stores??
 			go.User.loadLegacyModules(),
 			go.User.loadLegacyModuleScripts(),
-			go.customfields.CustomFields.init(),
+			go.customfields.CustomFields.init()
+		]). then( () => {
+			// this init depends on modules being loaded
 			go.Entities.init()
-		]);
+		})
 	}
 
 	/**
