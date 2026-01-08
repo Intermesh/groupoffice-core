@@ -13,7 +13,8 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 	protected formItems(): Component[] {
 		return [
 			fieldset({
-					title: t("Password")
+					width: 400,
+					legend: t("Password")
 				},
 
 				numberfield({
@@ -45,7 +46,7 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 			),
 
 			fieldset({
-					title: t("Allowed groups")
+					legend: t("Allowed groups")
 				},
 
 				comp({
@@ -60,7 +61,7 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 			),
 
 			fieldset({
-					title: t("Synchronization")
+					legend: t("Synchronization")
 				},
 
 				checkbox({
@@ -76,7 +77,7 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 			),
 
 			fieldset({
-					title: t("API settings")
+					legend: t("API settings")
 				},
 
 				comp({

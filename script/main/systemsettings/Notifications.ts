@@ -40,7 +40,8 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 
 		return [
 			fieldset({
-					title: t("Outgoing E-mail (SMTP)")
+					width: 400,
+					legend: t("Outgoing E-mail (SMTP)")
 				},
 
 				this.systemEmailField,

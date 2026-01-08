@@ -2,7 +2,7 @@ import {BaseEntity, Component, EntityID, MaterialIcon, t, translate} from "@inte
 import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
-import {DetailPanel, extjswrapper} from "./components/index";
+import {DetailPanel, extjswrapper, LanguageField} from "./components/index";
 import {main} from "./main/index.js";
 
 export interface EntityFilter {
@@ -297,11 +297,13 @@ class Modules {
 	 */
 	public async loadUI() {
 
-		const r =  await fetch("/go/modules/community/main/modules.php")
-		const mods = await r.json();
+		const r =  await fetch("/go/modules/community/main/capabilities.php")
+		const capabilities = await r.json();
+
+		LanguageField.languages = capabilities.languages;
 
 		return Promise.all(
-			mods.filter((m:any) => {
+			capabilities.modules.filter((m:any) => {
 				return m.entry;
 			}).map((m:any) => {
 					return import(m.entry).catch((e) => {
