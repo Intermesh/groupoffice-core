@@ -54,7 +54,7 @@ export class EntityPanel extends Component {
 					id: "name",
 					header: t("Name"),
 					renderer: (value, record) => {
-						return record.isFieldSet ? `<h5>${value}</h5>` : value;
+						return record.isFieldSet ? comp({tagName: "h5", text: value}) : value;
 					}
 				}),
 				column({

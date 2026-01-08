@@ -8,6 +8,6 @@ export * from './Notifications.js';
 export * from './Authentication.js';
 export * from './AuthAllowGroupGrid.js';
 export * from './DefaultPermissionsPanel.js';
-
+export * from './CustomFields.js';
 
 export * from './Apps.js';

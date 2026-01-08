@@ -1,18 +1,22 @@
-import {btn, column, Component, Store, store, t, table} from "@intermesh/goui";
-import {EntityDialog} from "./EntityDialog.js";
-import {modules} from "../Modules.js";
-import {entities} from "../Entities.js";
+import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
+import {btn, column, store, Store, t, table} from "@intermesh/goui";
+import {EntityDialog} from "../../customfields/index.js";
+import {modules} from "../../Modules.js";
+import {entities} from "../../Entities.js";
+import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 
 interface EntityWithCustomfields {
 	entityName: string,
 	moduleTitle: string
 }
 
-export class SystemSettingsPanel extends Component {
-	private readonly store: Store<EntityWithCustomfields>
+class CustomFields extends AbstractSystemSettingsPanel {
 
+	private readonly store: Store<EntityWithCustomfields>
 	constructor() {
-		super();
+		super("customfields", t("Custom fields"), "storage");
+
+		this.cls = "fit scroll";
 
 		this.store = store<EntityWithCustomfields>({});
 
@@ -68,7 +72,7 @@ export class SystemSettingsPanel extends Component {
 		void this.load();
 	}
 
-	private async load() {
+	public async load() {
 		const tableData: EntityWithCustomfields[] = [];
 
 		const mods = modules.getAll();
@@ -93,4 +97,8 @@ export class SystemSettingsPanel extends Component {
 		}
 		this.store.loadData(tableData);
 	}
+
 }
+
+
+systemSettingsPanels.add(CustomFields);

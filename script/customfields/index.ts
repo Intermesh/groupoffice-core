@@ -1,11 +1,17 @@
-import {modules} from "../Modules.js";
-import {t} from "@intermesh/goui";
-import {SystemSettingsPanel} from "./SystemSettingsPanel.js";
 import {JmapDataSource} from "../jmap/index.js";
 
-modules.addSystemSettingsPanel("core", "core", "customfields1", t("Custom fields"), "storage", () => {
-	return new SystemSettingsPanel();
-});
+export * from './CustomFields.js';
+export * from './TreeSelectField.js';
+export * from './Types.js';
+export * from './FormFieldset.js';
+export * from './FieldSetDialog.js';
+export * from './FieldDialog.js';
+export * from './ExportDialog.js';
+export * from './EntityPanel.js';
+export * from './EntityDialog.js';
+export * from './DetailFieldset.js';
+
+
 
 export const fieldsetDS = new JmapDataSource("FieldSet");
 
