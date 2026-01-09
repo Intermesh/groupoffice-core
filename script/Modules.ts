@@ -4,6 +4,7 @@ import {Entity} from "./Entities.js";
 import {User} from "./auth";
 import {DetailPanel, extjswrapper, LanguageField} from "./components/index";
 import {main} from "./main/index.js";
+import {router} from "./Router.js";
 
 export interface EntityFilter {
 	name: string,
@@ -428,10 +429,9 @@ class Modules {
 	 */
 	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
 
-
 		translate.setDefaultModule(pkg, module);
 
-		if(window.go) {
+		if(!router.newMainLayout) {
 			go.Translate.package = go.package = pkg;
 			go.Translate.module = go.module = module;
 			// @ts-ignore
