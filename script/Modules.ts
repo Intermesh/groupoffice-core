@@ -298,12 +298,14 @@ class Modules {
 	/**
 	 * Loads module script before being authenticated
 	 */
-	public async loadUI() {
+	public async loadCapabilities() {
 
 		const r =  await fetch("/go/modules/community/main/capabilities.php")
 		const capabilities = await r.json();
 
 		LanguageField.languages = capabilities.languages;
+
+		document.title = capabilities.title;
 
 		return Promise.all(
 			capabilities.modules.filter((m:any) => {
