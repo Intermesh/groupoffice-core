@@ -72,3 +72,38 @@
 		margin: 0;
 	}
 }
+
+h4.goui {
+	font: config.$fontBase;
+	font-weight: bold;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.goui.card.module {
+	img {
+		padding: util.dp(8) util.dp(16);
+	}
+	p {
+		height: util.dp(60);
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+}
+
+.goui.apps {
+	display: flex;
+	flex-flow: row wrap;
+	align-content: flex-start;
+	align-items: start;
+
+	overflow-y: scroll;
+
+	width: 100%;
+	height: 100%;
+	h3 {
+		width: 100%;
+		padding: util.dp(8) util.dp(16);
+	}
+}
