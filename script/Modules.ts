@@ -143,7 +143,7 @@ if(window.GO) {
 			}, this);
 		},
 
-		 setSize (w:number, h:number){
+		 setSize (_w:number, _h:number){
 			// dont
 		 }
 
@@ -289,10 +289,11 @@ class Modules {
 			go.Modules.init(), // TODO jmapds() and userDS two separate stores??
 			go.User.loadLegacyModules(),
 			go.User.loadLegacyModuleScripts(),
-			go.customfields.CustomFields.init()
-		]). then( () => {
+		]). then( async () => {
 			// this init depends on modules being loaded
+			await go.customfields.CustomFields.init()
 			go.Entities.init()
+
 		})
 	}
 
@@ -362,9 +363,6 @@ class Modules {
 	public async init() {
 
 		return Promise.all([
-
-			// TODO: A duplicate module query is done for the legacy init
-
 
 			this.legacyInit(),
 
