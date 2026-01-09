@@ -25,7 +25,9 @@ export class DetailFieldset extends Component {
 		);
 
 		const fields = customFields.getFieldSetFields(fieldSet),
-			formFields = fields.map(f =>  customFields.getType(f.type).createDetailField(f)).filter(f => f !== undefined);
+			formFields = fields.map(f =>  {
+				return customFields.getType(f.type).createDetailField(f)
+			}).filter(f => f !== undefined);
 
 		// Buffer this function so it's not called many times for each field. We want to react on each field because some load async and might be hidden later.
 		const bufferedToggleVisibility = FunctionUtil.buffer(0, () => {

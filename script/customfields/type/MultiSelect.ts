@@ -7,11 +7,7 @@ import {Field} from "../CustomFields.js";
 
 export class MultiSelect extends Select {
 	constructor() {
-		super();
-
-		this.name = "MultiSelect";
-		this.label = t("Multi Select");
-		this.icon = "list";
+		super("MultiSelect", "list", t("Multi Select"));
 	}
 
 	getDialog(): FieldDialog {

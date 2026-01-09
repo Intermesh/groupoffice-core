@@ -1,17 +1,12 @@
-import {Component, t, textfield} from "@intermesh/goui";
+import {Component, MaterialIcon, t, textfield} from "@intermesh/goui";
 import {TextDialog} from "./TextDialog.js";
 import {Type} from "./Type.js";
 import {customFields, Field} from "../CustomFields.js";
 
 export class Text extends Type {
 
-	constructor() {
-		super();
-
-		this.name = "Text";
-
-		this.label = t("Text");
-		this.icon = "description";
+	constructor(name = "Text", icon:MaterialIcon = "description", label = t("Text")) {
+		super(name, icon, label);
 	}
 
 	getDialog() {
@@ -23,4 +18,4 @@ export class Text extends Type {
 	}
 }
 
-customFields.registerType(Text);
+customFields.registerType(new Text);

@@ -4,14 +4,9 @@ import {FieldDialog} from "../FieldDialog.js";
 import {customFields, Field} from "../CustomFields.js";
 import {EncryptedText} from "./EncryptedText.js";
 
-export class TextArea extends Type{
+export class TextArea extends Type {
 	constructor() {
-		super();
-
-		this.name = "TextArea";
-
-		this.label = t("TextArea");
-		this.icon = "description";
+		super("TextArea", "description", t("Text area"));
 	}
 
 	getDialog() {
@@ -26,4 +21,4 @@ export class TextArea extends Type{
 		return textarea(this.getFormFieldConfig(field));
 	}
 }
-customFields.registerType(TextArea);
+customFields.registerType(new TextArea);

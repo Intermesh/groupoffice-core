@@ -6,11 +6,11 @@ import {customFields, Field} from "../CustomFields.js";
 
 export class DateTime extends Type {
 	constructor() {
-		super();
-
-		this.name = "DateTime";
-		this.label = t("Date and time");
-		this.icon = "schedule";
+		super(
+			"DateTime",
+			"schedule",
+			t("Date and time")
+		);
 	}
 
 	getDialog(): FieldDialog {
@@ -29,4 +29,4 @@ export class DateTime extends Type {
 		return displaydatefield({withTime: true,icon: undefined, ...this.getDetailFieldConfig(field)});
 	}
 }
-customFields.registerType(DateTime);
+customFields.registerType(new DateTime);

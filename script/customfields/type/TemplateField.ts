@@ -6,11 +6,7 @@ import {customFields} from "../CustomFields.js";
 
 export class TemplateField extends Type {
 	constructor() {
-		super();
-
-		this.name = "TemplateField";
-		this.label  = t("Template");
-		this.icon = "note";
+		super("TemplateField", "note", t("Template"));
 	}
 
 	getDialog(): FieldDialog {
@@ -18,4 +14,4 @@ export class TemplateField extends Type {
 	}
 }
 
-customFields.registerType(TemplateField);
+customFields.registerType(new TemplateField);

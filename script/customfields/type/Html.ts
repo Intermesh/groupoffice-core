@@ -6,11 +6,7 @@ import {EncryptedText} from "./EncryptedText.js";
 
 export class Html extends Type {
 	constructor() {
-		super();
-
-		this.name = "Html";
-		this.label = t("HTML");
-		this.icon = "html";
+		super("Html", "html", "HTML");
 	}
 
 	getDialog(): FieldDialog {
@@ -32,4 +28,4 @@ export class Html extends Type {
 		})
 	}
 }
-customFields.registerType(Html);
+customFields.registerType(new Html);

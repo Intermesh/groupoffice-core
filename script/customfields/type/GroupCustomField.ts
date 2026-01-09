@@ -8,11 +8,7 @@ import {EncryptedText} from "./EncryptedText.js";
 
 export class GroupCustomField extends Type {
 	constructor() {
-		super();
-
-		this.name = "Group";
-		this.label = t("Group")
-		this.icon = "group";
+		super("Group", "group", t("Group"));
 	}
 
 	getDialog(): FieldDialog {
@@ -48,4 +44,4 @@ export class GroupCustomField extends Type {
 	}
 }
 
-customFields.registerType(GroupCustomField);
+customFields.registerType(new GroupCustomField);

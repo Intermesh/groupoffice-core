@@ -12,11 +12,12 @@ import {FieldDialog} from "../FieldDialog.js";
 import {Field} from "../CustomFields.js";
 
 export abstract class Type {
-	public name?: string;
-	public icon?: MaterialIcon;
-	public label?: string;
 
-	constructor() {
+	constructor(
+		public readonly name: string,
+		public readonly icon: MaterialIcon,
+		public readonly label: string
+	) {
 	}
 
 	public createFormField(field: Field) : Component|undefined {

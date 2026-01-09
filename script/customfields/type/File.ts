@@ -22,11 +22,7 @@ import {TextDialog} from "./TextDialog.js";
 
 export class File extends Type {
 	constructor() {
-		super();
-
-		this.name = "File";
-		this.label = t("File");
-		this.icon = "star";
+		super("File", "star", t("File"));
 	}
 
 	getDialog(): FieldDialog {
@@ -114,4 +110,4 @@ export class File extends Type {
 	}
 }
 
-customFields.registerType(File);
+customFields.registerType(new File);

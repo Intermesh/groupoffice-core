@@ -177,7 +177,7 @@ export class SelectOptionsTree extends Component {
 		this.fieldId = fieldId;
 		const field = await fieldDS.single(fieldId);
 
-		this.rootNode.children = field!.dataType.options;
+		this.rootNode.children = field!.dataType.options as unknown as TreeRecord[];
 	}
 
 	private removeFromTreeData(treeRecords: TreeRecord[], idToFind: string): boolean {

@@ -8,11 +8,7 @@ import {EncryptedText} from "./EncryptedText.js";
 
 export class UserCustomField extends Type {
 	constructor() {
-		super();
-
-		this.name = "User";
-		this.icon = "person";
-		this.label = t("User");
+		super( "User", "person", t("User"));
 
 	}
 
@@ -49,4 +45,4 @@ export class UserCustomField extends Type {
 	}
 }
 
-customFields.registerType(UserCustomField);
+customFields.registerType(new UserCustomField);

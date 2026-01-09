@@ -22,11 +22,7 @@ import {TextDialog} from "./TextDialog.js";
 
 export class MultiContact extends Type {
 	constructor() {
-		super();
-
-		this.name = "MultiContact";
-		this.label = t("Contact") + " (Multiple)";
-		this.icon = "person";
+		super("MultiContact", "person", t("Contact") + " (Multiple)");
 	}
 
 	getDialog(): FieldDialog {
@@ -105,4 +101,4 @@ export class MultiContact extends Type {
 	}
 }
 
-customFields.registerType(MultiContact);
+customFields.registerType(new MultiContact);

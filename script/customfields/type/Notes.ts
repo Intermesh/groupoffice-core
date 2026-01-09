@@ -7,11 +7,7 @@ import {TemplateField} from "./TemplateField.js";
 
 export class Notes extends Type {
 	constructor() {
-		super();
-
-		this.name = "Notes";
-		this.label = t("Notes");
-		this.icon = "description";
+		super("Notes", "note", t("Notes"));
 	}
 
 	getDialog(): FieldDialog {
@@ -31,4 +27,4 @@ export class Notes extends Type {
 	}
 }
 
-customFields.registerType(Notes);
+customFields.registerType(new Notes);

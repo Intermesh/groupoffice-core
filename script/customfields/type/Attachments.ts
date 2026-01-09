@@ -6,11 +6,11 @@ import {customFields} from "../CustomFields.js";
 
 export class Attachments extends Type {
 	constructor() {
-		super();
-
-		this.label = t("Attachments");
-		this.icon = "attachment";
-		this.name = "Attachments";
+		super(
+			"attachments",
+			"attachment",
+			t("Attachments")
+		)
 	}
 
 	getDialog(): FieldDialog {
@@ -18,4 +18,4 @@ export class Attachments extends Type {
 	}
 }
 
-customFields.registerType(Attachments);
+customFields.registerType(new Attachments);

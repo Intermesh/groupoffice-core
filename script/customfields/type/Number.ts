@@ -7,11 +7,7 @@ import {EncryptedText} from "./EncryptedText.js";
 
 export class Number extends Type {
 	constructor() {
-		super();
-
-		this.name = "Number";
-		this.label = t("Number");
-		this.icon = "format_list_numbered";
+		super("Number", "format_list_numbered", t("Number"));
 	}
 
 	getDialog(): FieldDialog {
@@ -34,4 +30,4 @@ export class Number extends Type {
 	}
 }
 
-customFields.registerType(Number);
+customFields.registerType(new Number);

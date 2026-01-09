@@ -38,6 +38,7 @@ export interface Field extends AclItemEntity {
 	hiddenInGrid: boolean,
 	required: boolean,
 	hint?: string,
+	sortOrder: number,
 	options: {
 		validationRegex?:string
 		validationModifiers?:string
@@ -52,12 +53,6 @@ export interface Field extends AclItemEntity {
 }
 export const fieldSetDS = new JmapDataSource<FieldSet>("FieldSet");
 export const fieldDS = new JmapDataSource<Field>("Field");
-
-
-type ConstructableAbstractCustomField = {
-	new (...args: ConstructorParameters<typeof Type>): Type;
-};
-
 
 
 class CustomFields {
@@ -111,25 +106,34 @@ class CustomFields {
 		return this.fields[fieldSet.id] ?? [];
 	}
 
-	private types: Record<string, ConstructableAbstractCustomField> = {
+	private types: Record<string, Type> = {}
 
-	}
-
-
-	public registerType(cf: ConstructableAbstractCustomField) {
+	/**
+	 * Register a custom field type
+	 *
+	 * @param cf
+	 */
+	public registerType(cf: Type) {
 		this.types[cf.name] = cf;
 	}
 
+	/**
+	 * Get all registered custom field types
+	 */
 	public getTypes() {
 		return Object.keys(this.types);
 	}
 
 
+	/**
+	 * Get a custom field type by name
+	 * @param type
+	 */
 	public getType(type: string) {
 
 		return this.types[type]
-			? new this.types[type]()
-			: new this.types["Text"]()
+			? this.types[type]
+			: this.types["Text"]
 	}
 
 	public getTableColumns(entity: string): TableColumn[] {
@@ -137,7 +141,6 @@ class CustomFields {
 			return this.getType(f.type).createTableColumn(f);
 		}).filter(c => c !== undefined);
 	}
-
 
 }
 

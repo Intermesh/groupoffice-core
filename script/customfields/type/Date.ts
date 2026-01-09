@@ -6,11 +6,11 @@ import {customFields, Field} from "../CustomFields.js";
 
 export class Date extends Type {
 	constructor() {
-		super();
-
-		this.name = "Date";
-		this.label = t("Date");
-		this.icon = "event";
+		super(
+			"Date",
+			"event",
+			t("Date")
+		)
 	}
 
 	getDialog(): FieldDialog {
@@ -22,7 +22,6 @@ export class Date extends Type {
 	}
 
 	public createFormField(field:Field) {
-		debugger;
 		return datefield(this.getFormFieldConfig(field))
 	}
 
@@ -31,4 +30,4 @@ export class Date extends Type {
 	}
 }
 
-customFields.registerType(Date);
+customFields.registerType(new Date());

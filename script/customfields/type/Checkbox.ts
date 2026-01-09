@@ -6,11 +6,9 @@ import {customFields, Field} from "../CustomFields.js";
 
 export class Checkbox extends Type {
 	constructor() {
-		super();
-
-		this.name = "Checkbox";
-		this.icon = "check_box";
-		this.label = t("Checkbox");
+		super(
+			"Checkbox","check_box", t("Checkbox")
+		)
 	}
 
 	getDialog(): FieldDialog {
@@ -30,4 +28,4 @@ export class Checkbox extends Type {
 	}
 }
 
-customFields.registerType(Checkbox);
+customFields.registerType(new Checkbox);

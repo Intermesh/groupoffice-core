@@ -92,24 +92,7 @@ export class EntityPanel extends Component {
 									icon: "edit",
 									text: t("Edit"),
 									handler: () => {
-										if (record.isFieldSet) {
-											const dlg = new FieldSetDialog();
-
-											void dlg.load(record.fieldSetId);
-											dlg.show();
-										} else {
-											const type = customFields.getType(record.type)
-
-											const dlg = type.getDialog();
-
-											dlg.form.value = {
-												fieldSetId: record.fieldSetId,
-												type: record.type
-											}
-
-											dlg.load(record.fieldId);
-											dlg.show();
-										}
+										this.edit(record);
 									}
 								}),
 								btn({
@@ -131,6 +114,10 @@ export class EntityPanel extends Component {
 					}
 				})
 			]
+		});
+
+		this.table.on("rowdblclick", (ev) => {
+			this.edit(this.store.get(ev.storeIndex)!)
 		});
 
 		this.items.add(
@@ -186,6 +173,27 @@ export class EntityPanel extends Component {
 			),
 			this.table
 		);
+	}
+
+	private edit(record:StoreEntity) {
+		if (record.isFieldSet) {
+			const dlg = new FieldSetDialog();
+
+			void dlg.load(record.fieldSetId!);
+			dlg.show();
+		} else {
+			const type = customFields.getType(record.type!)
+
+			const dlg = type.getDialog();
+
+			dlg.form.value = {
+				fieldSetId: record.fieldSetId,
+				type: record.type
+			}
+
+			dlg.load(record.fieldId!);
+			dlg.show();
+		}
 	}
 
 	public async load() {

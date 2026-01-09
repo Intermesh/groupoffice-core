@@ -7,11 +7,7 @@ import {EncryptedText} from "./EncryptedText.js";
 
 export class YesNo extends Type {
 	constructor() {
-		super();
-
-		this.name = "YesNo";
-		this.label = t("Yes or no");
-		this.icon = "check_box";
+		super("YesNo", "check_box", t("Yes or no"));
 	}
 
 	getDialog(): FieldDialog {
@@ -43,4 +39,4 @@ export class YesNo extends Type {
 	}
 }
 
-customFields.registerType(YesNo);
+customFields.registerType(new YesNo);

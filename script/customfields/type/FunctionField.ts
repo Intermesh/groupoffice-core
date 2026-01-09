@@ -7,11 +7,7 @@ import {EncryptedText} from "./EncryptedText.js";
 
 export class FunctionField extends Type {
 	constructor() {
-		super();
-
-		this.name = "FunctionField";
-		this.label = t("Function");
-		this.icon = "functions";
+		super("FunctionField", "functions", t("Function"));
 	}
 
 	getDialog(): FieldDialog {
@@ -35,4 +31,4 @@ export class FunctionField extends Type {
 }
 
 
-customFields.registerType(FunctionField);
+customFields.registerType(new FunctionField);

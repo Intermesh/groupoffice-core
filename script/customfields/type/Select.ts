@@ -1,5 +1,5 @@
 import {Type} from "./Type.js";
-import {column, displayfield, t} from "@intermesh/goui";
+import {column, displayfield, MaterialIcon, t} from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
 import {SelectDialog} from "./SelectDialog.js";
 import {customFields, Field, SelectOption} from "../CustomFields.js";
@@ -7,12 +7,8 @@ import {treeselect} from "../TreeSelectField.js";
 import {EncryptedText} from "./EncryptedText.js";
 
 export class Select extends Type {
-	constructor() {
-		super();
-
-		this.name = "Select";
-		this.label = t("Select");
-		this.icon = "list";
+	constructor(name = "Select", icon:MaterialIcon = "list", label = t("Select")) {
+		super(name, icon, label);
 	}
 
 	getDialog(): FieldDialog {
@@ -96,4 +92,4 @@ export class Select extends Type {
 	}
 }
 
-customFields.registerType(Select);
+customFields.registerType(new Select);

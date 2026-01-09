@@ -5,12 +5,12 @@ import {Checkbox} from "./Checkbox.js";
 
 export class EncryptedText extends Text {
 	constructor() {
-		super();
-
-		this.name = "EncryptedText";
-		this.label = t("Encrypted text");
-		this.icon = "lock";
+		super(
+			"EncryptedText",
+			"lock",
+			t("Encrypted text")
+		);
 	}
 }
 
-customFields.registerType(EncryptedText);
+customFields.registerType(new EncryptedText);

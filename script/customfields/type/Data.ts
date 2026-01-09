@@ -6,11 +6,7 @@ import {Checkbox} from "./Checkbox.js";
 
 export class Data extends Type {
 	constructor() {
-		super();
-
-		this.name = "Data";
-		this.label = t("Data");
-		this.icon = "storage";
+		super("Data", "storage", t("Data"));
 	}
 
 	getDialog(): FieldDialog {
@@ -19,4 +15,4 @@ export class Data extends Type {
 }
 
 
-customFields.registerType(Data);
+customFields.registerType(new Data);

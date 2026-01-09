@@ -11,11 +11,9 @@ import {TextDialog} from "./TextDialog.js";
 
 export class Contact extends Type {
 	constructor() {
-		super();
-
-		this.name = "Contact";
-		this.label = t("Contact");
-		this.icon = "person";
+		super(
+			"Contact", "person", t("Contact")
+		)
 	}
 
 	getDialog(): FieldDialog {
@@ -72,4 +70,4 @@ export class Contact extends Type {
 	}
 }
 
-customFields.registerType(Contact);
+customFields.registerType(new Contact);
