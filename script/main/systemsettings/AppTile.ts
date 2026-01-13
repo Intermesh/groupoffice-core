@@ -1,7 +1,23 @@
-import {btn, checkbox, comp, Component, ComponentEventMap, h4, img, p, t, tbar, Window} from "@intermesh/goui";
+import {
+	btn,
+	checkbox,
+	comp,
+	Component,
+	ComponentEventMap, displayfield,
+	fieldset,
+	h4,
+	img,
+	p,
+	Panel,
+	t,
+	tbar,
+	Window
+} from "@intermesh/goui";
 import {client, jmapds} from "../../jmap/index.js";
 import {Module2} from "./Apps.js";
 import {Module} from "../../Modules.js";
+import {FormWindow} from "../../components/index.js";
+import {AppDialog} from "./AppDialog.js";
 
 
 export interface AppTileEventMap extends ComponentEventMap {
@@ -64,7 +80,12 @@ export class AppTile extends Component<AppTileEventMap> {
 				}),
 				btn({
 					text: t("Settings"),
-					hidden: !m.installed
+					hidden: !m.installed,
+					handler: () => {
+						const d = new AppDialog(m);
+						d.load(m.model.id);
+						d.show();
+					}
 				}),
 				btn({
 					cls: "filled primary",
@@ -88,3 +109,4 @@ export class AppTile extends Component<AppTileEventMap> {
 		);
 	}
 }
+

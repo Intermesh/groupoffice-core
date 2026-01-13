@@ -122,12 +122,16 @@ h4.goui {
 	overflow-y: scroll;
 	flex: 1;
 	align-content: start;
-
+	position: relative;
 	h3 {
 		//width: 100%;
+		position:sticky;
+		top: 0;
+		z-index: 1;
+		background-color: config.$surfaceLow;
 		grid-column: 1 / -1;
 		padding: util.dp(16) 0 util.dp(8);
-		margin: util.dp(8);
+
 		border-bottom: util.dp(4) solid config.$colorPrimary;
 	}
 }

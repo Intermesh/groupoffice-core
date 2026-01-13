@@ -1,9 +1,23 @@
-import {ArrayUtil, btn, comp, Component, h3, Panel, searchbtn, t, tbar, Window} from "@intermesh/goui";
+import {
+	ArrayUtil,
+	btn,
+	comp,
+	Component, displayfield,
+	fieldset,
+	h3,
+	Panel,
+	searchbtn,
+	t,
+	tbar,
+	textfield,
+	Window
+} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
 import {AppTile} from "./AppTile.js";
 import {Module} from "../../Modules.js";
+import {FormWindow} from "../../components/index.js";
 
 export interface Module2 {
 	id: string
@@ -168,6 +182,8 @@ class InstallWindow extends Window {
 		})
 	}
 }
+
+
 
 
 export class AppSystemSettingsPanel extends Panel {
