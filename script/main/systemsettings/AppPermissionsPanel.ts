@@ -69,6 +69,31 @@ class GroupTable extends Table<DataSourceStore> {
 						)
 					)
 				}
+			}),
+
+			checkboxcolumn({
+				id: "mayRead",
+				header: t("Use"),
+				width: 200,
+				renderer: (v, record) => {
+					if(!this.value) {
+						this.value = {};
+					}
+					return checkbox({
+						value: this.value[record.id]?.rights["mayRead"] ?? false,
+						listeners: {
+							change: ({newValue}) => {
+
+								if(!this.value[record.id]) {
+									this.value[record.id] = {rights: {}};
+								}
+								this.value[record.id].rights["mayRead"] = newValue;
+
+								console.log(this.value);
+							}
+						}
+					})
+				}
 			})
 
 		]
@@ -79,11 +104,14 @@ class GroupTable extends Table<DataSourceStore> {
 				header: t(right, module.name, module.package),
 				width: 200,
 				renderer: (v, record) => {
-					console.log(this.value, record.id, right);
+					if(!this.value) {
+						this.value = {};
+					}
 					return checkbox({
 						value: this.value[record.id]?.rights[right] ?? false,
 						listeners: {
 							change: ({newValue}) => {
+
 								if(!this.value[record.id]) {
 									this.value[record.id] = {rights: {}};
 								}

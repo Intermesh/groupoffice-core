@@ -1,23 +1,8 @@
-import {
-	ArrayUtil,
-	btn,
-	comp,
-	Component, displayfield,
-	fieldset,
-	h3,
-	Panel,
-	searchbtn,
-	t,
-	tbar,
-	textfield,
-	Window
-} from "@intermesh/goui";
+import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, Window} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
 import {AppTile} from "./AppTile.js";
-import {Module} from "../../Modules.js";
-import {FormWindow} from "../../components/index.js";
 
 export interface Module2 {
 	id: string
@@ -99,12 +84,6 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 
 			this.appContainer.items.add(new AppTile(m));
 		})
-
-		return Promise.all(this.findChildrenByType(AppSystemSettingsPanel).map(p => p.load()));
-	}
-
-	async save(): Promise<any> {
-		return Promise.all(this.findChildrenByType(AppSystemSettingsPanel).map(p => p.save()));
 	}
 }
 
@@ -186,28 +165,16 @@ class InstallWindow extends Window {
 
 
 
-export class AppSystemSettingsPanel extends Panel {
-	constructor() {
-		super();
-		this.baseCls = 'panel app-settings-panel';
-		this.collapsed = true;
-	}
-
-	public async save() : Promise<any> {
-		return Promise.resolve();
-	}
-
-	public async load() :Promise<any> {
-		return Promise.resolve();
-	}
-}
-
 
 class AppSystemSettings {
-	private panels: Record<string, typeof AppSystemSettingsPanel[]> = {};
+	private panels: Record<string, (new () => Component)[]> = {};
 
-	public addPanel(modulePackage:string, moduleName:string, cmp: typeof AppSystemSettingsPanel) {
-		this.panels[modulePackage+"/"+moduleName].push(cmp);
+	public addPanel(modulePackage:string, moduleName:string, cmp: (new () => Component)) {
+		const id = modulePackage+"/"+moduleName;
+		if(!this.panels[id]) {
+			this.panels[id] = [];
+		}
+		this.panels[id].push(cmp);
 	}
 
 	public getPanels(modulePackage:string, moduleName:string) {

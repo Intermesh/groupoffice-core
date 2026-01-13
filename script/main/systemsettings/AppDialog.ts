@@ -1,6 +1,6 @@
 import {FormWindow} from "../../components/index.js";
 import {displayfield, fieldset, t} from "@intermesh/goui";
-import {Module2} from "./Apps.js";
+import {appSystemSettings, Module2} from "./Apps.js";
 import {AppPermissionPanel} from "./AppPermissionsPanel.js";
 
 export class AppDialog extends FormWindow {
@@ -27,6 +27,8 @@ export class AppDialog extends FormWindow {
 				})
 			)
 		);
+
+		this.generalTab.items.add(...appSystemSettings.getPanels(moduleInfo.package, moduleInfo.name).map(c => new c));
 
 		const permissionPanel = new AppPermissionPanel(moduleInfo);
 		permissionPanel.cls = "fit";
