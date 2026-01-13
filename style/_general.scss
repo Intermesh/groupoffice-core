@@ -82,28 +82,52 @@ h4.goui {
 }
 
 .goui.card.module {
-	img {
-		padding: util.dp(8) util.dp(16);
-	}
-	p {
-		height: util.dp(60);
-		text-overflow: ellipsis;
-		overflow: hidden;
+
+	width: util.dp(400);
+
+	.desc {
+		margin: util.dp(16) util.dp(16)  0 util.dp(16);
+		display: flex;
+		flex-direction: row;
+		gap: util.dp(16);
+
+		> div {
+			min-width: 0;
+			flex: 1;
+		}
+
+		img {
+			margin-top: util.dp(8);
+			width: util.dp(64);
+			height: util.dp(64);
+			//margin: 0 util.dp(16);
+			//padding: util.dp(8) util.dp(16);
+		}
+
+		p {
+			height: util.dp(60);
+			text-overflow: ellipsis;
+			overflow: hidden;
+			margin: 0;
+		}
 	}
 }
 
 .goui.apps {
-	display: flex;
-	flex-flow: row wrap;
-	align-content: flex-start;
-	align-items: start;
-
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(40rem, max-content));
+	grid-gap: 1.6rem;
+	justify-content: center;
+	padding: initial;
 	overflow-y: scroll;
+	flex: 1;
+	align-content: start;
 
-	width: 100%;
-	height: 100%;
 	h3 {
-		width: 100%;
-		padding: util.dp(8) util.dp(16);
+		//width: 100%;
+		grid-column: 1 / -1;
+		padding: util.dp(16) 0 util.dp(8);
+		margin: util.dp(8);
+		border-bottom: util.dp(4) solid config.$colorPrimary;
 	}
 }

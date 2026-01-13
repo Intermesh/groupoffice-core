@@ -1,24 +1,11 @@
-import {
-	ArrayUtil,
-	btn,
-	checkbox,
-	comp,
-	Component,
-	ComponentEventMap,
-	h3,
-	h4,
-	img,
-	p,
-	panel,
-	Panel,
-	t,
-	tbar
-} from "@intermesh/goui";
+import {ArrayUtil, btn, comp, Component, h3, Panel, searchbtn, t, tbar, Window} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
+import {AppTile} from "./AppTile.js";
+import {Module} from "../../Modules.js";
 
-interface Module {
+export interface Module2 {
 	id: string
 	name: string
 	package: string
@@ -32,6 +19,7 @@ interface Module {
 	installed: boolean
 	model: any
 	installable: boolean
+	documentationUrl: string
 }
 
 class SystemSettingsApps extends AbstractSystemSettingsPanel {
@@ -46,70 +34,56 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 		this.items.add(
 			tbar({cls: "border-bottom"},
 				"->",
+				searchbtn({
+					listeners: {
+						input: ({text}) => {
+							this.load(text);
+						}
+					}
+				}),
 				btn({
 					text: t("Install"),
-					icon: "add"
+					icon: "add",
+					handler: () => {
+						const win = new InstallWindow();
+						win.on("close", () => this.reload())
+						win.show();
+					}
 				})),
-			this.appContainer = comp({cls: "apps", flex: 1},)
+			this.appContainer = comp({cls: "apps"},)
 			)
 	}
+	async reload() {
+		response = undefined;
+		return this.load()
+	}
+	async load(text = ""): Promise<any> {
 
-	async load(): Promise<any> {
+		if(!response) {
+			try {
+				response = await client.jmap("core/Module2/get");
+			}catch (e) {
+				void Window.error(e);
+			} finally {
+				this.unmask()
+			}
+		}
 
-		const response = await client.jmap("core/Module2/get")
-		console.log(response);
+		this.appContainer.items.clear()
 
-		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as Module[];
-
-		// sorted
+		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as Module2[];
 
 		let lastPackage = "";
 		sorted.filter(m => m.installed).forEach(m => {
+
+			if(text && !m.title.toLowerCase().includes(text.toLowerCase())) return;
 
 			if(lastPackage != m.packageTitle) {
 				this.appContainer.items.add(h3(m.packageTitle));
 				lastPackage = m.packageTitle;
 			}
 
-			this.appContainer.items.add(comp({
-				width: 400,
-				cls: "card module vbox",
-				itemId: m.id,
-				dataSet: {
-					icon: "apps"
-				}
-			},
-				img({src: client.downloadUrl("core/moduleImg/" + m.id)}),
-
-				h4(m.title),
-				p(m.description),
-				tbar({
-				},
-					btn({
-						cls: "filled",
-						hidden: m.installed,
-						text: t("Install"),
-					}),
-					checkbox({
-						type: "switch",
-						name: "enabled",
-						hidden: !m.installed,
-						value: m.enabled,
-						listeners:{
-							change: ({newValue}) => {
-								client.jmap("core/Module2/set", {
-									update: {[m.id]: {enabled: newValue}}
-								});
-							}
-						}
-					}),
-					"->",
-					btn({
-						text: t("Settings"),
-						hidden: !m.installed
-					})
-				)
-				))
+			this.appContainer.items.add(new AppTile(m));
 		})
 
 		return Promise.all(this.findChildrenByType(AppSystemSettingsPanel).map(p => p.load()));
@@ -117,6 +91,81 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 
 	async save(): Promise<any> {
 		return Promise.all(this.findChildrenByType(AppSystemSettingsPanel).map(p => p.save()));
+	}
+}
+
+let response: any;
+
+class InstallWindow extends Window {
+	private appContainer: Component
+
+	constructor() {
+		super();
+		this.title = t("Install apps");
+		this.modal = true;
+
+		this.width = 900;
+		this.height = 600;
+		this.maximizable = true;
+		this.resizable = true;
+
+		this.on("show", () => {
+			void this.load();
+		});
+
+		this.items.add(
+			tbar({cls: "border-bottom"},
+				"->",
+				searchbtn({
+					listeners: {
+						input: ({text}) => {
+							this.load(text);
+						}
+					}
+				})
+				),
+				this.appContainer = comp({cls: "apps",flex: 1}
+			))
+	}
+
+	async reload() {
+		response = undefined;
+		return this.load()
+	}
+
+	async load(text:string = "") {
+		this.appContainer.items.clear();
+
+		if(!response) {
+			this.mask();
+			try {
+				response = await client.jmap("core/Module2/get");
+			}catch (e) {
+				void Window.error(e);
+			} finally {
+				this.unmask()
+			}
+
+		}
+
+		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as Module2[];
+
+		let lastPackage = "";
+		sorted.filter(m => !m.installed).forEach(m => {
+
+			if(text && !m.title.toLowerCase().includes(text.toLowerCase())) return;
+
+			if(lastPackage != m.packageTitle) {
+				this.appContainer.items.add(h3(m.packageTitle));
+				lastPackage = m.packageTitle;
+			}
+
+			const tile = new AppTile(m);
+			tile.on("install", () => {
+				this.reload();
+			})
+			this.appContainer.items.add(tile);
+		})
 	}
 }
 
