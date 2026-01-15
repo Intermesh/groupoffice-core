@@ -42,9 +42,8 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 	public readonly scroller: Component;
 	private detailView: any;
 	public readonly toolbar: Toolbar;
-	private comments: any;
 
-	protected constructor(public entityName:string) {
+	public constructor(public entityName:string) {
 		super();
 
 		// reload or reset on entity update or destroy
@@ -145,6 +144,10 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 		return super.title;
 	}
 
+	public async reload() {
+		return this.load(this.entity!.id);
+	}
+
 	public async load(id: EntityID) {
 
 		this.mask();
@@ -175,7 +178,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 		this.scroller.items.forEach((i:any) => {
 			if(i != this.detailView && i.onLoad) {
-				i.onLoad(this.entity!);
+				i.onLoad(this.entity!, this);
 			}
 		})
 	}

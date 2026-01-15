@@ -16,7 +16,7 @@ export interface Entity {
 
 export interface LinkConfig extends EntityLink {
 	title: string,
-	entity: string
+	entity: string,
 }
 
 

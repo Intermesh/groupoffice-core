@@ -8,11 +8,10 @@ import {
 	cards,
 	comp,
 	Component,
-	containerfield,
 	datasourceform,
 	DataSourceFormEventMap,
 	DefaultEntity,
-	EntityID, FunctionUtil,
+	EntityID,
 	t,
 	tbar,
 	Toolbar, translate,
@@ -21,12 +20,11 @@ import {
 } from "@intermesh/goui";
 import {sharepanel, SharePanel} from "../permissions";
 import {jmapds} from "../jmap";
-import {CreateLinkButton, createlinkbutton} from "./CreateLinkButton";
+import {CreateLinkButton, createlinkbutton, LinkBrowseButton, linkbrowsebutton} from "./links/index";
 import {Link} from "../model/Link";
 import {customFields} from "../customfields/CustomFields";
 import {FormFieldset} from "../customfields/FormFieldset";
-import {LinkBrowseButton, linkbrowsebutton} from "./LinkBrowseButton";
-import {entities} from "../Entities";
+import {entities} from "../Entities.js";
 
 
 /**
@@ -86,6 +84,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 		this.height = 600;
 		this.maximizable = true;
 		this.resizable = true;
+		this.collapsible = true;
 
 		const e = entities.get(this.entityName);
 		translate.setDefaultModule(e.package, e.module);
@@ -165,6 +164,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 			return true;
 		}
 		if(this.form.isModified()) {
+			console.log(this.form.modified);
 			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
 				if(confirmed) {
 					this.internalClose();
@@ -246,83 +246,21 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 	}
 
 
-	// protected addCustomFields() {
-	//
-	// 	const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
-	//
-	// 	fieldsets.forEach((fs) => {
-	// 		if (fs.fieldSet.isTab) {
-	// 			fs.title = fs.fieldSet.name;
-	// 			fs.legend = "";
-	// 			this.cards.items.add(fs);
-	// 		} else {
-	// 			this.generalTab.items.add(fs);
-	// 		}
-	// 	}, this);
-	// }
-
-
 	protected addCustomFields() {
 
-		this.on("render", () => {
-			if(this.hidden) {
-				this.on("show", () => this.renderCustomFields())
+		const fieldsets = customFields.getFieldSets(this.entityName).map(fs => new FormFieldset(fs))
+
+		fieldsets.forEach((fs) => {
+			if (fs.fieldSet.isTab) {
+				fs.title = fs.fieldSet.name;
+				fs.legend = "";
+				this.cards.items.add(fs);
 			} else {
-				this.renderCustomFields();
+				this.generalTab.items.add(fs);
 			}
-		})
+		}, this);
 	}
 
-
-	private renderCustomFields() {
-		if (go.Entities.get(this.entityName).customFields) {
-
-			const fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityName);
-			fieldsets.forEach((fs: any) => {
-
-				//replace customFields. because we will use a containerfield here.
-				fs.cascade((item: any) => {
-					if (item.getName) {
-						let fieldName = item.getName().replace('customFields.', '');
-						item.name = item.hiddenName =  fieldName;
-					}
-				});
-
-				if (fs.fieldSet.isTab) {
-					fs.title = null;
-					fs.collapsible = false;
-
-					this.cards.items.add(
-						containerfield({
-								name: "customFields",
-								cls: "scroll fit",
-								title: fs.fieldSet.name,
-								listeners: {
-									show: () => {
-										fs.doLayout();
-									}
-								}
-							}, fs
-						)
-					);
-				} else {
-					//in case formPanelLayout is set to column
-					fs.columnWidth = 1;
-					this.generalTab.items.add(containerfield({name: "customFields"}, fs));
-				}
-			}, this);
-
-
-			if(fieldsets.length) {
-				const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
-					fieldsets.forEach((fs: any) => fs.doLayout());
-				}));
-
-				ro.observe(this.el);
-			}
-
-		}
-	}
 
 	/**
 	 * Adds a link between two entities on save.

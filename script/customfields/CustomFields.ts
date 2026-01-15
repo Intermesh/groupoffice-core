@@ -117,7 +117,7 @@ class CustomFields {
 	}
 
 	getFieldSetFields(fieldSet: FieldSet) {
-		return this.fields[fieldSet.id];
+		return this.fields[fieldSet.id] ?? [];
 	}
 
 	private types: Record<string, ConstructableAbstractCustomField> = {

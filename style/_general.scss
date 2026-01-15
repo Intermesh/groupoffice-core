@@ -25,11 +25,24 @@
 	height: util.dp(46);
 	padding: util.dp(14);
 }
-//@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
-	//.goui-module-panel {
-	//	top : 0;
-	//}
-	//aside ~ .vbox > .goui-toolbar {
-	//	margin-right: util.dp(240);
-	//}
-//}
+
+.goui.link-detail {
+	table {
+		cursor: pointer;
+	}
+}
+
+.list.checkbox-list {
+	padding-bottom: util.dp(16);
+	li {
+		padding-left: util.dp(16);
+		.goui-form-field.check {
+			.control {
+				.box-label {
+					padding-top: util.dp(4);
+					padding-bottom: util.dp(4);
+				}
+			}
+		}
+	}
+}
