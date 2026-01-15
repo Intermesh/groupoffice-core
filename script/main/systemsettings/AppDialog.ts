@@ -1,10 +1,10 @@
 import {FormWindow} from "../../components/index.js";
 import {displayfield, fieldset, t} from "@intermesh/goui";
-import {appSystemSettings, Module2} from "./Apps.js";
+import {appSystemSettings, ModuleInfo} from "./Apps.js";
 import {AppPermissionPanel} from "./AppPermissionsPanel.js";
 
 export class AppDialog extends FormWindow {
-	constructor(moduleInfo:Module2) {
+	constructor(moduleInfo:ModuleInfo) {
 		super("Module");
 
 		this.title = moduleInfo.title;

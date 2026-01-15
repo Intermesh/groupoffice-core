@@ -4,7 +4,7 @@ import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
 import {AppTile} from "./AppTile.js";
 
-export interface Module2 {
+export interface ModuleInfo {
 	id: string
 	name: string
 	package: string
@@ -60,7 +60,7 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 
 		if(!response) {
 			try {
-				response = await client.jmap("core/Module2/get");
+				response = await client.jmap("core/ModuleInfo/get");
 			}catch (e) {
 				void Window.error(e);
 			} finally {
@@ -70,7 +70,7 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 
 		this.appContainer.items.clear()
 
-		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as Module2[];
+		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as ModuleInfo[];
 
 		let lastPackage = "";
 		sorted.filter(m => m.installed).forEach(m => {
@@ -132,7 +132,7 @@ class InstallWindow extends Window {
 		if(!response) {
 			this.mask();
 			try {
-				response = await client.jmap("core/Module2/get");
+				response = await client.jmap("core/ModuleInfo/get");
 			}catch (e) {
 				void Window.error(e);
 			} finally {
@@ -141,7 +141,7 @@ class InstallWindow extends Window {
 
 		}
 
-		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as Module2[];
+		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as ModuleInfo[];
 
 		let lastPackage = "";
 		sorted.filter(m => !m.installed).forEach(m => {

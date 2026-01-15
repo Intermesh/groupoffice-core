@@ -22,7 +22,7 @@ import {client, jmapds} from "../../jmap/index.js";
 import {entities} from "../../Entities.js";
 import {SharePanel} from "../../permissions/index.js";
 import {Module} from "../../Modules.js";
-import {Module2} from "./Apps.js";
+import {ModuleInfo} from "./Apps.js";
 
 
 class GroupTable extends Table<DataSourceStore> {
@@ -30,7 +30,7 @@ class GroupTable extends Table<DataSourceStore> {
 
 	levels?:{ [key: string]: any }[]
 
-	constructor(sharePanel: AppPermissionPanel, module:Module2) {
+	constructor(sharePanel: AppPermissionPanel, module:ModuleInfo) {
 
 
 		const columns = [
@@ -168,7 +168,7 @@ export class AppPermissionPanel extends Field {
 	private readonly groupTable: GroupTable;
 
 	public levels?:{ [key: string]: any }[]
-	constructor(module:Module2) {
+	constructor(module:ModuleInfo) {
 		super("div");
 
 		this.name = "permissions";

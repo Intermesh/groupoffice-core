@@ -14,7 +14,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {client, jmapds} from "../../jmap/index.js";
-import {Module2} from "./Apps.js";
+import {ModuleInfo} from "./Apps.js";
 import {Module} from "../../Modules.js";
 import {FormWindow} from "../../components/index.js";
 import {AppDialog} from "./AppDialog.js";
@@ -22,13 +22,13 @@ import {AppDialog} from "./AppDialog.js";
 
 export interface AppTileEventMap extends ComponentEventMap {
 
-	install: {module: Module2}
+	install: {module: ModuleInfo}
 
 }
 
 
 export class AppTile extends Component<AppTileEventMap> {
-	constructor(m:Module2) {
+	constructor(m:ModuleInfo) {
 		super();
 
 		// this.width = 400;
@@ -59,7 +59,7 @@ export class AppTile extends Component<AppTileEventMap> {
 						change: async ({newValue}) => {
 							this.mask();
 							try {
-								void jmapds("core/Module2").update(m.id, {enabled: newValue});
+								void jmapds("core/ModuleInfo").update(m.id, {enabled: newValue});
 							}catch (e) {
 								void Window.error(e);
 							}
@@ -95,7 +95,7 @@ export class AppTile extends Component<AppTileEventMap> {
 
 						this.mask();
 						try {
-							void jmapds("core/Module2").update(m.id, {installed: true});
+							void jmapds("core/ModuleInfo").update(m.id, {installed: true});
 							this.fire("install", {module:m});
 						}catch (e) {
 							void Window.error(e);
