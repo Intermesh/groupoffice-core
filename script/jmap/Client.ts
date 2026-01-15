@@ -117,7 +117,7 @@ export class Client extends Observable<ClientEventMap> {
 	public accessToken = "";
 	private delayedJmap: (...args: any[]) => void;
 	private SSEABortController?: AbortController;
-	private pollInterval?: number;
+	private pollInterval?: any;
 	private SSEEventsRegistered: boolean = false;
 	private SSELastEntities?: string[];
 
@@ -601,7 +601,7 @@ export class Client extends Observable<ClientEventMap> {
 
 	public startPolling(entities:string[]) {
 		this.updateAllDataSources(entities);
-		this.pollInterval =setInterval(() => {
+		this.pollInterval = setInterval(() => {
 			this.updateAllDataSources(entities);
 		}, 60000);
 	}
