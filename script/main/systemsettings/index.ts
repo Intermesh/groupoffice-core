@@ -11,5 +11,6 @@ export * from './DefaultPermissionsPanel.js';
 export * from './CustomFields.js';
 
 export * from './users';
+export * from './groups';
 export * from './Apps.js';
 
