@@ -10,4 +10,6 @@ export * from './AuthAllowGroupGrid.js';
 export * from './DefaultPermissionsPanel.js';
 export * from './CustomFields.js';
 
+export * from './users';
 export * from './Apps.js';
+
