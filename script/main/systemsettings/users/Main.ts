@@ -18,6 +18,7 @@ class Main extends AbstractSystemSettingsPanel {
 				mstbar({
 					table: this.userTbl
 				},
+					"->",
 					btn({
 						icon: "delete",
 						title: t("Delete"),
