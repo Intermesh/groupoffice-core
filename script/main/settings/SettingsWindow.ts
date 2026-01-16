@@ -4,7 +4,7 @@ import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
 
-class SettingsWindow extends Window {
+export class SettingsWindow extends Window {
 
 	private cards: CardContainer;
 	constructor(selectedItemId:string|undefined, user:User = client.user) {

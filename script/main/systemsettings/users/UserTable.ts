@@ -1,16 +1,17 @@
 import {
-	avatar, btn,
+	avatar, browserStoreConnection, btn,
 	column,
 	datasourcestore,
 	DataSourceStore,
 	datetimecolumn, menu, menucolumn,
 	numbercolumn,
 	t,
-	Table
+	Table, Window
 } from "@intermesh/goui";
-import {customFields} from "@intermesh/groupoffice-core";
-import {userDS} from "../../../auth/index.js";
-import {img} from "../../../jmap/index.js";
+import {User, userDS} from "../../../auth/index.js";
+import {client, img} from "../../../jmap/index.js";
+import {SettingsWindow} from "../../settings/index.js";
+import {customFields} from "../../../customfields/index.js";
 
 export class UserTable extends Table<DataSourceStore> {
 	constructor() {
@@ -29,7 +30,13 @@ export class UserTable extends Table<DataSourceStore> {
 					width: 64,
 					id: "avatarId",
 					sticky: true,
-					renderer: (avatarId, record) => {
+					renderer: (avatarId, record, td) => {
+
+						if(!record.enabled)
+						{
+							td.attr("disabled", true);
+						}
+
 						return avatarId ?
 							img({
 								cls: "goui-avatar",
@@ -48,6 +55,10 @@ export class UserTable extends Table<DataSourceStore> {
 					sortable: true,
 					htmlEncode: false, // disable html encoding as we will use html in the renderer. Make sure to encode the data in there.
 					renderer: (columnValue, record, td, table1, storeIndex) => {
+						if(!record.enabled)
+						{
+							td.attr("disabled", true);
+						}
 						// 2 line rendering
 						return `<h3>${record.displayName.htmlEncode()}</h3> <h4>${record.username.htmlEncode()}</h4>`
 					},
@@ -101,11 +112,26 @@ export class UserTable extends Table<DataSourceStore> {
 					menu: menu({},
 						btn({
 							icon: "edit",
-							text: t("Edit")
+							text: t("Edit"),
+							handler: (b) => {
+								const rowIndex = b.parent!.dataSet.rowIndex;
+								this.edit(rowIndex)
+							}
 						}),
 						btn({
 							icon: "swap_horiz",
-							text: t("Login as")
+							text: t("Login as"),
+							handler: async (b) => {
+								const rowIndex = b.parent!.dataSet.rowIndex;
+								const user = this.store.get(rowIndex) as User;
+								await browserStoreConnection.deleteDatabase();
+								const result = await client.jmap("User/loginAs", {userId: user.id});
+								if(!result.success) {
+									void Window.error(t("Failed to login as this user"));
+									return;
+								}
+								window.location.replace(BaseHref);
+							}
 						}),
 						"-",
 						btn({
@@ -126,9 +152,7 @@ export class UserTable extends Table<DataSourceStore> {
 		this.rowSelectionConfig = {multiSelect: true};
 
 		this.on("rowdblclick", async ({target, storeIndex}) => {
-			// const dlg = new NoteDialog();
-			// dlg.show();
-			// await dlg.load(target.store.get(storeIndex)!.id);
+			this.edit(storeIndex);
 		});
 
 		this.on("delete", async ({target}) => {
@@ -138,5 +162,10 @@ export class UserTable extends Table<DataSourceStore> {
 		});
 
 		this.fitParent = true;
+	}
+
+	private edit(rowIndex: number) {
+		const win = new SettingsWindow(undefined, this.store.get(rowIndex) as User);
+		win.show();
 	}
 }

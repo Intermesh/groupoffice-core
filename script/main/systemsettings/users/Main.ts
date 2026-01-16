@@ -2,6 +2,7 @@ import {btn, checkbox, comp, mstbar, searchbtn, t, tbar} from "@intermesh/goui";
 import {systemSettingsPanels} from "../SystemSettingsWindow.js";
 import {AbstractSystemSettingsPanel} from "../AbstractSystemSettingsPanel.js";
 import {UserTable} from "./UserTable.js";
+import {CreateUserDialog} from "./CreateUserDialog.js";
 
 class Main extends AbstractSystemSettingsPanel {
 	private userTbl: UserTable;
@@ -53,6 +54,10 @@ class Main extends AbstractSystemSettingsPanel {
 				btn({
 					text: t("Add"),
 					cls: "primary filled",
+					handler: (button, ev) => {
+						const d = new CreateUserDialog();
+						d.show();
+					}
 				}),
 
 				),
