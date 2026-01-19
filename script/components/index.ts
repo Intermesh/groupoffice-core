@@ -5,6 +5,7 @@ export * from './AddButton.js';
 export * from './FilterPanel.js';
 export * from './FilesButton.js';
 export * from './LinkBrowserButton.js';
+export * from './LinkBrowseButton.js';
 export * from './MainThreeColumnPanel.js';
 export * from './form/index.js';
 export * from './picker/RecurrencePicker.js';
