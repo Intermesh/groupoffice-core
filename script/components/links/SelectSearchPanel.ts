@@ -22,10 +22,11 @@ export class SelectSearchPanel extends Component {
 	public readonly resultTable
 	private searchField: TextField;
 
-	constructor() {
+
+	constructor(private multiSelect: boolean = true) {
 		super();
 
-		this.cls = "hbox";
+		this.cls = "hbox fit";
 		this.flex = 1;
 
 		this.resultTable = this.createTable();
@@ -106,7 +107,7 @@ export class SelectSearchPanel extends Component {
 			scrollLoad: true,
 			headers: false,
 			style: {width: "100%"},
-			rowSelectionConfig: {multiSelect: true},
+			rowSelectionConfig: {multiSelect: this.multiSelect},
 			store: datasourcestore({
 				dataSource: searchDS,
 				sort: [{isAscending:false, property:"modifiedAt"}],
