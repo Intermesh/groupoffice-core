@@ -11,6 +11,7 @@ export class GroupDialog extends FormWindow {
 		this.title = t("Group");
 
 		this.height = 800;
+		this.generalTab.cls = "vbox fit";
 
 		this.generalTab.items.add(
 
@@ -21,6 +22,8 @@ export class GroupDialog extends FormWindow {
 
 			fieldset({
 				legend: t("Members"),
+				cls:"scroll",
+				flex: 1
 			},
 
 				this.groupUserTbl = new GroupUserTable(this.usersField)
