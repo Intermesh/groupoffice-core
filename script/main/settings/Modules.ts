@@ -3,13 +3,13 @@ import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {settingsPanels} from "./SettingsWindow.js";
 import {User} from "../../auth/index.js";
 
-class Apps extends AbstractSettingsPanel {
+class Modules extends AbstractSettingsPanel {
 	constructor() {
-		super("apps", t("Apps"), "apps");
+		super("modules", t("Modules"), "apps");
 
 		this.cls = "fit scroll";
 
-		this.items.add(...appSettings.getPanels().map(p => new p))
+		this.items.add(...moduleSettings.getPanels().map(p => new p))
 	}
 
 	async load(user: User): Promise<any> {
@@ -39,7 +39,7 @@ export class AppSettingsPanel extends Panel {
 }
 
 
-class AppSettings {
+class ModuleSettings {
 	private panels: typeof AppSettingsPanel[] = [];
 
 	public addPanel(cmp: typeof AppSettingsPanel) {
@@ -51,6 +51,6 @@ class AppSettings {
 	}
 }
 
-export const appSettings = new AppSettings();
+export const moduleSettings = new ModuleSettings();
 
-settingsPanels.add(Apps);
+settingsPanels.add(Modules);
