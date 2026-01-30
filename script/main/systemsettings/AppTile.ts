@@ -84,6 +84,14 @@ export class AppTile extends Component<AppTileEventMap> {
 					handler: () => {
 						const d = new AppDialog(m);
 						d.load(m.model.id);
+						d.form.on('beforesave', ({data}) => {
+							// In settings tables, arrays are always saved as comma-separated strings
+							Object.entries(data.settings).forEach(([key, value]) => {
+								if(key !== 'readOnlyKeys' && Array.isArray(value)) {
+									data.settings[key] = value.join(",");
+								}
+							})
+						})
 						d.show();
 					}
 				}),
