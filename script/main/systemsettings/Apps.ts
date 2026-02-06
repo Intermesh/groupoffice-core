@@ -1,4 +1,4 @@
-import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, Window} from "@intermesh/goui";
+import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, TextField, textfield, Window} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
@@ -44,6 +44,7 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 				}),
 				btn({
 					text: t("Install"),
+					cls: "accent filled",
 					icon: "add",
 					handler: () => {
 						const win = new InstallWindow();
@@ -93,6 +94,7 @@ let response: any;
 
 class InstallWindow extends Window {
 	private appContainer: Component
+	private searchField;
 
 	constructor() {
 		super();
@@ -110,17 +112,29 @@ class InstallWindow extends Window {
 
 		this.items.add(
 			tbar({cls: "border-bottom"},
-				"->",
-				searchbtn({
-					listeners: {
-						input: ({text}) => {
-							this.load(text);
-						}
-					}
+				this.searchField = textfield({
+					flex: 1,
+					icon: "search",
+					buttons: [
+						btn({
+							icon: "clear",
+							handler: btn => {
+								const tf = btn.findAncestorByType(TextField)!
+								tf.reset()
+								tf.focus();
+							}
+						})]
 				})
+					.on("input", ({value}) => {
+						this.load(value);
+					}, {buffer: 300})
 				),
 				this.appContainer = comp({cls: "apps",flex: 1}
 			))
+	}
+
+	focus(o?: FocusOptions) {
+		this.searchField.focus(o);
 	}
 
 	async reload() {
