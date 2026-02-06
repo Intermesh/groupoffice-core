@@ -14,3 +14,4 @@ export * from './users';
 export * from './groups';
 export * from './Apps.js';
 
+export * from './ModuleSettingsFieldset.js';
