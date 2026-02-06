@@ -7,7 +7,7 @@ import {
 	Component,
 	h4,
 	Menu,
-	menu,
+	menu, root,
 	searchbtn,
 	t,
 	tbar,
@@ -19,10 +19,12 @@ import {ExtJSWrapper} from "../components/ExtJSWrapper.js";
 import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
+import {Launcher} from "./Launcher.js";
 
 class Main extends Component {
 	private readonly menu;
 	private readonly container;
+	private _launcher?: Launcher;
 	constructor() {
 		super();
 
@@ -108,10 +110,28 @@ class Main extends Component {
 			)
 	}
 
+	private getLauncher() {
+		return new Promise<Launcher>(resolve => {
+			if (!this._launcher) {
+				this._launcher = new Launcher();
+				root.items.add(this._launcher);
+				setTimeout(() => {
+					// give browser time to render menu and the animation can run
+					resolve(this._launcher!);
+				})
+			} else {
+				resolve(this._launcher);
+			}
+		})
+	}
+
+
 	/**
 	 * Load all module panels and sets up routes
 	 */
 	public load() {
+
+
 		this.items.add(
 			comp({
 					cls: "header hbox"
@@ -128,6 +148,15 @@ class Main extends Component {
 							m.show();
 						}
 
+					}),
+
+					btn({
+						title: t("Launcher"),
+						icon: "apps",
+						handler: async () => {
+							(await this.getLauncher()).show();
+
+						}
 					}),
 
 					avatar({

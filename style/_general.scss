@@ -147,3 +147,65 @@ h4.goui {
 		border-bottom: util.dp(4) solid config.$colorPrimary;
 	}
 }
+
+.goui.launcher {
+	position: absolute;
+	z-index: 10000000;
+	width: 100%;
+	bottom: 0;
+	top: 0;
+	opacity: 1;
+	transition: opacity 200ms cubic-bezier(0.4, 0.0, 0.6, 1);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	background-color: rgba(0, 0, 0, 0.68);
+
+	&[hidden] {
+		display: grid !important;
+		opacity: 0;
+		ul {transform: scale(.9);}
+		pointer-events: none;
+	}
+
+
+	padding: util.dp(80);
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(14rem, 17%), 1fr));
+	justify-content: space-between;
+	align-content: start;
+	transform: scale(1);
+	grid-gap: 1.6rem;
+	overflow-y: auto;
+
+	.goui-button {
+		align-items: end;
+		color: white;
+		height: 14rem;
+		width: 14rem;
+		background-position: center 1.6rem;
+		background-repeat: no-repeat;
+		background-size: 7.2rem 7.2rem;
+
+		font-size: 1.2rem;
+
+		//background-color: #3e3e3e;
+		//border-radius: 1rem;
+
+	}
+
+
+	&:before {
+		z-index: 10000001;
+		content: " ";
+		position:absolute;
+		background-image: url(./resources/groupoffice-logo-white.svg);
+		background-size: contain;
+		background-repeat: no-repeat;
+		height: util.dp(40);
+		width: util.dp(240);
+		margin: util.dp(12) util.dp(16);
+		display:block;
+		top: 0;
+		left: 0;
+	}
+}
