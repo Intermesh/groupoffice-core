@@ -2,7 +2,8 @@ import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, Window} from "@
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
-import {AppTile} from "./AppTile.js";
+import {InstallModuleTile} from "./InstallModuleTile.js";
+import {ModuleTile} from "./ModuleTile.js";
 
 export interface ModuleInfo {
 	id: string
@@ -14,6 +15,7 @@ export interface ModuleInfo {
 	rights: any
 	status: string
 	packageTitle: string
+	category: string,
 	enabled: boolean
 	installed: boolean
 	model: any
@@ -24,7 +26,7 @@ export interface ModuleInfo {
 class SystemSettingsApps extends AbstractSystemSettingsPanel {
 	private appContainer: Component;
 	constructor() {
-		super("apps", t("Apps"), "apps");
+		super("modules", t("Modules"), "apps");
 
 
 		// this.items.add(...appSystemSettings.getPanels().map(p => new p))
@@ -70,19 +72,19 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 
 		this.appContainer.items.clear()
 
-		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as ModuleInfo[];
+		const sorted = ArrayUtil.multiSort(response.list, [{property: "category"}, {property: "title"}]) as ModuleInfo[];
 
-		let lastPackage = "";
+		let lastCategory = "";
 		sorted.filter(m => m.installed).forEach(m => {
 
 			if(text && !m.title.toLowerCase().includes(text.toLowerCase())) return;
 
-			if(lastPackage != m.packageTitle) {
-				this.appContainer.items.add(h3(m.packageTitle));
-				lastPackage = m.packageTitle;
+			if(lastCategory != m.category) {
+				this.appContainer.items.add(h3(m.category));
+				lastCategory = m.category;
 			}
 
-			this.appContainer.items.add(new AppTile(m));
+			this.appContainer.items.add(new InstallModuleTile(m));
 		})
 	}
 }
@@ -97,8 +99,8 @@ class InstallWindow extends Window {
 		this.title = t("Install apps");
 		this.modal = true;
 
-		this.width = 900;
-		this.height = 600;
+		this.width = 1280;
+		this.height = 800;
 		this.maximizable = true;
 		this.resizable = true;
 
@@ -141,19 +143,19 @@ class InstallWindow extends Window {
 
 		}
 
-		const sorted = ArrayUtil.multiSort(response.list, [{property: "packageTitle"}, {property: "title"}]) as ModuleInfo[];
+		const sorted = ArrayUtil.multiSort(response.list, [{property: "category"}, {property: "title"}]) as ModuleInfo[];
 
-		let lastPackage = "";
+		let lastCategory = "";
 		sorted.filter(m => !m.installed).forEach(m => {
 
 			if(text && !m.title.toLowerCase().includes(text.toLowerCase())) return;
 
-			if(lastPackage != m.packageTitle) {
-				this.appContainer.items.add(h3(m.packageTitle));
-				lastPackage = m.packageTitle;
+			if(lastCategory != m.category) {
+				this.appContainer.items.add(h3(m.category));
+				lastCategory = m.category;
 			}
 
-			const tile = new AppTile(m);
+			const tile = new InstallModuleTile(m);
 			tile.on("install", () => {
 				this.reload();
 			})

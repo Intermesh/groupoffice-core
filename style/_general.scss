@@ -85,6 +85,15 @@ h4.goui {
 
 	width: util.dp(400);
 
+	&.installed {
+		.desc {
+			img {
+				width: util.dp(24);
+				height: util.dp(24);
+			}
+		}
+	}
+
 	.desc {
 		margin: util.dp(16) util.dp(16)  0 util.dp(16);
 		display: flex;
@@ -104,6 +113,8 @@ h4.goui {
 			//padding: util.dp(8) util.dp(16);
 		}
 
+
+
 		p {
 			height: util.dp(60);
 			text-overflow: ellipsis;
@@ -114,9 +125,10 @@ h4.goui {
 }
 
 .goui.apps {
+	margin: util.dp(16);
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(40rem, max-content));
-	grid-gap: 1.6rem;
+	grid-gap: 0;
 	justify-content: center;
 	padding: initial;
 	overflow-y: scroll;

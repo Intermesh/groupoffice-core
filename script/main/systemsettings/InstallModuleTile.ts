@@ -20,14 +20,14 @@ import {FormWindow} from "../../components/index.js";
 import {AppDialog} from "./AppDialog.js";
 
 
-export interface AppTileEventMap extends ComponentEventMap {
+export interface InstallModuleTileEventMap extends ComponentEventMap {
 
 	install: {module: ModuleInfo}
 
 }
 
 
-export class AppTile extends Component<AppTileEventMap> {
+export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 	constructor(m:ModuleInfo) {
 		super();
 
@@ -79,7 +79,8 @@ export class AppTile extends Component<AppTileEventMap> {
 					}
 				}),
 				btn({
-					text: t("Settings"),
+					title: t("Settings"),
+					icon: "settings",
 					hidden: !m.installed,
 					handler: () => {
 						const d = new AppDialog(m);
