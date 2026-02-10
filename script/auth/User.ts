@@ -19,10 +19,10 @@ export interface User extends AclOwnerEntity {
 export interface Principal extends DefaultEntity {
 	id:string
 	name: string
-	email?: string
-	description?:string
-	timeZone?:string
-	avatarId?:string
+	email: string | undefined
+	description:string  | undefined
+	timeZone:string  | undefined
+	avatarId:string  | undefined
 	type: string
 }
 

@@ -7,27 +7,83 @@ import {
 	comp,
 	Component,
 	DataSourceStore,
-	datasourcestore, EntityID, RowSelect,
+	datasourcestore,
+	EntityID,
 	splitter,
 	t,
 	Table,
 	tbar,
-	Window, WindowEventMap
+	Window,
+	WindowEventMap
 } from "@intermesh/goui";
-import {groupDS, Principal, principalDS} from "../../auth/index.js";
+import {groupDS, principalDS} from "../../auth/index.js";
+import {ExtJSWrapper} from "../ExtJSWrapper.js";
+import {jmapds} from "../../jmap/index.js";
 
 
 interface RecipientPickerComponent extends Component {
-	table: Table<DataSourceStore<typeof principalDS>> & {rowSelection: RowSelect};
+	getAll(): Promise<Recipient[]>;
+	getSelected(): Recipient[];
+}
+
+interface Recipient {
+	id: EntityID;
+	name: string;
+	email: string | undefined;
+	avatarId: string | undefined;
+	entity:string;
 }
 
 interface RecipientPickerEventMap extends WindowEventMap {
 	select: {
-		principalIds: EntityID[]
+		recipients: Recipient[]
+	}
+}
+
+class AddressBookPicker extends ExtJSWrapper implements RecipientPickerComponent{
+	constructor() {
+		super( new go.modules.community.addressbook.SelectDialogPanel({title: undefined}));
+
+		this.title = t("Contacts");
+		this.cls = "fit";
+
+		this.extJSComp.on("selectsingle", ( cmp:any,name:string,email:string, id:string) => {
+			const recipient:Recipient = {
+				id: "Contact:" + id,
+				email,
+				name,
+				entity: "Contact",
+				avatarId: undefined
+			}
+
+			const dlg = this.findAncestorByType(RecipientPicker)!;
+			dlg.fire("select", {recipients: [recipient]});
+			dlg.close();
+		})
+	}
+
+	async getAll(): Promise<Recipient[]> {
+		const ids = await this.extJSComp.addAll();
+		return jmapds<Recipient>("Contact").get(ids).then(r => r.list.map(this.contactToRecipient));
+	}
+
+	private contactToRecipient(contact:any) : Recipient {
+		return {
+			entity: "Contact",
+			id: "Contact:"+contact.id,
+			avatarId: contact.photoBlobId,
+			name: contact.name,
+			email: contact.emailAddresses[0]?.email,
+		}
+	}
+
+	getSelected(): Recipient[] {
+		return this.extJSComp.grid.getSelectionModel().getSelections().map((r:any) => this.contactToRecipient(r.data));
 	}
 }
 
 export class RecipientPicker extends Window<RecipientPickerEventMap> {
+
 	private cards;
 	constructor() {
 		super();
@@ -39,13 +95,14 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 		this.collapsible = true;
 		this.maximizable = true;
 
-		this.title = "Recipient picker";
+		this.title = t("Select people");
 
 		this.items.add(
 			cardmenu(),
 
 			this.cards = cards({flex: 1},
-				new UserPicker()
+				new UserPicker(),
+				new AddressBookPicker()
 				),
 
 			tbar({cls: "border-top"},
@@ -56,19 +113,14 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 					cls: "filled primary",
 					handler: async ()=> {
 
-						const tbl = (this.cards.activeItemComponent as RecipientPickerComponent).table;
-						const p = structuredClone(tbl.store.queryParams);
-						delete p.limit;
-						delete p.position;
+						const recipients = await  (this.cards.activeItemComponent as RecipientPickerComponent).getAll();
 
-						const response = await principalDS.query(p);
-
-						const confirmed = await Window.confirm(t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), t("Confirm"));
+						const confirmed = await Window.confirm(t("Are you sure you want to select all {count} results?").replace('{count}', recipients.length), t("Confirm"));
 						if(!confirmed) {
 							return;
 						}
 
-						this.fire("select", {principalIds: response.ids});
+						this.fire("select", {recipients});
 						this.close();
 					}
 				}),
@@ -77,9 +129,9 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 					text: t("Add selected"),
 					cls: "filled primary",
 					handler: ()=>{
-						const principalIds = (this.cards.activeItemComponent as RecipientPickerComponent).table.rowSelection.getSelected().map(r => r.id);
+						const recipients = (this.cards.activeItemComponent as RecipientPickerComponent).getSelected()
 
-						this.fire("select", {principalIds});
+						this.fire("select", {recipients});
 						this.close();
 					}
 				})
@@ -143,9 +195,9 @@ class UserTable extends Table<DataSourceStore<typeof principalDS>> {
 	}
 }
 
-class UserPicker extends Component {
+class UserPicker extends Component implements RecipientPickerComponent {
 
-	public readonly table;
+	private readonly table;
 	constructor() {
 		super();
 
@@ -167,5 +219,27 @@ class UserPicker extends Component {
 			}),
 			comp({flex: 1, cls: "scroll bg-lowest"}, this.table),
 		)
+	}
+
+	public async getAll(): Promise<Recipient[]> {
+
+		const p = structuredClone(this.table.store.queryParams);
+		delete p.limit;
+		delete p.position;
+
+		const r = await principalDS.query(p);
+		return principalDS.get(r.ids).then(r => r.list.map(r => Object.assign(r, {entity: "User"})));
+	}
+
+	public getSelected() : Recipient[] {
+		return this.table.rowSelection!.getSelected().map(r => {
+			return {
+				entity: "User",
+				id: r.id,
+				avatarId: r.record.avatarId,
+				name: r.record.name,
+				email: r.record.email,
+			}
+		});
 	}
 }
