@@ -16,8 +16,6 @@ export class Launcher extends Component {
 
 		ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).forEach(async (m) => {
 
-
-
 			// Add button to the route
 			this.items.add(
 				btn({

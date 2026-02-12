@@ -22,8 +22,8 @@
 					}
 				}
 			}
-			 .goui-form-field input.control {
-			background-color: transparent;
+			.goui-form-field input.control {
+				background-color: transparent;
 				color: white;
 
 				&::placeholder {
@@ -34,7 +34,16 @@
 		}
 	}
 
+	menu.goui-toolbar.header-right {
+		padding: 0 1.6rem 0 0;
+	}
 	menu.goui-toolbar.goui-cardmenu.main-menu {
+
+		padding:0;
+
+		.btn-overflow {
+			display: none;
+		}
 
 		button.goui-button {
 			color: white;

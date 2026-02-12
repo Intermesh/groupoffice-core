@@ -137,7 +137,7 @@ class Main extends Component {
 					cls: "header hbox"
 				},
 				this.menu,
-				tbar({},
+				tbar({cls: "header-right"},
 					btn({
 						icon: "notifications"
 					}),
