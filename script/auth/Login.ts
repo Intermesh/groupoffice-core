@@ -1,7 +1,7 @@
 import {
 	btn,
 	CardContainer,
-	cards,
+	cards, checkbox,
 	comp,
 	fieldset,
 	form,
@@ -40,7 +40,7 @@ export class Login extends Window<LoginEventMap> {
 		super();
 
 		this.width = 480;
-		this.height = 800;
+		this.height = "auto";
 		this.title = t("Login");
 		this.cls = "login";
 		this.modal = true;
@@ -83,6 +83,13 @@ export class Login extends Window<LoginEventMap> {
 					autocomplete: "current-password",
 					required: true
 				}),
+
+				checkbox({
+					type: "switch",
+					label: t("Remember my login on this device"),
+					name: "rememberLogin"
+				}),
+
 				btn({
 					style: {
 						width: "100%"
