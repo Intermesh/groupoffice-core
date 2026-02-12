@@ -32,7 +32,7 @@ export class SelectSearchPanel extends Component<SelectSearchPanelEventMap> {
 	constructor(protected multiSelect = true) {
 		super();
 
-		this.cls = "hbox";
+		this.cls = "hbox fit";
 		this.flex = 1;
 
 		this.resultTable = this.createTable();
