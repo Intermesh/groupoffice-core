@@ -62,3 +62,16 @@
 .app-settings-panel {
 	@extend .card;
 }
+
+.login-overlay {
+	background: #0f386e;
+	background: linear-gradient(30deg, rgba(15, 56, 110, 1) 26%, rgba(25, 111, 224, 1) 100%);
+	&:after {
+		background-color: transparent;
+		opacity: 1;
+		background-image: url("./resources/groupoffice-logo-white.svg");
+		background-repeat: no-repeat;
+		background-size: 20rem auto;
+		background-position: 1.6rem 1.6rem;
+	}
+}

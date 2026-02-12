@@ -36,6 +36,10 @@ export class Login extends Window<LoginEventMap> {
 	private registerForm!: Form;
 	private forgotPasswordForm!: Form;
 
+	protected createModalOverlayCls() {
+		return "goui-window-modal-overlay goui-goui-fade-in goui-goui-fade-out login-overlay";
+	}
+
 	constructor() {
 		super();
 
@@ -44,7 +48,9 @@ export class Login extends Window<LoginEventMap> {
 		this.title = t("Login");
 		this.cls = "login";
 		this.modal = true;
-		this.resizable = true;
+		this.resizable = false;
+		this.draggable = false;
+		this.draggable = false;
 
 
 		this.on("close", async window => {
