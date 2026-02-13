@@ -37,7 +37,7 @@ export class Login extends Window<LoginEventMap> {
 	private forgotPasswordForm!: Form;
 
 	protected createModalOverlayCls() {
-		return "goui-window-modal-overlay goui-goui-fade-in goui-goui-fade-out login-overlay";
+		return "goui-window-modal-overlay goui-fade-in goui-fade-out login-overlay";
 	}
 
 	constructor() {
@@ -320,7 +320,7 @@ export class Login extends Window<LoginEventMap> {
 			Notifier.error("Sorry, an unexpected error occurred");
 		} else {
 			Notifier.success(t("Logged in successfully"));
-			this.close();
+			this.hide();
 			this.fire("login", {});
 		}
 
