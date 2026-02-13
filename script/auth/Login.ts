@@ -316,10 +316,9 @@ export class Login extends Window<LoginEventMap> {
 		client.session = await response.json();
 		const success = await client.authenticate();
 		if(!success) {
-			//???
 			Notifier.error("Sorry, an unexpected error occurred");
 		} else {
-			Notifier.success(t("Logged in successfully"));
+			Notifier.success(t("Welcome back, {name}!").replace('{name}', client.user.displayName));
 			this.hide();
 			this.fire("login", {});
 		}
