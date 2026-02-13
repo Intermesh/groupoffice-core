@@ -37,7 +37,7 @@ export class Login extends Window<LoginEventMap> {
 	private forgotPasswordForm!: Form;
 
 	protected createModalOverlayCls() {
-		return "goui-window-modal-overlay goui-fade-in goui-fade-out login-overlay";
+		return "goui-window-modal-overlay login-overlay";
 	}
 
 	constructor() {

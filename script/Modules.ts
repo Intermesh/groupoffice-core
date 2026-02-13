@@ -287,12 +287,12 @@ class Modules {
 
 		return Promise.all([
 			go.Modules.init(), // TODO jmapds() and userDS two separate stores??
-			go.User.loadLegacyModules(),
 			go.User.loadLegacyModuleScripts(),
 		]). then( async () => {
 			// this init depends on modules being loaded
 			await go.customfields.CustomFields.init()
 			go.Entities.init()
+			go.User.loadLegacyModules()
 
 		})
 	}
