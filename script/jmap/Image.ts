@@ -68,7 +68,8 @@ export class Image extends Component {
 
 			let blobId = img.dataset.blobId;
 			if(!blobId) {
-				const regex = new RegExp('blob=([^">\'&\?].*)');
+				//match blob= in img src attributes. For example emails have this from the email module.
+				const regex = new RegExp(/blob=([^">'&?]*)/);
 				const matches = regex.exec(img.src);
 				if(matches && matches[1]) {
 					blobId = matches[1];
@@ -76,7 +77,6 @@ export class Image extends Component {
 			}
 
 			if(blobId) {
-
 				img.src = Image.defaultSrc;
 
 				promises.push(client.getBlobURL(blobId).then(src => {
