@@ -7,6 +7,7 @@ export * from './FilesButton.js';
 export * from './MainThreeColumnPanel.js';
 export * from './form/index.js';
 export * from './picker/index.js';
+export * from './pdftemplate/index';
 
 export * from './EntityTypeTable.js';
 export * from './links';
