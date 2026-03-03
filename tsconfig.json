@@ -15,12 +15,12 @@
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
-
-    "paths": {
-      "@intermesh/goui": [
-        "../goui/script/index.ts"
-      ]
-    }
+// removed this as it caused goui to build alongside it
+//    "paths": {
+//      "@intermesh/goui": [
+//        "../goui/script/index.ts"
+//      ]
+//    }
   },
   "include": [
     "./script"
