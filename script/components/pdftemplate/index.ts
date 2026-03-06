@@ -24,7 +24,8 @@ export interface PdfTemplate extends BaseEntity {
 	footerX: number|undefined,
 	footerY: number|undefined,
 	fontFamily: string|undefined,
-	fontSize: string|undefined
+	fontSize: string|undefined,
+	blocks: Array<PdfBlock>
 }
 
 export interface PdfBlock extends BaseEntity {
