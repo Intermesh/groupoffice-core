@@ -20,7 +20,8 @@
     "@fortaine/fetch-event-source": "latest",
     "@intermesh/goui": "latest",
     "chart.js": "latest",
-    "ical.js": "latest"
+    "ical.js": "2.1.0",
+    "pdfjs-dist": "latest"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
