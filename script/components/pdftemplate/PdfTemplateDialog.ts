@@ -12,6 +12,7 @@ import {
 	textarea,
 	textfield
 } from "@intermesh/goui";
+import {filebutton, languagefield} from "../form";
 
 export class PdfTemplateDialog extends FormWindow {
 	constructor() {
@@ -64,23 +65,35 @@ export class PdfTemplateDialog extends FormWindow {
 							numberfield({
 								name: "width",
 								label: t("Width"),
+								min: 0,
 								decimals: 0
 							}),
 							numberfield({
 								name: "height",
 								label: t("Height"),
+								min: 0,
 								decimals: 0
 							}),
-							textfield({
+							select({
 								label: t("Align"),
 								name: "align",
 								value: "L",
+								options: [
+									{value: "L", name: t("Left")},
+									{value: "C", name: t("Center")},
+									{value: "R", name: t("Right")},
+									{value: "J", name: t("Justify")}
+								]
 							}),
-							textfield({
+							select({
 								label: t("Type"),
 								name: "type",
-								value: "html"
-							}),
+								value: "html",
+								options: [
+									{value: "html", name: "HTML"},
+									{value: "text", name: t("Text")}
+								]
+							})
 						),
 						comp({cls: "fit", flex: 1},
 							textarea({
@@ -152,15 +165,8 @@ export class PdfTemplateDialog extends FormWindow {
 					required: true,
 					label: t("Name"),
 				}),
-				// TODO: make a language combo as a sharable component
-				select({
-					name: "language",
-					label: t("Lanugage"),
-					required: true,
-					options: [
-						{value: "en", name: "English"},
-						{value: "nl", name: "Nederlands"},
-					]
+				languagefield({
+					required: true
 				})
 			),
 			comp({cls: "hbox"},
@@ -213,21 +219,16 @@ export class PdfTemplateDialog extends FormWindow {
 						name: "landscape",
 						label: t("Landscape")
 					}),
-					/*
-					// TODO
-					new go.form.FileButtonField({
-						fieldLabel: t("Stationary PDF"),
-						name: 'stationary',
-						anchor: '100%',
-						accept: '.pdf'
+					filebutton({
+						label: t("Stationary PDF"),
+						accept: "application/pdf",
+						name: "stationary"
 					}),
-					// TODO
-					new go.form.FileButtonField({
-						fieldLabel: t("Logo"),
-						name: 'logo',
-						anchor: '100%',
-						accept: 'image/*'
-					})*/
+					filebutton({
+						label: t("Logo"),
+						accept:  "image/*",
+						name: "logo"
+					})
 				),
 				fieldset({
 						flex: 0.5,
