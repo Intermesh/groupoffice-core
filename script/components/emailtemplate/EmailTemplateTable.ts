@@ -1,20 +1,17 @@
-import {column, datasourcestore, Store, Table, t, btn, menu, DataSourceStore} from "@intermesh/goui";
-import {PdfTemplate, pdfTemplateDS} from "./index";
+import {btn, column, DataSourceStore, datasourcestore, menu, t, Table} from "@intermesh/goui";
+import {EmailTemplate, emailTemplateDS} from "./index";
 import {JmapDataSource} from "../../jmap";
-import {PdfTemplateDialog} from "./PdfTemplateDialog";
 
-export class PdfTemplateTable extends Table<DataSourceStore<JmapDataSource<PdfTemplate>>> {
-
-	constructor(module: {name: string, package: string}) {
-
+export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<EmailTemplate>>> {
+	constructor() {
 		const store = datasourcestore({
-			dataSource: pdfTemplateDS,
+			dataSource: emailTemplateDS,
 			queryParams: {
 				limit: 20
 			},
-			filters: {
-				module: {module: module}
-			},
+			// filters: {
+			// 	module: {module: module}
+			// },
 			sort: [{property: "name", isAscending: true}]
 		});
 
@@ -48,28 +45,27 @@ export class PdfTemplateTable extends Table<DataSourceStore<JmapDataSource<PdfTe
 								text: t("Edit"),
 								icon: "edit",
 								handler: () => {
-									const dlg = new PdfTemplateDialog();
-									dlg.load(id).then(() => dlg.show());
+									// const dlg = new go.emailtemplate.EmailDialog(); // TODO: Refactor into GOUI
+									// dlg.load(id).show();
 								}
 							}),
 							btn({
 								text: t("Copy"),
 								icon: "file_copy",
 								handler: () => {
-									debugger;
 									const newRecord = structuredClone(record);
 									delete newRecord.id;
 									newRecord.blocks.map((b: any) => delete b.id);
-									const dlg = new go.pdftemplate.TemplateDialog();
-									dlg.setValues(newRecord);
-									dlg.show();
+									// const dlg = new go.pdftemplate.TemplateDialog();
+									// dlg.setValues(newRecord);
+									// dlg.show();
 								}
 							}),
 							btn({
 								text: t("Delete"),
 								icon: "delete",
 								handler: () => {
-									void pdfTemplateDS.confirmDestroy([id]);
+									void emailTemplateDS.confirmDestroy([id]);
 								}
 							})
 						)
@@ -79,10 +75,5 @@ export class PdfTemplateTable extends Table<DataSourceStore<JmapDataSource<PdfTe
 		];
 		super(store, columns);
 		this.fitParent = true;
-
-		this.on('rowdblclick', async ({storeIndex}) => {
-			const dlg = new PdfTemplateDialog();
-			dlg.load(this.store.get(storeIndex)!.id).then(() => dlg.show());
-		});
 	}
 }
