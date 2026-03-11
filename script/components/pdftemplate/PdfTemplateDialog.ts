@@ -312,5 +312,6 @@ export class PdfTemplateDialog extends FormWindow {
 		this.form.on("submit", () => {
 			Notifier.success(t("Saved successfully"))
 		});
+		this.form.on("load", ({data})=> this.title = data.name);
 	}
 }
