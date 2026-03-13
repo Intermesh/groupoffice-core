@@ -1,5 +1,7 @@
 import {JmapDataSource} from "../../jmap";
 import {BaseEntity} from "@intermesh/goui";
+export * from './EmailTemplatePanel';
+export * from "./EmailTemplateTable";
 
 export interface EmailTemplate extends BaseEntity {
 	moduleId: string,

@@ -1,6 +1,7 @@
 import {btn, column, DataSourceStore, datasourcestore, menu, t, Table} from "@intermesh/goui";
 import {EmailTemplate, emailTemplateDS} from "./index";
 import {JmapDataSource} from "../../jmap";
+import {EmailTemplateDialog} from "./EmailTemplateDialog";
 
 export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<EmailTemplate>>> {
 	constructor() {
@@ -9,9 +10,6 @@ export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<Ema
 			queryParams: {
 				limit: 20
 			},
-			// filters: {
-			// 	module: {module: module}
-			// },
 			sort: [{property: "name", isAscending: true}]
 		});
 
@@ -45,8 +43,8 @@ export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<Ema
 								text: t("Edit"),
 								icon: "edit",
 								handler: () => {
-									// const dlg = new go.emailtemplate.EmailDialog(); // TODO: Refactor into GOUI
-									// dlg.load(id).show();
+									const dlg = new EmailTemplateDialog();
+									dlg.load(id).then(() => dlg.show());
 								}
 							}),
 							btn({
@@ -56,9 +54,9 @@ export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<Ema
 									const newRecord = structuredClone(record);
 									delete newRecord.id;
 									newRecord.blocks.map((b: any) => delete b.id);
-									// const dlg = new go.pdftemplate.TemplateDialog();
-									// dlg.setValues(newRecord);
-									// dlg.show();
+									const dlg = new EmailTemplateDialog();
+									dlg.form.value = newRecord;
+									dlg.show();
 								}
 							}),
 							btn({
