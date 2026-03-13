@@ -1,6 +1,7 @@
 import {FormWindow} from "../FormWindow";
 import {fieldset, htmlfield, t, textfield} from "@intermesh/goui";
 import {languagefield} from "../form";
+import {attachmentsfield} from "../form/AttachmentsField";
 
 export class EmailTemplateDialog extends FormWindow {
 	private hideLanguage: boolean;
@@ -35,13 +36,18 @@ export class EmailTemplateDialog extends FormWindow {
 					required: true
 				}),
 				textfield({
+					hidden: true,
 					readOnly: true,
 					name: "key"
 				}),
 				textfield({
+					hidden: true,
 					name: "moduleId",
 					readOnly: true
 				})
+			),
+			fieldset({},
+				attachmentsfield()
 			)
 		);
 

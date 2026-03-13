@@ -53,7 +53,7 @@ export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<Ema
 								handler: () => {
 									const newRecord = structuredClone(record);
 									delete newRecord.id;
-									newRecord.blocks.map((b: any) => delete b.id);
+									newRecord.attachments.map((b: any) => delete b.id);
 									const dlg = new EmailTemplateDialog();
 									dlg.form.value = newRecord;
 									dlg.show();
