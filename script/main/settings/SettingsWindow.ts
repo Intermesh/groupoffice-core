@@ -9,9 +9,10 @@ export class SettingsWindow extends Window {
 	private cards: CardContainer;
 	constructor(selectedItemId:string|undefined, user:User = client.user) {
 		super();
-		this.title = t("Settings");
-		this.maximized = true;
-		this.maximizable = false;
+		this.title = t("My Account");
+		this.width = 1100;
+		this.height = 800;
+		this.resizable = true;
 
 		this.on("close", () => {
 			router.setPath("");

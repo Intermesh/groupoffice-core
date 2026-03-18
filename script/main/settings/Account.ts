@@ -1,70 +1,52 @@
-import {checkbox, comp, datasourceform, fieldset, form, t, textfield} from "@intermesh/goui";
+import {checkbox, comp, datasourceform, fieldset, numberfield, t, textfield} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {settingsPanels} from "./SettingsWindow.js";
 import {imagefield} from "../../components/index.js";
-import {client} from "../../jmap/index.js";
 import {User, userDS} from "../../auth/index.js";
+import {modules} from "../../Modules";
 
-class Account extends AbstractSettingsPanel {
-	private form;
+settingsPanels.add(class Account extends AbstractSettingsPanel {
 	constructor() {
 		super("account", t("Account"), "account_box");
+		const core = modules.get("core", "core")!;
+		const rights = core.userRights,
+			settings = core.settings;
 
-		this.items.add(
-			this.form = datasourceform({dataSource: userDS},
+		this.items.add(this.form = datasourceform({dataSource: userDS},
+			fieldset({},
+				comp({ width: 200},
+					imagefield({name: "avatarId"}),
+					checkbox({name: "enabled", label: t("Enabled"),type: "switch", hidden: !rights.mayChangeUsers})
+				),
+				comp({cls: "flow", flex: 1, minWidth: 200},
+					textfield({name: "displayName", label: t("Name"), required: true}),
+					textfield({name: "username", label: t("Username"), validate(v) {
+							if(!/^[A-Za-z0-9_\-.@]*$/.test(v))
+								this.invalidMsg = t("You have invalid characters in the username") + " (a-z, 0-9, -, _, ., @).";
 
-				fieldset({legend: t("User")},
-
-					imagefield({
-						name: "avatarId",
-						width: 200
+						}, required: true}),
+					textfield({name: "email", label: t("E-mail"),type:'email', required: true}),
+					textfield({name: "recoveryEmail", label: t("Recovery e-mail"),type:'email', required: true,
+						hint:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'
+							+t('Please use an email address that you can access from outside Group-Office.')
 					}),
-
-					comp({cls: "flow", flex: 1, minWidth: 200},
-						textfield({
-							label: t("Name"),
-							name: "displayName",
-							required: true
-						}),
-
-						textfield({
-							label: t("Username"),
-							name: "username",
-							required: true
-						}),
-
-						textfield({
-							label: t("E-mail"),
-							name: "email",
-							required: true
-						}),
-
-						textfield({
-							label: t("Recovery e-mail"),
-							name: "recoveryEmail",
-							required: true
-						}),
-
-						checkbox({
-							type: "switch",
-							name: "enabled",
-							label: t("Login enabled"),
-						})
-					)
 				)
+			),
+			comp({cls:'flow'},
+				fieldset({width: 320,legend: t('Disk space'), hidden: !rights.mayChangeUsers},
+					numberfield({name:'disk_quota', label: t('Disk quota'), suffix:'MB',decimals:0, hint:
+						t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
+					numberfield({name:'disk_usage', label: t('Space used'), readOnly:true})
+				),
+				fieldset({flex:1,legend: t('Password')},
+					textfield({name:'password', label: t('Password'), type:'password', minLength: settings.passwordMinLength}),
+					textfield({label: t('Confirm password'), type:'password', minLength: settings.passwordMinLength}),
+					checkbox({name: "forcePasswordChange", label: t("Force password change"),hidden: !rights.mayChangeUsers}),
+				)
+			),
+			fieldset({legend: t("Authorized clients")},
+
 			)
-		)
-
+		))
 	}
-
-	async save(){
-		return this.form.submit();
-	}
-
-	async load(user: User): Promise<any> {
-		this.form.value = user;
-		this.form.currentId = user.id;
-	}
-}
-
-settingsPanels.add(Account);
+});

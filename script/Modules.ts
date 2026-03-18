@@ -254,8 +254,8 @@ class Modules {
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
 
 		// stuff that mainlayout did on boot
-		const goui = "../../../../../../../views/goui/dist/goui/script/index.js?v=" + GO.version,
-			groupofficeCore = "../../../../../../../views/goui/dist/groupoffice-core/script/index.js?v=" + GO.version;
+		const goui = "../../../../../views/goui/dist/goui/script/index.js?v=" + GO.version,
+			groupofficeCore = "../../../../../views/goui/dist/groupoffice-core/script/index.js?v=" + GO.version;
 
 		window.GOUI = await import(goui);
 		window.groupofficeCore = await import(groupofficeCore);
@@ -301,8 +301,7 @@ class Modules {
 	 * Loads module script before being authenticated
 	 */
 	public async loadCapabilities() {
-
-		const r =  await fetch("/go/modules/community/main/capabilities.php")
+		const r =  await fetch(BaseHref+"go/modules/community/main/capabilities.php")
 		const capabilities = await r.json();
 
 		LanguageField.languages = capabilities.languages;
@@ -313,7 +312,7 @@ class Modules {
 			capabilities.modules.filter((m:any) => {
 				return m.entry;
 			}).map((m:any) => {
-					return import(m.entry).catch((e) => {
+					return import(BaseHref+m.entry).catch((e) => {
 						console.error("Module loading error: ", e);
 					})
 			})
