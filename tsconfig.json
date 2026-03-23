@@ -15,13 +15,20 @@
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
-    "skipLibCheck": true
-// removed this as it caused goui to build alongside it
-//    "paths": {
-//      "@intermesh/goui": [
-//        "../goui/script/index.ts"
-//      ]
-//    }
-  }
+    "skipLibCheck": true,
+    "composite": true,
+    "rootDir": "./script",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    // removed this as it caused goui to build alongside it
+    "paths": {
+      "@intermesh/goui": [
+        "../goui/dist/index.d.ts",
+        "../goui/script/index.ts"
+      ]
+    }
+  },
+  "references": [
+    { "path": "../goui/" },
+  ]
 
 }
