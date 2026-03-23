@@ -20,12 +20,12 @@
     "rootDir": "./script",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     // removed this as it caused goui to build alongside it
-    "paths": {
-      "@intermesh/goui": [
-        "../goui/dist/index.d.ts",
-        "../goui/script/index.ts"
-      ]
-    }
+//    "paths": {
+//      "@intermesh/goui": [
+//        "../goui/dist/index.d.ts",
+//        "../goui/script/index.ts"
+//      ]
+//    }
   },
   "references": [
     { "path": "../goui/" },
