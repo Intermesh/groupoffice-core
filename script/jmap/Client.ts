@@ -329,8 +329,31 @@ export class Client extends Observable<ClientEventMap> {
 
 	private static blobCache: Record<string, Promise<any>> = {};
 
+
+
 	/**
-	 * Generate a URL for a blob ID
+	 * Generate a data URL for a blob ID
+	 *
+	 * @param blobId
+	 */
+	public async getBlobDataURL(blobId: string): Promise<string> {
+
+		const r = await fetch(client.downloadUrl(blobId), {
+			method: 'GET',
+			credentials: "include",
+			headers: this.buildHeaders()
+		});
+
+		const type = r.headers.get("Content-Type") || "application/octet-stream";
+		const ab = await r.arrayBuffer();
+		const b64 = btoa(
+			new Uint8Array(ab).reduce((s, b) => s + String.fromCharCode(b), '')
+		);
+		return `data:${type};base64,${b64}`;
+	}
+
+	/**
+	 * Generate an object URL for a blob ID
 	 *
 	 * @param blobId
 	 */
