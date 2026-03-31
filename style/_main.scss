@@ -4,7 +4,7 @@
 
 .main-container {
 	.header {
-		background-color: $colorMain;
+		background-color: var(--c-header-bg);
 		position:relative;
 
 		button.goui-button {
@@ -12,7 +12,7 @@
 		}
 
 		.overlay {
-			background-color: $colorMain;
+			background-color: var(--c-header-bg);
 
 			.goui-form-field .wrap {
 				background-color: rgba(255,255,255,0.1);

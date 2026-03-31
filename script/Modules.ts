@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, t, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, root, t, translate} from "@intermesh/goui";
 import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
@@ -280,7 +280,7 @@ class Modules {
 				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
 			}));
 		}
-		document.documentElement.cls('compact',go.User.theme === 'Compact');
+		// document.documentElement.cls('compact',go.User.theme === 'Compact');
 		window.GOUI.DateTime.staticInit(go.User.language.substring(0,2), go.User.firstWeekday);
 
 		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
@@ -308,15 +308,51 @@ class Modules {
 
 		document.title = capabilities.title;
 
+		this.applyCustomStyle(capabilities.settings);
+
 		return Promise.all(
 			capabilities.modules.filter((m:any) => {
 				return m.entry;
 			}).map((m:any) => {
-					return import(BaseHref+m.entry).catch((e) => {
+
+					return import(m.entry).catch((e) => {
 						console.error("Module loading error: ", e);
 					})
 			})
 		);
+	}
+
+	private applyCustomStyle(settings:any) {
+		let style = "<style> :root, body {";
+		style += this.printCustomStyle(settings, 'Color') + "};";
+		style += "body.dark{" + this.printCustomStyle(settings, 'Dark');
+		style += "};</style>";
+
+		document.head.insertAdjacentHTML('beforeend', style);
+
+		(document.getElementsByTagName("meta") as any)["theme-color"].content = document.body.style.getPropertyValue("--fg-main");
+console.log(document.body.style.getPropertyValue("--fg-main"));
+	}
+
+	private printCustomStyle(settings:any, theme = 'Color') {
+
+		const vars:any = {
+			'--fg-main': 'primary',
+			'--c-primary': 'secondary',
+			'--c-secondary': 'tertiary',
+			'--c-accent': 'accent'
+		}
+
+		let style = "";
+		for(const css in vars) {
+			const prefix = vars[css];
+			const varName = prefix + theme;
+			if(settings[varName]) {
+
+				style += `${css}: #${settings[varName]};\n`;
+			}
+		}
+		return style;
 	}
 
 
