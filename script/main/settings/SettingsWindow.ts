@@ -3,6 +3,8 @@ import {router} from "../../Router.js";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
+import {OPS} from "pdfjs-dist";
+import save = OPS.save;
 
 export class SettingsWindow extends Window {
 
@@ -50,8 +52,11 @@ export class SettingsWindow extends Window {
 							cls: "filled primary",
 							text: t("Save"),
 							handler: async () => {
-								await this.save();
-								this.close();
+
+								const success = await this.save();
+								if(success) {
+									this.close();
+								}
 							}
 						})
 					)
@@ -71,10 +76,15 @@ export class SettingsWindow extends Window {
 		})
 	}
 
+	/**
+	 * Saves all settings panels. Returns true if all panels were saved successfully.
+	 * @returns
+	 */
 	public async save() {
 		try {
 			this.mask();
-			await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
+			const p = await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
+			return p.filter(i => !i).length === 0;
 		} finally {
 			this.unmask();
 		}

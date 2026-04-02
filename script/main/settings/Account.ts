@@ -20,14 +20,7 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 				),
 				comp({cls: "flow", flex: 1, minWidth: 200},
 					textfield({name: "displayName", label: t("Name"), required: true}),
-					textfield({name: "username", label: t("Username")
-						// validate(v) {
-						// 	if(!/^[A-Za-z0-9_\-.@]*$/.test(v))
-						// 		this.invalidMsg = t("You have invalid characters in the username") + " (a-z, 0-9, -, _, ., @).";
-						//
-						// },
-						, required: true}
-						),
+					textfield({name: "username", label: t("Username"), required: true, pattern: "[A-Za-z0-9_\\-.@]*"}),
 					textfield({name: "email", label: t("E-mail"),type:'email', required: true}),
 					textfield({name: "recoveryEmail", label: t("Recovery e-mail"),type:'email', required: true,
 						hint:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'
@@ -39,19 +32,16 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 				fieldset({width: 320,legend: t('Disk space'), hidden: !rights.mayChangeUsers},
 					numberfield({
 						name:'disk_quota', label: t('Disk quota'),
-						//suffix:'MB',
+						suffix:'MB',
+						prefix: '€',
+						icon: "star",
 						decimals:0,
 						hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
 					numberfield({name:'disk_usage', label: t('Space used'), readOnly:true})
 				),
 				fieldset({flex:1,legend: t('Password')},
-					textfield({
-						name: 'password', label: t('Password'), type: 'password'
-						//minLength: settings.passwordMinLength
-					}),
-					textfield({label: t('Confirm password'), type:'password'
-						//, minLength: settings.passwordMinLength
-					}),
+					textfield({name: 'password', label: t('Password'), type: 'password', minLength: settings.passwordMinLength}),
+					textfield({label: t('Confirm password'), type:'password', minLength: settings.passwordMinLength}),
 					checkbox({name: "forcePasswordChange", label: t("Force password change"),hidden: !rights.mayChangeUsers}),
 				)
 			),

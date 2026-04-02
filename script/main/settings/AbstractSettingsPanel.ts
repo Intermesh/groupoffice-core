@@ -13,11 +13,11 @@ export abstract class AbstractSettingsPanel extends Component {
 		this.dataSet.icon = icon;
 	}
 
-	public async save() : Promise<any> {
+	public async save() : Promise<boolean> {
 		if(this.form){
 			return this.form.submit();
 		}
-		return Promise.resolve();
+		return Promise.resolve(true);
 	}
 
 	public async load(user:User) :Promise<any> {

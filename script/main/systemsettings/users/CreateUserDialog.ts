@@ -42,6 +42,7 @@ export class CreateUserDialog extends FormWindow {
 		this.width = 460;
 		this.height = 740;
 
+		const settings = modules.get("core", "core")!.settings;
 		this.generalTab.items.add(
 
 			fieldset({},
@@ -62,7 +63,8 @@ export class CreateUserDialog extends FormWindow {
 				textfield({
 					label: t("Username"),
 					name: "username",
-					required: true
+					required: true,
+					pattern: "[A-Za-z0-9_\\-.@]*"
 				}),
 
 				textfield({
@@ -93,6 +95,7 @@ export class CreateUserDialog extends FormWindow {
 					required: true,
 					type: "password",
 					autocomplete: "new-password",
+					minLength: settings.minPasswordLength,
 					buttons: [btn({
 						icon: "magic_button",
 						handler: (btn) => {
