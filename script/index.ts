@@ -13,3 +13,4 @@ export * from "./util/Recurrence.js";
 export * from "./customfields/index.js";
 export * from "./Entities.js";
 export * from "./main/index.js";
+export * from "./model/Link.js";

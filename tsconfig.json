@@ -11,7 +11,6 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "module": "preserve",
-    "baseUrl": ".",
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,

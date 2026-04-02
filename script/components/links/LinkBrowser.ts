@@ -1,25 +1,30 @@
 import {
-	btn, cards,
-	checkbox, column,
-	comp, Component,
-	datasourcestore, datecolumn,
-	EntityID, Format, menu, menucolumn, root, searchbtn, splitter, store,
-	t, Table,
-	table, TableColumn,
+	btn,
+	cards,
+	checkbox,
+	column,
+	comp,
+	Component,
+	datasourcestore,
+	datecolumn,
+	EntityID,
+	menu,
+	menucolumn,
+	searchbtn,
+	splitter,
+	t,
+	Table,
+	table,
+	TableColumn,
 	tbar,
-	TextField,
-	textfield,
 	Window
 } from "@intermesh/goui";
-import {SelectSearchPanel} from "./SelectSearchPanel";
 import {entityttypeable} from "../EntityTypeTable";
 import {Link, linkDS, Search, searchDS} from "../../model/Link";
 import {entities} from "../../Entities";
 import {LinkDetailWindow} from "./LinkDetailWindow";
 import {extjswrapper} from "../ExtJSWrapper";
-import {LinkDetail} from "./LinkDetail";
 import {DetailPanel} from "../DetailPanel";
-import {addbutton} from "./AddButton";
 import {SelectSearchWindow} from "./SelectSearchWindow";
 
 export class LinkBrowser extends Window {
