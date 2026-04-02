@@ -34,7 +34,6 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 						name:'disk_quota', label: t('Disk quota'),
 						suffix:'MB',
 						prefix: '€',
-						icon: "star",
 						decimals:0,
 						hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
 					numberfield({name:'disk_usage', label: t('Space used'), readOnly:true})
