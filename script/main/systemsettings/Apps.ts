@@ -3,7 +3,6 @@ import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {client} from "../../jmap/index.js";
 import {InstallModuleTile} from "./InstallModuleTile.js";
-import {ModuleTile} from "./ModuleTile.js";
 
 export interface ModuleInfo {
 	id: string

@@ -6,7 +6,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "start": "npm run build:clean && npm run start:parallel",
+    "start": "npm run build:clean &&gi npm run start:parallel",
     "start:parallel": "npm run start:watch & npm run start:sass",
     "start:watch": "npx tsc --watch",
     "start:sass": "npx sass --watch ./style:./dist",
@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
-    "@intermesh/goui": "latest",
     "chart.js": "latest",
     "ical.js": "2.1.0",
     "pdfjs-dist": "latest"
