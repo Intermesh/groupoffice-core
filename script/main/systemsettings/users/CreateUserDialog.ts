@@ -1,10 +1,10 @@
 import {FormWindow} from "../../../components/index.js";
 import {
-	autocompletechips, browser, btn,
+	autocompletechips, browser, btn, checkbox,
 	checkboxselectcolumn,
 	column,
 	datasourcestore,
-	fieldset, Notifier,
+	fieldset, Notifier, p, passwordfield,
 	t,
 	table,
 	TextField,
@@ -13,22 +13,6 @@ import {
 import {groupDS} from "../../../auth/index.js";
 import {modules} from "../../../Modules.js";
 
-
-function generatePassword(length = 16) {
-	const charset =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.<>?";
-	const charsetLength = charset.length;
-
-	const randomValues = new Uint32Array(length);
-	window.crypto.getRandomValues(randomValues);
-
-	let password = "";
-	for (let i = 0; i < length; i++) {
-		password += charset[randomValues[i] % charsetLength];
-	}
-
-	return password;
-}
 
 
 export class CreateUserDialog extends FormWindow {
@@ -89,25 +73,15 @@ export class CreateUserDialog extends FormWindow {
 			),
 
 			fieldset({},
-				textfield({
-					label: t("Password"),
-					name: "password",
-					required: true,
-					type: "password",
+				passwordfield({
 					autocomplete: "new-password",
 					minLength: settings.minPasswordLength,
-					buttons: [btn({
-						icon: "magic_button",
-						handler: (btn) => {
-							const pass = generatePassword(),
-								passwordFld = btn.findAncestorByType(TextField)!,
-								confirmFld = passwordFld.nextSibling() as TextField;
-							passwordFld.value = confirmFld.value = pass;
-							browser.copyTextToClipboard(pass);
-							Notifier.success(t("The generated password has been copied to your clipboard."));
-						}
-					})]
-				}),
+					required: true,
+
+				})
+					.on("generatepassword", ({target, password}) => {
+						(target.nextSibling() as TextField).value = password;
+					}),
 				textfield({
 					label: t("Confirm password"),
 					required: true,
@@ -122,7 +96,8 @@ export class CreateUserDialog extends FormWindow {
 							}
 						}
 					}
-				})
+				}),
+				checkbox({name: "forcePasswordChange", label: t("Force password change")}),
 			),
 
 			fieldset({},

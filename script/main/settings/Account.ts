@@ -1,4 +1,14 @@
-import {checkbox, comp, datasourceform, fieldset, numberfield, t, textfield} from "@intermesh/goui";
+import {
+	checkbox,
+	comp,
+	datasourceform,
+	fieldset,
+	numberfield,
+	passwordfield,
+	t,
+	TextField,
+	textfield
+} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {settingsPanels} from "./SettingsWindow.js";
 import {imagefield} from "../../components/index.js";
@@ -45,8 +55,30 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 					})
 				),
 				fieldset({flex:1,legend: t('Password')},
-					textfield({name: 'password', label: t('Password'), type: 'password', minLength: settings.passwordMinLength}),
-					textfield({label: t('Confirm password'), type:'password', minLength: settings.passwordMinLength}),
+					passwordfield({
+						autocomplete: "new-password",
+						minLength: settings.minPasswordLength,
+						required: true,
+
+					})
+						.on("generatepassword", ({target, password}) => {
+							(target.nextSibling() as TextField).value = password;
+						}),
+					textfield({
+						label: t("Confirm password"),
+						required: true,
+						type: "password",
+						autocomplete: "new-password",
+						listeners: {
+							validate: ({target}) => {
+								const passwordFld = target.previousSibling() as TextField;
+
+								if(target.value != passwordFld.value) {
+									target.setInvalid("The passwords don't match");
+								}
+							}
+						}
+					}),
 					checkbox({name: "forcePasswordChange", label: t("Force password change"),hidden: !rights.mayChangeUsers}),
 				)
 			),
