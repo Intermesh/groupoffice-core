@@ -7,13 +7,14 @@
 import {client} from "./Client.js";
 import {
 	AbstractDataSource,
+	DataSourceEventMap,
 	CommitResponse,
 	Config,
 	createComponent,
 	DefaultEntity, EntityID, MergeResponse,
 	QueryParams,
 	QueryResponse,
-	SetRequest
+	SetRequest,
 } from "@intermesh/goui";
 
 
@@ -33,6 +34,14 @@ import {
 // }
 
 
+export interface JmapDataSourceEventMap extends DataSourceEventMap {
+	/**
+	 * Fires when a state mismatch occurs. Normally the store will fetch updates and retry. But you can
+	 * cancel the update by returning false in the listener.
+	 */
+	statemismatch: {params: SetRequest<DefaultEntity>, error: any}
+}
+
 
 /**
  * JMAP Data source
@@ -40,7 +49,7 @@ import {
  * Single Source Of Truth for JMAP entities
  *
  */
-export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> extends AbstractDataSource<EntityType> {
+export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> extends AbstractDataSource<EntityType, JmapDataSourceEventMap> {
 
 	constructor(id:string) {
 		super(id);
@@ -87,8 +96,25 @@ export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> ex
 		} catch(error:any) {
 			//automatic retry when statemismatch occurs
 			if(error.type && error.type == 'stateMismatch') {
-				console.warn("statemismatch, we'll update and auto retry the JMAP set request");
+
+				console.warn("statemismatch", JSON.stringify(
+					{
+						error: error,
+					}
+				))
+
 				await this.updateFromServer();
+
+				if(this.fire("statemismatch", {
+					error: error,
+					params: params
+				}) === false) {
+					console.warn("statemismatch auto retry cancelled by event");
+					throw error;
+				}
+
+
+				console.warn("statemismatch, we'll update and auto retry the JMAP set request");
 				params.ifInState = await this.getState();
 				return this.internalCommit(params);
 			}
