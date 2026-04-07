@@ -1,6 +1,6 @@
-@use '../../goui/style/util' as *;
-@use '../../goui/style/config' as *;
-@use '../../goui/style/layout';
+@use '@intermesh/goui/style/util' as *;
+@use '@intermesh/goui/style/config' as *;
+@use '@intermesh/goui/style/layout';
 
 .main-container {
 	.header {
@@ -74,7 +74,7 @@
 	&:after {
 		background-color: transparent;
 		opacity: 1;
-		background-image: url("./resources/groupoffice-logo-white.svg");
+		background-image: url("../resources/groupoffice-logo-white.svg");
 		background-repeat: no-repeat;
 		background-size: 20rem auto;
 		background-position: 3.2rem 3.2rem;

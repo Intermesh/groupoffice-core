@@ -6,25 +6,26 @@
   },
   "scripts": {
     "test": "mocha",
-    "start": "npm run build:clean &&gi npm run start:parallel",
-    "start:parallel": "npm run start:watch & npm run start:sass",
-    "start:watch": "npx tsc --watch",
-    "start:sass": "npx sass --watch ./style:./dist",
+    "start": "npm run build:clean && npm run start:parallel",
+    "start:parallel": "npm run start:watch & npm run start:watch-dts & npm run start:sass",
+    "start:watch": "node esbuild.mjs watch",
+    "start:watch-dts": "npx tsc --watch --emitDeclarationOnly",
+    "start:sass": "npx sass --load-path=$(npm root) --watch ./style:./dist",
 
     "build": "npm run build:clean && npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
-    "build:sass": "npx sass --style=compressed --no-source-map ./style:./dist",
-    "build:ts": "npx tsc",
+    "build:sass": "npx sass --load-path=$(npm root) --style=compressed --no-source-map ./style:./dist",
+    "build:ts": "node esbuild.mjs",
+    "build:dts": "npx tsc --emitDeclarationOnly",
     "test:ts": "tsc --noEmit",
 
-
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   },
   "dependencies": {
+    "@intermesh/goui": "latest",
     "@fortaine/fetch-event-source": "latest",
     "chart.js": "latest",
-    "ical.js": "2.1.0",
-    "pdfjs-dist": "latest"
+    "ical.js": "2.1.0"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
@@ -41,15 +42,12 @@
     "Group-Office"
   ],
   "homepage": "https://github.com/Intermesh/groupoffice-core#readme",
+  "main": "dist/index.js",
   "module": "./dist/index.js",
   "typings": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js"
-    }
-  },
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
-  "version": "2.0.7",
-  "main": "index.js"
+  "version": "2.0.7"
+
+
 }

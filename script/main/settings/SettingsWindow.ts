@@ -3,8 +3,6 @@ import {router} from "../../Router.js";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
-import {OPS} from "pdfjs-dist";
-import save = OPS.save;
 
 export class SettingsWindow extends Window {
 

@@ -18,9 +18,5 @@
     "composite": true,
     "rootDir": "./script",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
-  },
-  "references": [
-    { "path": "../goui/" },
-  ]
-
+  }
 }

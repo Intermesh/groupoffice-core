@@ -254,8 +254,8 @@ class Modules {
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
 
 		// stuff that mainlayout did on boot
-		const goui = "../../../../../views/goui/dist/goui/script/index.js?v=" + GO.version,
-			groupofficeCore = "../../../../../views/goui/dist/groupoffice-core/script/index.js?v=" + GO.version;
+		const goui = "../../../../../node_modules/@intermesh/goui/dist/index.js?v=" + GO.version,
+			groupofficeCore = "../../../../../views/goui//groupoffice-core/dist/index.js?v=" + GO.version;
 
 		window.GOUI = await import(goui);
 		window.groupofficeCore = await import(groupofficeCore);
