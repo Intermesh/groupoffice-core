@@ -43,16 +43,10 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 					numberfield({
 						name:'disk_quota', label: t('Disk quota'),
 						suffix:'MB',
-						multiplier: 1/(1024*1024), //bytes to MB
+						prefix: '€',
 						decimals:0,
 						hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
-					numberfield({
-						name:'disk_usage',
-						multiplier: 1/(1024*1024), //bytes to MB
-						label: t('Space used'),
-						readOnly:true,
-						suffix: "MB"
-					})
+					numberfield({name:'disk_usage', label: t('Space used'), readOnly:true})
 				),
 				fieldset({flex:1,legend: t('Password')},
 					passwordfield({

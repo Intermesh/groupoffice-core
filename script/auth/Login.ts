@@ -257,8 +257,8 @@ export class Login extends Window<LoginEventMap> {
 
 		if (!this.registerForm) {
 			this.registerForm = new RegisterForm();
-			this.registerForm.on("submit", async ({target}) => {
-				if((await target.isValid())) {
+			this.registerForm.on("submit", ({target}) => {
+				if(target.isValid()) {
 					this.close();
 					Notifier.success(t("Registration and successful"));
 					this.fire("login", {});
