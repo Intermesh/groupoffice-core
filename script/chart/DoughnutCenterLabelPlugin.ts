@@ -1,4 +1,4 @@
-import {Chart, ChartDataset, ChartType, DefaultDataPoint} from "chart.js/auto";
+import {Chart, ChartDataset, ChartType, DefaultDataPoint} from "chart.js";
 
 declare module 'chart.js' {
 	interface PluginOptionsByType<TType extends ChartType> {
