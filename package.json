@@ -6,13 +6,13 @@
   },
   "scripts": {
     "test": "mocha",
-    "start": "npm run build:clean && npm run start:parallel",
+    "start": "npm run start:parallel",
     "start:parallel": "npm run start:watch & npm run start:watch-dts & npm run start:sass",
     "start:watch": "node esbuild.mjs watch",
     "start:watch-dts": "npx tsc --watch --emitDeclarationOnly",
     "start:sass": "npx sass --update --load-path=$(npm root) --watch ./style:./dist",
 
-    "build": "npm run build:clean && npm run build:sass && npm run build:ts",
+    "build": "npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed --no-source-map ./style:./dist",
     "build:ts": "node esbuild.mjs",
