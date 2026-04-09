@@ -23,9 +23,9 @@ const opts = {
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
-	target: "es2017",
+	target: "es2020",
 	external: ["@intermesh/goui"],
-	minify: false,//!watch,
+	minify: !watch,
 	outdir: "dist",
 	//plugins: [importPathPlugin],
 	logLevel: "info"
