@@ -2,7 +2,8 @@
   "type": "module",
   "devDependencies": {
     "sass": "latest",
-    "typescript": "5.9.*"
+    "typescript": "5.9.*",
+    "esbuild": "latest"
   },
   "scripts": {
     "test": "mocha",
