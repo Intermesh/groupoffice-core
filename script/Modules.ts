@@ -301,7 +301,7 @@ class Modules {
 	 * Loads module script before being authenticated
 	 */
 	public async loadCapabilities() {
-		const r =  await fetch(BaseHref+"go/modules/community/main/capabilities.php")
+		const r =  await fetch(BaseHref+"views/goui/capabilities.php")
 		const capabilities = await r.json();
 
 		LanguageField.languages = capabilities.languages;

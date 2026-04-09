@@ -5,7 +5,7 @@ import {Router as GouiRouter, RouterMethod} from "@intermesh/goui";
  */
 class Router extends GouiRouter {
 	
-	public newMainLayout = document.location.pathname.indexOf("/main/") > -1;
+	public newMainLayout = true;//document.location.pathname.indexOf("/main/") > -1;
 	public add(re: RegExp | RouterMethod, handler?: RouterMethod) {
 
 		if(!this.newMainLayout)

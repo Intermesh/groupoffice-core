@@ -1,18 +1,4 @@
-import {
-	avatar,
-	btn,
-	cardmenu,
-	cards,
-	comp,
-	Component,
-	h4,
-	Menu,
-	menu, root,
-	searchbtn,
-	t,
-	tbar,
-	Window
-} from "@intermesh/goui";
+import {avatar, btn, cardmenu, cards, comp, Component, h4, Menu, menu, root, t, tbar, Window} from "@intermesh/goui";
 import {modules} from "../Modules.js";
 import {entities} from "../Entities.js";
 import {ExtJSWrapper} from "../components/ExtJSWrapper.js";

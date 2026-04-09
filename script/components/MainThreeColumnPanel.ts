@@ -9,7 +9,7 @@ import {Component, splitter, btn, t, router} from "@intermesh/goui";
  * center: main grid
  * east: Show detail
  */
-export abstract class MainThreeColumnPanel extends Component {
+export abstract class MainThreeColumnPanel<West extends Component = Component, Center extends Component = Component, East extends Component = Component> extends Component {
 	protected readonly center;
 	protected readonly west;
 	protected readonly east;
@@ -116,21 +116,21 @@ export abstract class MainThreeColumnPanel extends Component {
 	 *
 	 * @protected
 	 */
-	protected abstract createWest(): Component
+	protected abstract createWest(): West
 
 	/**
 	 * Create east panel
 	 *
 	 * @protected
 	 */
-	protected abstract createEast(): Component
+	protected abstract createEast(): East
 
 	/**
 	 * Create center panel
 	 *
 	 * @protected
 	 */
-	protected abstract createCenter(): Component
+	protected abstract createCenter(): Center
 
 	/**
 	 * Activate the given panel
