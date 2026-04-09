@@ -13,7 +13,7 @@
     "start:watch-dts": "npx tsc --watch --emitDeclarationOnly",
     "start:sass": "npx sass --update --load-path=$(npm root) --watch ./style:./dist",
 
-    "build": "npm run build:sass && npm run build:ts",
+    "build": "npm run build:sass && npm run build:ts && npm run build:dts",
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed ./style:./dist",
     "build:ts": "node esbuild.mjs",
