@@ -2,7 +2,7 @@
   "type": "module",
   "devDependencies": {
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.x"
   },
   "scripts": {
     "test": "mocha",
@@ -18,10 +18,8 @@
   },
   "dependencies": {
     "@fortaine/fetch-event-source": "latest",
-    "@intermesh/goui": "latest",
     "chart.js": "latest",
-    "ical.js": "2.1.0",
-    "pdfjs-dist": "latest"
+    "ical.js": "2.1.0"
   },
   "author": "Intermesh",
   "license": "LGPL-3.0-or-later",
