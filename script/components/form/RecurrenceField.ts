@@ -21,7 +21,7 @@ export class RecurrenceField extends Field {
 	private readonly picker: RecurrencePicker
 	private readonly pickerButton: Button;
 
-	protected control: HTMLInputElement | undefined
+	declare protected control: HTMLInputElement | undefined
 
 	protected baseCls = 'goui-form-field recurrence';
 

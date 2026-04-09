@@ -23,7 +23,7 @@ const opts = {
 	bundle: true,
 	sourcemap: true,
 	format: "esm",
-	target: "es2020",
+	target: "es2022",
 	external: ["@intermesh/goui"],
 	minify: !watch,
 	outdir: "dist",
