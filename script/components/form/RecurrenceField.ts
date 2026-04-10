@@ -147,4 +147,4 @@ export class RecurrenceField extends Field {
  *
  * @param config
  */
-	export const recurrencefield = (config?: FieldConfig<RecurrenceField>) => createComponent(new RecurrenceField(), config);
+export const recurrencefield = (config?: FieldConfig<RecurrenceField>) => createComponent(new RecurrenceField(), config);
