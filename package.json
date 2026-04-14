@@ -13,7 +13,7 @@
     "start:watch-dts": "npx tsc --watch --emitDeclarationOnly",
     "start:sass": "npx sass --update --load-path=$(npm root) --watch ./style:./dist",
 
-    "build": "npm run build:sass && npm run build:ts && npm run build:dts",
+    "build": "npm run build:sass && npm run build:ts",
     "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --update --load-path=$(npm root) --style=compressed ./style:./dist",
     "build:ts": "node esbuild.mjs",
@@ -43,8 +43,6 @@
     "Group-Office"
   ],
   "homepage": "https://github.com/Intermesh/groupoffice-core#readme",
-  "main": "dist/index.js",
-  "module": "./dist/index.js",
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
   "version": "2.0.8",
