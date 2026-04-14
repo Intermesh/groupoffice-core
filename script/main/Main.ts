@@ -6,11 +6,13 @@ import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
+import {Notify} from "./Notifier";
 
 class Main extends Component {
-	private readonly menu;
-	private readonly container;
-	private _launcher?: Launcher;
+	private readonly menu
+	private readonly container
+	private _launcher?: Launcher
+	private declare readonly notify
 	constructor() {
 		super();
 
@@ -27,6 +29,7 @@ class Main extends Component {
 			cardContainer: this.container
 		});
 
+		this.notify = new Notify();
 
 		// default route opens first module
 		router.add(() => {
@@ -40,60 +43,28 @@ class Main extends Component {
 
 
 	private createAccountMenu() {
-		return menu({
-			isDropdown: true,
-			removeOnClose: false
-		},
-
+		return menu({isDropdown: true, removeOnClose: false},
 			h4(client.user.displayName),
-
 			"-",
-
-			btn({
-				icon: "account_circle",
-				text: t("Account settings"),
-				handler: () => {
-					void router.goto("settings");
-				}
+			btn({icon: "account_circle", text: t("Account settings")}).on('click',() => {
+				void router.goto("settings");
 			}),
-
-			btn({
-				icon: "settings",
-				text: t("System settings"),
-				handler: () => {
-					void router.goto("systemsettings");
-				}
+			btn({icon: "settings", text: t("System settings")}).on('click',() => {
+				void router.goto("systemsettings");
 			}),
-
 			"-",
-
-			btn({
-				icon: "info",
-				text: t("About"),
-				handler: () => {
-					void Window.alert(t("About"), "TODO")
-				}
+			btn({icon: "info", text: t("About")}).on('click',() => {
+				void Window.alert(t("About"), "TODO")
 			}),
-
-			btn({
-				icon: "help",
-				text: t("Documentation"),
-				handler: () => {
-					window.open("https://www.group-office.com/documentation.html", "_blank");
-				}
+			btn({icon: "help", text: t("Documentation")}).on('click',() => {
+				window.open("https://www.group-office.com/documentation.html", "_blank");
 			}),
-
 			"-",
-
-			btn({
-				icon: "exit_to_app",
-				text: t("Logout"),
-				handler: async () => {
-					await client.logout();
-					document.location.reload();
-				}
+			btn({icon: "exit_to_app", text: t("Logout")}).on('click',async () => {
+				await client.logout();
+				document.location.reload();
 			})
-			)
+		);
 	}
 
 	private getLauncher() {
@@ -119,53 +90,33 @@ class Main extends Component {
 
 
 		this.items.add(
-			comp({
-					cls: "header hbox"
-				},
+			comp({cls: "header hbox"},
 				this.menu,
 				tbar({cls: "header-right"},
-					btn({
-						icon: "notifications"
+					this.notify.btn,
+					btn({icon: "search"}).on('click',() => {
+						const m = new MainSearchWindow();
+						m.show();
 					}),
-					btn({
-						icon: "search",
-						handler: () => {
-							const m = new MainSearchWindow();
-							m.show();
+
+					btn({title: t("Launcher"),icon: "apps"}).on('click', async () => {
+						(await this.getLauncher()).show();
+					}),
+
+					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
+						target.displayName = client.user.displayName
+						if(client.user.avatarId) {
+							target.backgroundImage = client.downloadUrl(client.user.avatarId);
 						}
-
-					}),
-
-					btn({
-						title: t("Launcher"),
-						icon: "apps",
-						handler: async () => {
-							(await this.getLauncher()).show();
-
-						}
-					}),
-
-					avatar({
-						style: {cursor: "pointer"},
-						listeners: {
-							render: ({target}) => {
-								target.displayName = client.user.displayName
-								if(client.user.avatarId) {
-									target.backgroundImage = client.downloadUrl(client.user.avatarId);
-								}
-								target.el.on("click", () => {
-									if(!this.accountMenu) {
-										this.accountMenu = this.createAccountMenu();
-										this.accountMenu.alignTo = target.el;
-									}
-
-									this.accountMenu.show();
-								})
+						target.el.on("click", () => {
+							if(!this.accountMenu) {
+								this.accountMenu = this.createAccountMenu();
+								this.accountMenu.alignTo = target.el;
 							}
 
-						}
+							this.accountMenu.show();
+						})
 					})
-
 				)
 			),
 			this.container
