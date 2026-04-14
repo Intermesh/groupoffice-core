@@ -45,10 +45,14 @@
   "homepage": "https://github.com/Intermesh/groupoffice-core#readme",
   "main": "dist/index.js",
   "module": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
-  "version": "2.0.8"
-
+  "version": "2.0.8",
+  "exports": {
+    ".": {
+      "types": "./script/index.ts",
+      "default": "./dist/index.js"
+    }
+  }
 
 }
