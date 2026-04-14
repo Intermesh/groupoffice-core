@@ -8,7 +8,7 @@
   "scripts": {
     "test": "mocha",
     "start": "npm run start:parallel",
-    "start:parallel": "npm run start:watch & npm run start:watch-dts & npm run start:sass",
+    "start:parallel": "npm run start:watch & npm run start:sass",
     "start:watch": "node esbuild.mjs watch",
     "start:watch-dts": "npx tsc --watch --emitDeclarationOnly",
     "start:sass": "npx sass --update --load-path=$(npm root) --watch ./style:./dist",

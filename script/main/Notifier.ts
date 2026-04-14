@@ -37,22 +37,23 @@ export class Notify extends Observable {
 
 	declare btn: Button
 	private canNotify = false
-	private notifications: INotification[] = [];
 	private readonly store: Store<INotification>
 	private panel
+	private count = 0
 	private msgList: List
 
 	constructor() {
 		super();
 
-		this.store = store<INotification>({data:this.notifications});
+		this.store = store<INotification>({data:[]});
 
 		// has child with cls "notifications"
-		const area = comp({cls:'notifications'},
+		const area = comp({cls:'notifications', hidden:true},
 			tbar({},'->',
 				btn({icon: 'delete_sweep', title: t('Dismiss all')}).on('click', _=>{
-					area.hide();
+
 					Window.confirm(t("Confirm"), t('Are you sure you want to dismiss all notifications?')).then(ok => {
+						area.hide();
 						ok && this.clear();
 					});
 				}),
@@ -69,7 +70,7 @@ export class Notify extends Observable {
 		root.items.add(area);
 
 		this.btn = btn({icon: "notifications"}).on('click',_=>{
-			area.show();
+			area.hidden ? area.show() : area.hide();
 		});
 
 		Notifier.on('notify',({msg})=>{
@@ -101,19 +102,22 @@ export class Notify extends Observable {
 		// 	msg.el.remove(); // todo
 		// });
 		this.store.clear();
-		this.btn.dataSet.count = 0;
+		this.count = 0;
+		this.btn.el.dataset.count = '';
 	}
 
 	private add(msg: INotification) {
 		this.store.add(msg);
 		this.msgList.onStoreLoad();
-		this.btn.dataSet.count = this.notifications.length;
+		this.count++;
+		this.btn.el.dataset.count = this.count+'';
 	}
 
 	private remove(msg:INotification) {
 		this.store.remove(msg);
 		this.msgList.onStoreLoad();
-		this.btn.dataSet.count = this.notifications.length;
+		this.count--;
+		this.btn.el.dataset.count = this.count === 0 ? '' : this.count+'';
 	}
 
 	async initNotifications() {
