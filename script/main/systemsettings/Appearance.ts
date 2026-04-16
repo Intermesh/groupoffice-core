@@ -1,5 +1,5 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
-import {btn, colorfield, Component, comp, fieldset, t} from "@intermesh/goui";
+import {btn, colorfield, Component, comp, fieldset, t, p} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {imagefield} from "../../components/index.js";
@@ -22,7 +22,8 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 
 				imagefield({
 					name: "logoId",
-					width: 200
+					width: 200,
+					icon: "image"
 				}),
 
 				this.createColorField("primaryColor", "Primary color", "--fg-main", "1652A1"),
@@ -40,7 +41,8 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 
 				imagefield({
 					name: "logoIdDark",
-					width: 200
+					width: 200,
+					icon: "image"
 				}),
 
 				this.createColorField("primaryDark", "Primary color", "--fg-main", "1652A1"),

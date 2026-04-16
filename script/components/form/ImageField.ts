@@ -1,4 +1,16 @@
-import {Avatar, avatar, browser, btn, comp, Config, createComponent, Field, t, tbar} from "@intermesh/goui";
+import {
+	Avatar,
+	avatar,
+	browser,
+	btn,
+	comp,
+	Config,
+	createComponent,
+	Field,
+	MaterialIcon,
+	t,
+	tbar
+} from "@intermesh/goui";
 import {client} from "../../jmap/index.js";
 
 export class ImageField extends Field {
@@ -43,6 +55,14 @@ export class ImageField extends Field {
 				)
 			)
 		)
+	}
+
+	set icon(icon: MaterialIcon | "" | undefined) {
+		this.avatar.icon = icon;
+	}
+
+	get icon() {
+		return this.avatar.icon;
 	}
 
 	protected internalSetValue(v:string|undefined) {
