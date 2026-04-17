@@ -2,6 +2,24 @@
 @use '@intermesh/goui/style/config' as *;
 @use '@intermesh/goui/style/layout';
 
+
+.groupoffice-logo {
+	// 210 x 43
+	background-image: url("../resources/groupoffice-logo-white.svg");
+	background-size: contain;
+	background-repeat: no-repeat;
+	height: 4rem;
+	width: 21rem;
+	margin: .8rem 1.6rem;
+	display:block;
+}
+
+@media only screen and (max-width: $breakpointSmall) {
+	.groupoffice-logo {
+		display: none;
+	}
+}
+
 .main-container {
 	.header {
 		background-color: var(--c-header-bg);

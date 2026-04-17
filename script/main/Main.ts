@@ -91,6 +91,9 @@ class Main extends Component {
 
 		this.items.add(
 			comp({cls: "header hbox"},
+				comp({
+					cls: "groupoffice-logo"
+				}),
 				this.menu,
 				tbar({cls: "header-right"},
 					this.notify.btn,
