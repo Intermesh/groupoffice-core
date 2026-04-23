@@ -97,7 +97,7 @@ export class CsvMappingDialog extends Window {
 										btn({
 											text: t("Rename"),
 											handler: async () => {
-												const name = await Window.prompt("Name", this.importMapping.name);
+												const name = await Window.prompt({inputLabel: t("Name"), text: this.importMapping.name});
 
 												if (name) {
 													this.importMapping.name = name;
@@ -108,7 +108,7 @@ export class CsvMappingDialog extends Window {
 											text: t("Copy as"),
 											handler: async () => {
 												if (this.importMapping.id !== "new") {
-													const name = await Window.prompt("Name", this.importMapping.name);
+													const name = await Window.prompt({inputLabel: t("Name"), text: this.importMapping.name});
 
 													if (name) {
 														importMappingDS.create({

@@ -3,7 +3,7 @@ import {BaseEntity, browser, t, Window} from "@intermesh/goui";
 import {CsvMappingDialog} from "./CsvMappingDialog.js";
 
 export abstract class Import {
-	public static async importFile(entity: string, accept: string, values: Record<string, any>, options: Record<string, any>) {
+	public static async fromFile(entity: string, accept: string, values: Record<string, any>, options: Record<string, any>) {
 		const files = await browser.pickLocalFiles(true, undefined, accept);
 
 		const blobs = await client.uploadMultiple(files);

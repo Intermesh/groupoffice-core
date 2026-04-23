@@ -176,7 +176,7 @@ export class ColumnSelectDialog extends Window {
 			defaultName = preset.name;
 		}
 
-		const name = await Window.prompt(t("Please enter a name"), t("name"), defaultName);
+		const name = await Window.prompt({title: t("Please enter a name"), inputLabel: t("Name"), defaultValue: defaultName});
 
 		if (!name) {
 			return

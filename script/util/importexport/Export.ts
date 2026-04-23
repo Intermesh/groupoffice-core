@@ -4,7 +4,7 @@ import {ColumnSelectDialog} from "./ColumnSelectDialog.js";
 import {Entity} from "../../Entities.js";
 
 export abstract class Export {
-	public static exportToFile(entity: string, queryParams: Record<string, any>, extension: string) {
+	public static toFile(entity: string, queryParams: Record<string, any>, extension: string) {
 		if (extension == 'csv' || extension == 'xlsx' || extension == 'html') {
 			const dlg = new ColumnSelectDialog(entity, extension);
 
