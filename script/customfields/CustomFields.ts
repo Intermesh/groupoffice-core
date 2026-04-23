@@ -1,22 +1,7 @@
 import {EntityID, TableColumn} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index.js";
 import {AclItemEntity, AclOwnerEntity} from "../auth/index.js";
-import {
-	AbstractCustomField, CheckboxCustomField,
-	ContactCustomField,
-	DateCustomField,
-	DateTimeCustomField, FileCustomField, FunctionCustomField,
-	GroupCustomField,
-	HtmlCustomField, MultiContactCustomField,
-	MultiSelectCustomField, NotesCustomField,
-	NumberCustomField,
-	ProjectCustomField,
-	SelectCustomField, TemplateCustomField,
-	TextAreaCustomField,
-	TextCustomField,
-	UserCustomField,
-	YesNoCustomField
-} from "./Types.js";
+import {Type} from "./type/index.js";
 
 
 export interface FieldSet extends AclOwnerEntity {
@@ -26,7 +11,9 @@ export interface FieldSet extends AclOwnerEntity {
 	isTab: boolean,
 	collapseIfEmpty: boolean,
 	parentFieldSetId: EntityID|undefined,
-	columns: number
+	columns: number,
+	sortOrder: number,
+	aclId: number
 }
 
 export type SelectOption = {
@@ -51,6 +38,7 @@ export interface Field extends AclItemEntity {
 	hiddenInGrid: boolean,
 	required: boolean,
 	hint?: string,
+	sortOrder: number,
 	options: {
 		validationRegex?:string
 		validationModifiers?:string
@@ -67,33 +55,31 @@ export const fieldSetDS = new JmapDataSource<FieldSet>("FieldSet");
 export const fieldDS = new JmapDataSource<Field>("Field");
 
 
-type ConstructableAbstractCustomField = {
-	new (...args: ConstructorParameters<typeof AbstractCustomField>): AbstractCustomField;
-};
-
-
-
 class CustomFields {
 	private fieldSets: Record<string, FieldSet[]> = {};
 	private fields: Record<string, Field[]> = {};
 
 
 	public async init() {
-		const fs = await fieldSetDS.get();
-		fs.list.forEach(fs => {
-			if (!this.fieldSets[fs.entity])
-				this.fieldSets[fs.entity] = [];
+		return Promise.all([
+			fieldSetDS.get().then(fs => {
+				fs.list.forEach(fs => {
+					if (!this.fieldSets[fs.entity])
+						this.fieldSets[fs.entity] = [];
 
-			this.fieldSets[fs.entity].push(fs);
-		})
+					this.fieldSets[fs.entity].push(fs);
+				})
+			}),
 
-		const f = await fieldDS.get();
-		f.list.forEach(f => {
-			if (!this.fields[f.fieldSetId])
-				this.fields[f.fieldSetId] = [];
+			fieldDS.get().then(f => {
+				f.list.forEach(f => {
+					if (!this.fields[f.fieldSetId])
+						this.fields[f.fieldSetId] = [];
 
-			this.fields[f.fieldSetId].push(f);
-		})
+					this.fields[f.fieldSetId].push(f);
+				})
+			})
+		])
 	}
 
 	getEntityFields(entity: string) {
@@ -120,49 +106,41 @@ class CustomFields {
 		return this.fields[fieldSet.id] ?? [];
 	}
 
-	private types: Record<string, ConstructableAbstractCustomField> = {
-		Date: DateCustomField,
-		DateTime: DateTimeCustomField,
-		YesNo: YesNoCustomField,
-		Checkbox: CheckboxCustomField,
-		Select: SelectCustomField,
-		MultiSelect: MultiSelectCustomField,
-		User: UserCustomField,
-		Number: NumberCustomField,
-		FunctionField: FunctionCustomField,
-		Group: GroupCustomField,
-		Html: HtmlCustomField,
-		TextArea: TextAreaCustomField,
-		Text: TextCustomField,
-		Notes: NotesCustomField,
-		Template: TemplateCustomField,
+	private types: Record<string, Type> = {}
 
-		// Todo, these should be added by the modules using registerTableColumnCreator
-		Project: ProjectCustomField,
-		Contact: ContactCustomField,
-		MultiContact: MultiContactCustomField,
-		File: FileCustomField
+	/**
+	 * Register a custom field type
+	 *
+	 * @param cf
+	 */
+	public registerType(cf: Type) {
+		this.types[cf.name] = cf;
+	}
+
+	/**
+	 * Get all registered custom field types
+	 */
+	public getTypes() {
+		return Object.keys(this.types);
 	}
 
 
-	public registerType(type: string, cf: ConstructableAbstractCustomField) {
-		this.types[type] = cf;
-	}
+	/**
+	 * Get a custom field type by name
+	 * @param type
+	 */
+	public getType(type: string) {
 
-
-	public getType(f: Field) {
-
-		return this.types[f.type]
-			? new this.types[f.type](f)
-			: new this.types["Text"](f)
+		return this.types[type]
+			? this.types[type]
+			: this.types["Text"]
 	}
 
 	public getTableColumns(entity: string): TableColumn[] {
 		return this.getEntityFields(entity).map(f => {
-			return this.getType(f).createTableColumn();
+			return this.getType(f.type).createTableColumn(f);
 		}).filter(c => c !== undefined);
 	}
-
 
 }
 

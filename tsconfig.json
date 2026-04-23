@@ -1,29 +1,18 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "es2020",
+    "target": "ES2022",
     "sourceMap": true,
-    "lib": [
-      "es2020",
-      "dom"
-    ],
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "esModuleInterop": true,
     "module": "preserve",
-    "baseUrl": ".",
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
-
-    "paths": {
-      "@intermesh/goui": [
-        "../dist/goui/script/index.d.ts"
-      ]
-    }
-  },
-  "include": [
-    "./script"
-  ],
-
+    "skipLibCheck": true,
+    "composite": true,
+    "rootDir": "./script",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+  }
 }

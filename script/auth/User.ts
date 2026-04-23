@@ -2,10 +2,10 @@ import {BaseEntity, DefaultEntity, EntityID} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index";
 
 export interface User extends AclOwnerEntity {
-	username?: string,
-	displayName?: string,
+	username: string,
+	displayName: string,
 	profile?: any,
-	email?: string,
+	email: string,
 	dateFormat:string,
 	timeFormat:string,
 	timezone:string,
@@ -19,10 +19,10 @@ export interface User extends AclOwnerEntity {
 export interface Principal extends DefaultEntity {
 	id:string
 	name: string
-	email?: string
-	description?:string
-	timeZone?:string
-	avatarId?:string
+	email: string | undefined
+	description:string  | undefined
+	timeZone:string  | undefined
+	avatarId:string  | undefined
 	type: string
 }
 

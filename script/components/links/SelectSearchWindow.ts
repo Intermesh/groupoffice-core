@@ -35,9 +35,9 @@ export class SelectSearchWindow extends Window<SelectSearchWindowEventMap> {
 				)
 		);
 
-		this.selectSearchPanel.resultTable.on("rowdblclick", () => {
-			this.select()
-		})
+		this.selectSearchPanel.on('select', ({record}) => {
+			this.fire("select", {records: [record]});
+		});
 
 		this.on('focus', () => {
 			this.selectSearchPanel.focus();

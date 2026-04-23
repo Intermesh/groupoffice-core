@@ -56,7 +56,7 @@ export class Image extends Component {
 	}
 
 	/**
-	 * Replaces all img tags with a blob ID source from group-office with an objectURL
+	 * Replaces all img tags with a blob ID source from group-office with an data URL
 	 *
 	 * @param el
 	 * @return Promise that resolves when all images are fully loaded
@@ -68,7 +68,8 @@ export class Image extends Component {
 
 			let blobId = img.dataset.blobId;
 			if(!blobId) {
-				const regex = new RegExp('blob=([^">\'&\?].*)');
+				//match blob= in img src attributes. For example emails have this from the email module.
+				const regex = new RegExp(/blob=([^">'&?]*)/);
 				const matches = regex.exec(img.src);
 				if(matches && matches[1]) {
 					blobId = matches[1];
@@ -76,10 +77,10 @@ export class Image extends Component {
 			}
 
 			if(blobId) {
-
+				img.dataset.blobId = blobId;
 				img.src = Image.defaultSrc;
 
-				promises.push(client.getBlobURL(blobId).then(src => {
+				promises.push(client.getBlobDataURL(blobId).then(src => {
 
 					img.src = src;
 				}).then(() => {

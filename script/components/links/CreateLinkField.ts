@@ -18,8 +18,7 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 
 	constructor() {
 
-		const selectLinkPanel = new SelectSearchPanel();
-
+		const selectLinkPanel = new SelectSearchPanel(false);
 		super(selectLinkPanel.resultTable);
 
 		this.selectSearchPanel = selectLinkPanel;

@@ -8,6 +8,7 @@ export class HtmlFieldMentionPlugin {
 		const tbBtn = 	btn({
 			icon: "alternate_email",
 			title: t("Mention user"),
+			tabIndex: -1, // Skip toolbar in tabbing through forms
 			handler: () => {
 				const lastChar = this.getPreviousChar();
 				let insert = "@";

@@ -1,7 +1,7 @@
-@forward '../../goui/style/util';
-@use '../../goui/style/util';
-@forward '../../goui/style/config' with (
-	$resourcePath: "../../goui/resources/",
+@forward '@intermesh/goui/style/util';
+@use '@intermesh/goui/style/util';
+@forward '@intermesh/goui/style/config' with (
+	$resourcePath: "../../../../node_modules/@intermesh/goui/resources/",
 	$borderWidth: 1px,
 	$baseLineHeight: util.dp(20),
 	$fontSize: util.sp(16)

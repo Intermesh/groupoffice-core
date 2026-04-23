@@ -9,10 +9,10 @@ import {Component, splitter, btn, t, router} from "@intermesh/goui";
  * center: main grid
  * east: Show detail
  */
-export abstract class MainThreeColumnPanel extends Component {
-	protected readonly center;
-	protected readonly west;
-	protected readonly east;
+export abstract class MainThreeColumnPanel<West extends Component = Component, Center extends Component = Component, East extends Component = Component> extends Component {
+	protected center! : Center;
+	protected west! : West;
+	protected east!: East;
 
 	/**
 	 * Constructor
@@ -26,8 +26,19 @@ export abstract class MainThreeColumnPanel extends Component {
 		this.id = idAndRoute;
 
 		this.cls = "hbox fit mobile-cards";
+	}
 
-		this.center = this.createCenter();
+
+	/**
+	 * Child classes can call this method top setup the component after the child is fully constructed
+	 *
+	 * @param west
+	 * @param center
+	 * @param east
+	 * @protected
+	 */
+	protected setup(center: Center, west: West, east: East) {
+		this.center = center;
 		this.center.itemId = "center";
 		if(!this.center.minWidth) {
 			this.center.minWidth = 300;
@@ -40,7 +51,7 @@ export abstract class MainThreeColumnPanel extends Component {
 		//center is active by default
 		this.center.el.classList.add("active");
 
-		this.west = this.createWest();
+		this.west = west;
 		this.west.itemId = "west";
 
 		if(!this.west.minWidth) {
@@ -50,13 +61,12 @@ export abstract class MainThreeColumnPanel extends Component {
 			this.west.width = 300;
 		}
 
-		this.east = this.createEast();
+		this.east = east;
 		this.east.itemId = "east";
 		this.east.flex = 1;
 		if(!this.east.minWidth) {
 			this.east.minWidth = 140;
 		}
-
 
 		this.items.add(
 
@@ -110,27 +120,6 @@ export abstract class MainThreeColumnPanel extends Component {
 			}
 		})
 	}
-
-	/**
-	 * Create west panel
-	 *
-	 * @protected
-	 */
-	protected abstract createWest(): Component
-
-	/**
-	 * Create east panel
-	 *
-	 * @protected
-	 */
-	protected abstract createEast(): Component
-
-	/**
-	 * Create center panel
-	 *
-	 * @protected
-	 */
-	protected abstract createCenter(): Component
 
 	/**
 	 * Activate the given panel

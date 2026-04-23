@@ -1,19 +1,10 @@
-import {
-	BaseEntity,
-	Component,
-	EntityID,
-	MaterialIcon,
-	ObjectUtil,
-	t,
-	Translate,
-	translate,
-	Window
-} from "@intermesh/goui";
-import {client, jmapds} from "./jmap/index.js";
+import {BaseEntity, Component, EntityID, MaterialIcon, root, t, translate} from "@intermesh/goui";
+import {client, JmapDataSource} from "./jmap/index.js";
 import {Entity} from "./Entities.js";
 import {User} from "./auth";
-import {DetailPanel} from "./components/index";
-
+import {DetailPanel, extjswrapper, LanguageField} from "./components/index";
+import {main} from "./main/index.js";
+import {router} from "./Router.js";
 
 export interface EntityFilter {
 	name: string,
@@ -100,18 +91,38 @@ export type ModuleConfig = {
 	entities?: (string | EntityConfig)[];
 };
 
+export type MainPanel = {
+	package: string
+	module: string,
+	id: string,
+	title: string
+	callback: () => Component | Promise<Component>
+}
+
+
+// interface LegacyPanel extends typeof Component {
+// 	cls: string
+// 	id: string
+// 	moduleName: string
+// 	package: string
+// 	sort_order: number
+// 	title: string
+// }
+
 // for using old components in GOUI
 declare global {
 	var GO: any;
 	var go: any;
 	var Ext: any;
 	var BaseHref: string;
+
+	var GOUI: any;
+	var groupofficeCore: any;
 }
 
 let GouiMainPanel : any, GouiSystemSettingsPanel : any, GouiAccountSettingsPanel: any;
 
 if(window.GO) {
-	client.uri = document.location.origin + BaseHref + "api/";
 
 	GO.mainLayout.on("authenticated", () => {
 		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
@@ -132,7 +143,7 @@ if(window.GO) {
 			}, this);
 		},
 
-		 setSize (w:number, h:number){
+		 setSize (_w:number, _h:number){
 			// dont
 		 }
 
@@ -207,20 +218,205 @@ if(window.GO) {
 
 
 export interface Module extends BaseEntity {
+	id: EntityID
+	title: string
 	name: string,
 	package: string,
 	rights: string[],
 	settings: Record<string, any>
 	userRights: Record<string, boolean>,
 	version: number,
-	entities: Record<string, Entity>
+	entities: Record<string, Entity>,
+	enabled: boolean
+	/**
+	 * goui, extjs3
+	 */
+	views: string[]
 }
 
+export const moduleDS = new JmapDataSource<Module>("Module");
 
 class Modules {
 
-	private mods: Record<string, ModuleConfig> = {};
-	private modules?: Module[];
+	private clientModules: Record<string, ModuleConfig> = {};
+	private serverModules: Record<string, Module> = {};
+
+	private mainPanels: Record<string,MainPanel> = {};
+
+
+	private async legacyInit(): Promise<any> {
+
+		if(window.GOUI) {
+			// already initialized in old MainLayout.js UI
+			return;
+		}
+
+		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
+
+		// stuff that mainlayout did on boot
+		const goui = "@intermesh/goui",
+			groupofficeCore = "@intermesh/groupoffice-core";
+
+		window.GOUI = await import(goui);
+		window.groupofficeCore = await import(groupofficeCore);
+
+		await go.User.onLoad(client.session);
+
+		go.browserStorage.connect().finally(function() {
+			Ext.QuickTips.init();
+			Ext.apply(Ext.QuickTips.getQuickTip(), {
+				dismissDelay: 0,
+				maxWidth: 500
+			});
+		});
+
+
+		//load state
+		if(!GO.util.isMobileOrTablet()) {
+			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+		} else
+		{
+			Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
+			}));
+		}
+		// document.documentElement.cls('compact',go.User.theme === 'Compact');
+		window.GOUI.DateTime.staticInit(go.User.language.substring(0,2), go.User.firstWeekday);
+
+		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
+
+		return Promise.all([
+			go.Modules.init(), // TODO jmapds() and userDS two separate stores??
+			go.User.loadLegacyModuleScripts(),
+		]). then( async () => {
+			// this init depends on modules being loaded
+			await go.customfields.CustomFields.init()
+			go.Entities.init()
+			go.User.loadLegacyModules()
+
+		})
+	}
+
+	/**
+	 * Loads module script before being authenticated
+	 */
+	public async loadCapabilities() {
+		const r =  await fetch(BaseHref+"views/goui/capabilities.php")
+		const capabilities = await r.json();
+
+		LanguageField.languages = capabilities.languages;
+
+		document.title = capabilities.title;
+
+		this.applyCustomStyle(capabilities.settings);
+
+		const gouiModules = capabilities.modules.filter((m:any) => {
+			return m.entry;
+		});
+
+		return Promise.all(gouiModules.map((m:any) => {
+					return import(m.entry).catch((e) => {
+						console.error("Module loading error: ", e);
+					})
+			})
+		);
+	}
+
+	private applyCustomStyle(settings:any) {
+		let style = "<style> :root, body {";
+		style += this.printCustomStyle(settings, 'Color') + "};";
+		style += "body.dark{" + this.printCustomStyle(settings, 'Dark');
+		style += "};</style>";
+
+		document.head.insertAdjacentHTML('beforeend', style);
+
+		(document.getElementsByTagName("meta") as any)["theme-color"].content = document.body.style.getPropertyValue("--fg-main");
+console.log(document.body.style.getPropertyValue("--fg-main"));
+	}
+
+	private printCustomStyle(settings:any, theme = 'Color') {
+
+		const vars:any = {
+			'--fg-main': 'primary',
+			'--c-primary': 'secondary',
+			'--c-secondary': 'tertiary',
+			'--c-accent': 'accent'
+		}
+
+		let style = "";
+		for(const css in vars) {
+			const prefix = vars[css];
+			const varName = prefix + theme;
+			if(settings[varName]) {
+
+				style += `${css}: #${settings[varName]};\n`;
+			}
+		}
+		return style;
+	}
+
+
+	/**
+	 * The legacyscript.php is loaded by index.html. We transform the old modules into GOUI wrapped panels here.
+	 *
+	 * the user must be authenticated at this point in contrast to the new goui modules
+	 *
+	 * @private
+	 */
+	public loadLegacyUI() {
+
+		GO.moduleManager.getAllPanelConfigs().forEach((m:any) => {
+
+			const id = m.package+"/"+m.moduleName;
+
+			this.mainPanels[id] = {
+				package: m.package,
+				module: m.moduleName,
+				id: id,
+				title: m.title,
+				callback: () => {
+
+					const pnl = GO.moduleManager.getPanel(m.moduleName);
+					pnl.header = false;
+
+					return extjswrapper({
+						cls: "fit",
+						title: m.title,
+						comp: Ext.create(pnl)
+					});
+				}
+			};
+
+		})
+	}
+
+	/**
+	 * Initializes after the user is authenticated.
+	 *
+	 * It populates the serverModules entities from the JMAP server.
+	 */
+	public async init() {
+
+		return Promise.all([
+
+			this.legacyInit(),
+
+			moduleDS.get().then( serverMods => {
+				serverMods.list.map(m => {
+					if (!m.package) {
+						m.package = "legacy";
+					}
+					const id = m.package + "/" + m.name;
+					this.serverModules[id] = m;
+				})
+
+			})
+		]);
+	}
+
+	public getPanelById(id:string) : MainPanel|undefined {
+		return this.mainPanels[id] ?? undefined;
+	}
 
 	/**
 	 * Register a module so it's functionally is added to the GUI
@@ -231,21 +427,27 @@ class Modules {
 
 		const id = config.package + "/" + config.name;
 
-		if(this.mods[id]) {
+		// console.log(id); // why no legacy modules?????
+
+		if(this.clientModules[id]) {
 			return; //already registered
 		}
 
-		this.mods[id] = config;
+		this.clientModules[id] = config;
 
 
-
-		go.Translate.package = config.package;
-		go.Translate.module = config.name;
+		if(window.go) {
+			go.Translate.package = config.package;
+			go.Translate.module = config.name;
+		}
 
 		if (config.init) {
 			config.init();
 		}
-		this.registerInExtjs(config);
+
+		if(window.go) {
+			this.registerInExtjs(config);
+		}
 	}
 
 
@@ -260,22 +462,36 @@ class Modules {
 	 */
 	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
 
-		go.Translate.package = go.package = pkg;
-		go.Translate.module = go.module = module;
-
 		translate.setDefaultModule(pkg, module);
 
-		// @ts-ignore
-		const proto = Ext.extend(GouiMainPanel, {
-			id: id,
-			title: title,
-			callback: callback
-		});
+		if(!router.newMainLayout) {
+			go.Translate.package = go.package = pkg;
+			go.Translate.module = go.module = module;
+			// @ts-ignore
+			const proto = Ext.extend(GouiMainPanel, {
+				id: id,
+				title: title,
+				callback: callback
+			});
 
-		proto.package = pkg;
-		proto.module = module;
+			proto.package = pkg;
+			proto.module = module;
 
-		go.Modules.addPanel(proto);
+			go.Modules.addPanel(proto);
+		}
+
+		this.mainPanels[id] ={
+			package: pkg,
+			module: module,
+			id,
+			title,
+			callback
+		};
+
+	}
+
+	public getMainPanels() {
+		return Object.values(this.mainPanels);
 	}
 
 
@@ -291,6 +507,11 @@ class Modules {
 	 */
 	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component | Promise<Component>) {
 
+		if(!window.go) {
+
+			//todo
+			return;
+		}
 		go.Translate.package = go.package = pkg;
 		go.Translate.module = go.module = module;
 
@@ -323,20 +544,27 @@ class Modules {
 		const proto = new GouiAccountSettingsPanel({
 			callback: callback,
 			title: title,
-			iconCls: "ic-"+icon.replace('_', '-'),
+			iconCls: "ic-" + icon.replace('_', '-'),
 			itemId: id
 		});
 
 		GO.userSettingsPanels.push(proto);
+
 	}
 
 	/**
 	 * Open a main panel
 	 *
 	 * @param id
+	 * @deprecated use main.openPanel()
 	 */
 	public openMainPanel(id: string) {
-		GO.mainLayout.openModule(id);
+		// old extjs mainlayout
+		if(!main.rendered) {
+			GO.mainLayout.openModule(id);
+		} else {
+			return main.openPanel(id);
+		}
 	}
 
 	private registerInExtjs(config: ModuleConfig) {
@@ -351,7 +579,7 @@ class Modules {
 	 * Get all modules
 	 */
 	public getAll() : Module[] {
-		return go.Modules.getAvailable();
+		return Object.values(this.serverModules);
 	}
 
 	/**
@@ -361,7 +589,7 @@ class Modules {
 	 * @param name
 	 */
 	public isAvailable(pkg:string, name:string) : boolean {
-		return go.Modules.isAvailable(pkg, name);
+		return !!this.get(pkg, name);
 	}
 
 	/**
@@ -371,8 +599,7 @@ class Modules {
 	 * @param name
 	 */
 	public get(pkg:string, name:string) : Module | undefined {
-		const mod = go.Modules.get(pkg, name);
-		return mod ? mod : undefined;
+		return this.serverModules[pkg + "/" + name];
 	}
 
 
