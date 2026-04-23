@@ -21,7 +21,6 @@ export abstract class Export {
 	}
 
 	private static export(entity: string, queryParams: Record<string, any>, extension: string, columns?:string[]) {
-		debugger
 		client.jmap(entity + "/query", queryParams).then((result) => {
 			client.jmap(entity + "/export", {
 				extension: extension,
