@@ -4,12 +4,13 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {DateTime, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {DateTime, EntityID, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
 import {customFields} from "../customfields/CustomFields.js";
+import {modules} from "../Modules";
 
 
 export interface LoginData {
@@ -51,6 +52,22 @@ export type UploadResponse = {
 	subfolder: string | undefined
 }
 
+export type JmapSession = {
+	version: string
+	auth: any
+	accounts: any[]
+	capabilities: any[]
+	apiUrl: string
+	downloadUrl: string
+	pageUrl: string
+	uploadUrl: string
+	eventSourceUrl: string
+	userId: EntityID
+	state: any,
+	accessToken: string,
+	CSRFToken:string
+}
+
 /**
  * Result reference
  *
@@ -79,7 +96,7 @@ export class Client extends Observable<ClientEventMap> {
 	private _lastCallId?:string;
 	private _requests: [method: string, params: any, callid: string][] = [];
 	private _requestData: any = {};
-	private _session: any;
+	private _session?: JmapSession;
 
 	private debugParam = "";// "XDEBUG_SESSION=1"
 
@@ -90,17 +107,17 @@ export class Client extends Observable<ClientEventMap> {
 	 */
 	public uri = "";
 
-	private CSRFToken = "";
+	public CSRFToken = "";
 
 	/**
 	 * Either a cookie + CSRFToken are used when the API is on the same site. If it's not then an access token can be used
 	 *
 	 * @private
 	 */
-	private accessToken = "";
+	public accessToken = "";
 	private delayedJmap: (...args: any[]) => void;
 	private SSEABortController?: AbortController;
-	private pollInterval?: number;
+	private pollInterval?: any;
 	private SSEEventsRegistered: boolean = false;
 	private SSELastEntities?: string[];
 
@@ -115,18 +132,18 @@ export class Client extends Observable<ClientEventMap> {
 	constructor() {
 		super();
 
+
 		this.delayedJmap = FunctionUtil.buffer(0, () => {
 			this.doJmap();
 		})
 	}
 
-	set session(session:any) {
+	set session(session: JmapSession) {
 
 		if(session.accessToken) {
 			this.accessToken = session.accessToken;
 			sessionStorage.setItem("accessToken", this.accessToken);
-			// don't put this in the session to prevent token theft
-			delete session.accessToken;
+
 		}
 
 		this._session = session;
@@ -143,7 +160,7 @@ export class Client extends Observable<ClientEventMap> {
 	 *
 	 * this.authenticate() has to be called first.
 	 */
-	get session() {
+	get session(): JmapSession | undefined {
 		return this._session;
 	}
 
@@ -192,15 +209,11 @@ export class Client extends Observable<ClientEventMap> {
 		// make sure we update user
 		await userDS.reset();
 
-		const user =  await userDS.single(this._session.userId);
-
-		if(!user) {
-			return false;
-		}
-
-		this.setUser(user);
-
-		await customFields.init();
+		await Promise.all([
+			userDS.single(this._session.userId).then(user => {
+				this.setUser(user);
+			})
+			])
 
 		this.fire("authenticated", {session: this._session});
 
@@ -234,9 +247,9 @@ export class Client extends Observable<ClientEventMap> {
 	/**
 	 * This function is only used up to 6.8. In 6.9 authenticate() is called in mainlayout.js
 	 */
-	public async fireAuth() {
-		this.session = go.User.session;
-		this._user = go.User;
+	public fireAuth() {
+		// this.session = go.User.session;
+		// this._user = go.User;
 
 		this.fire("authenticated", {session: this._session});
 	}
@@ -316,8 +329,31 @@ export class Client extends Observable<ClientEventMap> {
 
 	private static blobCache: Record<string, Promise<any>> = {};
 
+
+
 	/**
-	 * Generate a URL for a blob ID
+	 * Generate a data URL for a blob ID
+	 *
+	 * @param blobId
+	 */
+	public async getBlobDataURL(blobId: string): Promise<string> {
+
+		const r = await fetch(client.downloadUrl(blobId), {
+			method: 'GET',
+			credentials: "include",
+			headers: this.buildHeaders()
+		});
+
+		const type = r.headers.get("Content-Type") || "application/octet-stream";
+		const ab = await r.arrayBuffer();
+		const b64 = btoa(
+			new Uint8Array(ab).reduce((s, b) => s + String.fromCharCode(b), '')
+		);
+		return `data:${type};base64,${b64}`;
+	}
+
+	/**
+	 * Generate an object URL for a blob ID
 	 *
 	 * @param blobId
 	 */
@@ -496,7 +532,7 @@ export class Client extends Observable<ClientEventMap> {
 	 *
 	 * @param method
 	 * @param params
-	 * @param callId
+	 * @param callId Make sure this ID is unique if you pass it
 	 */
 	public jmap(method: string, params: Object = {}, callId: string|undefined = undefined): Promise<any> {
 		if(callId === undefined) {
@@ -539,7 +575,7 @@ export class Client extends Observable<ClientEventMap> {
 
 					if (!this._requestData[callId]) {
 						//aborted
-						console.debug("Aborted");
+						console.debug("Aborted", callId, response);
 						return true;
 					}
 
@@ -588,7 +624,7 @@ export class Client extends Observable<ClientEventMap> {
 
 	public startPolling(entities:string[]) {
 		this.updateAllDataSources(entities);
-		this.pollInterval =setInterval(() => {
+		this.pollInterval = setInterval(() => {
 			this.updateAllDataSources(entities);
 		}, 60000);
 	}
@@ -626,7 +662,11 @@ export class Client extends Observable<ClientEventMap> {
 				return false;
 			}
 
-			const session = await this.session;
+			const session = this.session;
+			if(!session)
+			{
+				return;
+			}
 
 			if (!session.eventSourceUrl) {
 				console.debug("Server Sent Events (EventSource) is disabled on the server.");
@@ -716,3 +756,8 @@ export class Client extends Observable<ClientEventMap> {
 }
 
 export const client = new Client();
+
+if(window.GO) {
+	client.uri = document.location.origin + BaseHref + "api/";
+}
+

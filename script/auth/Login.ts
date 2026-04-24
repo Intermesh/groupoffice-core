@@ -1,7 +1,7 @@
 import {
 	btn,
 	CardContainer,
-	cards,
+	cards, checkbox,
 	comp,
 	fieldset,
 	form,
@@ -36,15 +36,21 @@ export class Login extends Window<LoginEventMap> {
 	private registerForm!: Form;
 	private forgotPasswordForm!: Form;
 
+	protected createModalOverlayCls() {
+		return "goui-window-modal-overlay login-overlay";
+	}
+
 	constructor() {
 		super();
 
 		this.width = 480;
-		this.height = 800;
+		this.height = "auto";
 		this.title = t("Login");
 		this.cls = "login";
 		this.modal = true;
-		this.resizable = true;
+		this.resizable = false;
+		this.draggable = false;
+		this.draggable = false;
 
 
 		this.on("close", async window => {
@@ -83,6 +89,13 @@ export class Login extends Window<LoginEventMap> {
 					autocomplete: "current-password",
 					required: true
 				}),
+
+				checkbox({
+					type: "switch",
+					label: t("Remember my login on this device"),
+					name: "rememberLogin"
+				}),
+
 				btn({
 					style: {
 						width: "100%"
@@ -303,11 +316,10 @@ export class Login extends Window<LoginEventMap> {
 		client.session = await response.json();
 		const success = await client.authenticate();
 		if(!success) {
-			//???
 			Notifier.error("Sorry, an unexpected error occurred");
 		} else {
-			Notifier.success(t("Logged in successfully"));
-			this.close();
+			Notifier.success(t("Welcome back, {name}!").replace('{name}', client.user.displayName));
+			this.hide();
 			this.fire("login", {});
 		}
 

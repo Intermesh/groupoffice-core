@@ -1,5 +1,5 @@
-@use '../../goui/style/util';
-@use '../../goui/style/config';
+@use '@intermesh/goui/style/util';
+@use '@intermesh/goui/style/config';
 
 .goui-share-panel {
 	.goui-avatar {
@@ -31,6 +31,22 @@
 		cursor: pointer;
 	}
 }
+
+.list.checkbox-list {
+	padding-bottom: util.dp(16);
+	li {
+		padding-left: util.dp(16);
+		.goui-form-field.check {
+			.control {
+				.box-label {
+					padding-top: util.dp(4);
+					padding-bottom: util.dp(4);
+				}
+			}
+		}
+	}
+}
+
 //@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
 	//.goui-module-panel {
 	//	top : 0;
@@ -39,3 +55,158 @@
 	//	margin-right: util.dp(240);
 	//}
 //}
+
+
+.image-field {
+
+	align-items: start;
+
+	.image-field-container{
+
+	}
+
+	.goui-avatar {
+		margin: 0 auto;
+	}
+	.goui-toolbar {
+		margin: 0;
+	}
+}
+
+h4.goui {
+	font: config.$fontBase;
+	font-weight: bold;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.goui.card.module {
+
+	width: util.dp(400);
+
+	&.installed {
+		.desc {
+			img {
+				width: util.dp(24);
+				height: util.dp(24);
+			}
+		}
+	}
+
+	.desc {
+		margin: util.dp(16) util.dp(16)  0 util.dp(16);
+		display: flex;
+		flex-direction: row;
+		gap: util.dp(16);
+
+		> div {
+			min-width: 0;
+			flex: 1;
+		}
+
+		img {
+			margin-top: util.dp(8);
+			width: util.dp(64);
+			height: util.dp(64);
+			//margin: 0 util.dp(16);
+			//padding: util.dp(8) util.dp(16);
+		}
+
+
+
+		p {
+			height: util.dp(60);
+			text-overflow: ellipsis;
+			overflow: hidden;
+			margin: 0;
+		}
+	}
+}
+
+.goui.apps {
+	margin: util.dp(16);
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(40rem, max-content));
+	grid-gap: 0;
+	justify-content: center;
+	padding: initial;
+	overflow-y: scroll;
+	flex: 1;
+	align-content: start;
+	position: relative;
+	h3 {
+		//width: 100%;
+		position:sticky;
+		top: 0;
+		z-index: 1;
+		background-color: config.$surfaceLow;
+		grid-column: 1 / -1;
+		padding: util.dp(16) 0 util.dp(8);
+
+		border-bottom: util.dp(4) solid config.$colorPrimary;
+	}
+}
+
+.goui.launcher {
+	position: absolute;
+	z-index: 10000000;
+	width: 100%;
+	bottom: 0;
+	top: 0;
+	opacity: 1;
+	transition: opacity 200ms cubic-bezier(0.4, 0.0, 0.6, 1);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	background-color: rgba(0, 0, 0, 0.68);
+
+	&[hidden] {
+		display: grid !important;
+		opacity: 0;
+		ul {transform: scale(.9);}
+		pointer-events: none;
+	}
+
+
+	padding: util.dp(80);
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(14rem, 17%), 1fr));
+	justify-content: space-between;
+	align-content: start;
+	transform: scale(1);
+	grid-gap: 1.6rem;
+	overflow-y: auto;
+
+	.goui-button {
+		align-items: end;
+		color: white;
+		height: 14rem;
+		width: 14rem;
+		background-position: center 1.6rem;
+		background-repeat: no-repeat;
+		background-size: 7.2rem 7.2rem;
+
+		font-size: 1.4rem;
+		font-weight: normal;
+
+		//background-color: #3e3e3e;
+		//border-radius: 1rem;
+
+	}
+
+
+	&:before {
+		z-index: 10000001;
+		content: " ";
+		position:absolute;
+		background-image: url(./resources/groupoffice-logo-white.svg);
+		background-size: contain;
+		background-repeat: no-repeat;
+		height: util.dp(40);
+		width: util.dp(240);
+		margin: util.dp(12) util.dp(16);
+		display:block;
+		top: 0;
+		left: 0;
+	}
+}

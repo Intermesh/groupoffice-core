@@ -93,8 +93,7 @@ export class Recurrence {
 			if (next.compare(startT) < 0) {
 				continue;
 			}
-			const dt = new DateTime(next.toJSDate());
-			dt.timezone = this.config.dtstart.timezone;
+			const dt = new DateTime(next.toJSDate(), this.config.dtstart.timezone);
 			yield dt;
 		}
 	}

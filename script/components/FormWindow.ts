@@ -84,6 +84,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 		this.height = 600;
 		this.maximizable = true;
 		this.resizable = true;
+		this.collapsible = true;
 
 		const e = entities.get(this.entityName);
 		translate.setDefaultModule(e.package, e.module);
@@ -163,6 +164,7 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 			return true;
 		}
 		if(this.form.isModified()) {
+			console.log(this.form.modified);
 			Window.confirm(t("Are you sure you want to close this window and discard your changes?")).then((confirmed) => {
 				if(confirmed) {
 					this.internalClose();

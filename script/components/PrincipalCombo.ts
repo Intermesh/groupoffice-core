@@ -15,6 +15,9 @@ import {Principal, principalDS, User} from "../auth/index.js";
 export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 
 	constructor(
+		/**
+		 * If provided, it will only show entities of this type. For example "User"
+		 */
 		entity?:string,
 		renderer:ComboRenderer = ComboBoxDefaultRenderer,
 		storeConfig:ComboBoxStoreConfig<JmapDataSource<Principal>> = {
@@ -47,6 +50,9 @@ export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 }
 
 export type PrincipalComboConfig = Omit<ComboBoxConfig<PrincipalCombo>, "dataSource"> & {
+	/**
+	 * If provided, it will only show entities of this type. For example "User"
+	 */
 	entity?: string
 }
 

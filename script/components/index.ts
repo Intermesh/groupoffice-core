@@ -6,7 +6,9 @@ export * from './filter/FilterPanel.js';
 export * from './FilesButton.js';
 export * from './MainThreeColumnPanel.js';
 export * from './form/index.js';
-export * from './picker/RecurrencePicker.js';
+export * from './picker/index.js';
+export * from './emailtemplate/index';
+export * from './pdftemplate/index';
 
 export * from './EntityTypeTable.js';
 export * from './links';

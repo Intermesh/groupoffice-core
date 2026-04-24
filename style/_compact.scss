@@ -1,5 +1,5 @@
-@use '../../goui/style/util';
-@use '../../goui/style/config';
+@use '@intermesh/goui/style/util';
+@use '@intermesh/goui/style/config';
 
 html.compact {
 	--density: 7.125px; // 44.53125% of 16px = 7.125px
