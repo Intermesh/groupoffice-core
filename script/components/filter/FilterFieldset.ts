@@ -101,7 +101,7 @@ export class FilterFieldset extends Fieldset {
 													customfield: filter.customfield
 												});
 
-												const cls = eval(filter.type);
+												const cls = (0, eval)(filter.type);
 
 												filterField.items.add(fieldset({},
 													new cls(filter.typeConfig)
