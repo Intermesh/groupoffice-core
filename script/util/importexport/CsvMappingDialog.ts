@@ -30,22 +30,12 @@ export class CsvMappingDialog extends Window {
 	private importMappingCombo: ComboBox;
 	private lookupSelect: SelectField;
 
-	private entity: string;
-	private readonly blobId: string;
-	private readonly values: Record<string, any>;
-	private fields: Record<string, any>;
-
 	private csvHeadersStore!: Store;
 	private mappingId: string | undefined;
 	private importMapping!: importMapping;
 
-	constructor(entity: string, fileName: string, blobId: string, values: Record<string, any>, fields: Record<string, any>, aliases: Record<string, any>, lookupFields: Record<string, any>) {
+	constructor(private entity: string, fileName: string, private blobId: string, private values: Record<string, any>, private fields: Record<string, any>, aliases: Record<string, any>, lookupFields: Record<string, any>) {
 		super();
-
-		this.entity = entity;
-		this.blobId = blobId;
-		this.values = values;
-		this.fields = fields;
 
 		this.title = t("Import Comma Separated values");
 
@@ -97,7 +87,10 @@ export class CsvMappingDialog extends Window {
 										btn({
 											text: t("Rename"),
 											handler: async () => {
-												const name = await Window.prompt({inputLabel: t("Name"), text: this.importMapping.name});
+												const name = await Window.prompt({
+													inputLabel: t("Name"),
+													text: this.importMapping.name
+												});
 
 												if (name) {
 													this.importMapping.name = name;
@@ -108,7 +101,10 @@ export class CsvMappingDialog extends Window {
 											text: t("Copy as"),
 											handler: async () => {
 												if (this.importMapping.id !== "new") {
-													const name = await Window.prompt({inputLabel: t("Name"), text: this.importMapping.name});
+													const name = await Window.prompt({
+														inputLabel: t("Name"),
+														text: this.importMapping.name
+													});
 
 													if (name) {
 														importMappingDS.create({
@@ -193,6 +189,10 @@ export class CsvMappingDialog extends Window {
 			this.mask();
 
 			client.jmap(entity + "/importCSVMapping", {blobId: blobId}).then((response) => {
+
+
+				console.log(response);
+
 				this.csvHeadersStore = store({
 					data: [
 						{
@@ -335,12 +335,17 @@ export class CsvMappingDialog extends Window {
 			hidden: true
 		});
 
+		const matchedRecord = this.csvHeadersStore.data.find(
+			(r: any) => r.name === header.name
+		);
+		const defaultValue = matchedRecord ? matchedRecord.index : -2;
+
 		const selectField = select({
 			name: "csvIndex",
 			width: 200,
 			label: header.label ?? header.name,
 			store: this.csvHeadersStore,
-			value: -2,
+			value: defaultValue,
 			valueField: "index",
 			textRenderer: ((r) => {
 				return r.name
