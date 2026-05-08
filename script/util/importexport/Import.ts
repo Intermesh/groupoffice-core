@@ -38,7 +38,7 @@ export abstract class Import {
 export interface importMapping extends BaseEntity {
 	mappingId?: string,
 	name: string,
-	columnMapping: Record<string, any>,
+	mapping: Record<string, any>,
 	dateFormat: string,
 	timeFormat: string,
 	decimalSeparator: string,

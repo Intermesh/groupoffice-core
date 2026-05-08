@@ -71,7 +71,7 @@ export class CsvMappingDialog extends Window {
 
 									this.form.value = {
 										mappingId: newValue,
-										columnMapping: record.columnMapping,
+										mapping: record.mapping,
 										dateFormat: record.dateFormat,
 										timeFormat: record.timeFormat,
 										decimalSeparator: record.decimalSeparator,
@@ -109,7 +109,7 @@ export class CsvMappingDialog extends Window {
 													if (name) {
 														importMappingDS.create({
 															name: name,
-															columnMapping: this.form.value.mapping,
+															mapping: this.form.value.mapping,
 															timeFormat: this.form.value.timeFormat,
 															dateFormat: this.form.value.dateFormat,
 															decimalSeparator: this.form.value.decimalSeparator,
@@ -126,7 +126,7 @@ export class CsvMappingDialog extends Window {
 											text: t("Delete"),
 											handler: async () => {
 												if (this.importMapping.id !== "new") {
-													await importMappingDS.confirmDestroy([this.importMapping.id])
+													await importMappingDS.confirmDestroy([this.importMapping.id]);
 												}
 											}
 										})
@@ -189,10 +189,6 @@ export class CsvMappingDialog extends Window {
 			this.mask();
 
 			client.jmap(entity + "/importCSVMapping", {blobId: blobId}).then((response) => {
-
-
-				console.log(response);
-
 				this.csvHeadersStore = store({
 					data: [
 						{
@@ -212,11 +208,11 @@ export class CsvMappingDialog extends Window {
 
 				const fields = this.buildFieldsForMapping(response.goHeaders);
 
-				this.fieldMappingContainer.items.add(containerfield({name: "columnMapping"}, ...fields));
+				this.fieldMappingContainer.items.add(containerfield({name: "mapping"}, ...fields));
 
 				this.form.value = {
 					mappingId: response.id,
-					columnMapping: response.columnMapping,
+					mapping: response.mapping,
 					updateBy: response.updateBy,
 					dateFormat: response.dateFormat ?? client.user.dateFormat,
 					timeFormat: response.timeFormat ?? client.user.timeFormat,
@@ -228,7 +224,7 @@ export class CsvMappingDialog extends Window {
 					this.importMapping = {
 						id: "new",
 						name: fileName,
-						columnMapping: {},
+						mapping: {},
 						updateBy: "",
 						dateFormat: client.user.dateFormat,
 						timeFormat: client.user.timeFormat,
@@ -368,7 +364,7 @@ export class CsvMappingDialog extends Window {
 		client.jmap(this.entity + "/import", {
 			blobId: this.blobId,
 			values: this.values,
-			mappingId: this.mappingId,
+			mappingId: value.mappingId ?? undefined,
 			mapping: value.mapping,
 			saveName: this.importMapping.name,
 			updateBy: value.updateBy,
