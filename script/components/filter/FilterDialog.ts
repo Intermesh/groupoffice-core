@@ -36,29 +36,15 @@ export class FilterDialog extends FormWindow {
 				return conditions.map(condition => {
 					if (condition.subconditions) {
 						const subcond = condition.subconditions;
-						const {subconditions, ...otherFilters} = condition;
-
-						const result: any[] = [];
-
-						Object.keys(otherFilters).forEach(key => {
-							result.push({[key]: otherFilters[key]});
-						});
-
-						result.push({
+						return {
 							operator: subcond.operator,
 							conditions: transformConditions(
 								Array.isArray(subcond.conditions)
 									? subcond.conditions
 									: Object.entries(subcond.conditions).map(([k, v]) => ({[k]: v}))
 							)
-						});
-
-						return result.length === 1 ? result[0] : {
-							operator: subcond.operator,
-							conditions: result
 						};
 					}
-
 					return condition;
 				});
 			};

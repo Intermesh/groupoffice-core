@@ -40,7 +40,7 @@ export class FilterFieldset extends Fieldset {
 				radio({
 					name: "operator",
 					type: "button",
-					label: t("How many condition should match?"),
+					label: t("How many conditions should match?"),
 					value: "AND",
 					options: [
 						{
