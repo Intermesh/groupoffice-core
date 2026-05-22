@@ -59,14 +59,18 @@
 
 		padding:0;
 
-		.btn-overflow {
-			display: none;
+		// scroll but hide scrollbar
+		overflow: auto;
+		scrollbar-width: none; /* For Firefox */
+		&::-webkit-scrollbar {
+			display: none; /* For Chrome, Safari, and Opera */
 		}
 
 		button.goui-button {
 			color: white;
 			font-weight: normal;
 			opacity: .8;
+			min-width: 10rem;
 
 			&.active {
 				opacity: 1;

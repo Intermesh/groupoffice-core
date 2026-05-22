@@ -8,6 +8,11 @@ import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
 import {Notify} from "./Notifier";
 
+/**
+ * Main view
+ *
+ * Top level component holding the main toolbar with logo and launcher and the module interfaces
+ */
 class Main extends Component {
 	private readonly menu
 	private readonly container
@@ -25,7 +30,7 @@ class Main extends Component {
 		this.menu = cardmenu({
 			flex: 1,
 			cls: "main-menu",
-			overflowMenu: true,
+			overflowMenu: false,
 			cardContainer: this.container
 		});
 
@@ -67,20 +72,20 @@ class Main extends Component {
 		);
 	}
 
-	private getLauncher() {
-		return new Promise<Launcher>(resolve => {
-			if (!this._launcher) {
-				this._launcher = new Launcher();
-				root.items.add(this._launcher);
-				setTimeout(() => {
-					// give browser time to render menu and the animation can run
-					resolve(this._launcher!);
-				})
-			} else {
-				resolve(this._launcher);
-			}
-		})
-	}
+	// private getLauncher() {
+	// 	return new Promise<Launcher>(resolve => {
+	// 		if (!this._launcher) {
+	// 			this._launcher = new Launcher();
+	// 			root.items.add(this._launcher);
+	// 			setTimeout(() => {
+	// 				// give browser time to render menu and the animation can run
+	// 				resolve(this._launcher!);
+	// 			})
+	// 		} else {
+	// 			resolve(this._launcher);
+	// 		}
+	// 	})
+	// }
 
 
 	/**
@@ -102,8 +107,10 @@ class Main extends Component {
 						m.show();
 					}),
 
-					btn({title: t("Launcher"),icon: "apps"}).on('click', async () => {
-						(await this.getLauncher()).show();
+					btn({
+						title: t("Launcher"),
+						icon: "apps",
+						menu: new Launcher()
 					}),
 
 					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
