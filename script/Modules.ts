@@ -367,7 +367,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		GO.moduleManager.getAllPanelConfigs().forEach((m:any) => {
 
-			const id = m.package+"/"+m.moduleName;
+			const id = (m.package ?? "legacy") + "/" + m.moduleName;
 
 			this.mainPanels[id] = {
 				package: m.package,
@@ -443,10 +443,6 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		if (config.init) {
 			config.init();
-		}
-
-		if(window.go) {
-			this.registerInExtjs(config);
 		}
 	}
 
