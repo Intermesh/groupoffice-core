@@ -51,15 +51,19 @@ export class Launcher extends Menu {
 						if(e.key == "Enter") {
 							const first = this.modulesContainer.items.first();
 							if(first)
-								first.el.click();
+								first.items.get(0)!.el.click();
 						}
 					})
 				})
 				.on("input", ({value}) => {
-					this.modulesContainer.items.replace(...this.allButtons.filter((b) => {
-						// console.log(b.te)
-						return b.text.toLowerCase().startsWith(value.toLowerCase());
-					}));
+					if(value) {
+						this.modulesContainer.items.replace(...this.allButtons.filter((b) => {
+							// console.log(b.te)
+							return b.text.toLowerCase().startsWith(value.toLowerCase());
+						}));
+					} else {
+						this.modulesContainer.items.replace(...this.allButtons);
+					}
 				}, {buffer: 300})
 
 
@@ -71,14 +75,14 @@ export class Launcher extends Menu {
 
 		this.on("show", () => {
 			this.searchFld.value = "";
-			this.modulesContainer.items.add(...this.allButtons);
+			this.modulesContainer.items.replace(...this.allButtons);
 
 			this.searchFld.focus();
 		})
 
 
 		this.allButtons = ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).map(m => {
-			return btn({
+			return comp({}, btn({
 				style: {
 					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
 				},
@@ -88,7 +92,7 @@ export class Launcher extends Menu {
 				handler: () => {
 					router.goto(m.id);
 				}
-			})
+			}))
 		})
 
 
