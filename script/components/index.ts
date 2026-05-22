@@ -11,3 +11,4 @@ export * from './picker/index.js';
 export * from './EntityTypeTable.js';
 export * from './links';
 export * from './ExtJSWrapper.js';
+export * from './table/TableTitle.js';
