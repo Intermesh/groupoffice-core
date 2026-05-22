@@ -1,9 +1,22 @@
-import {ArrayUtil, btn, Component} from "@intermesh/goui";
+import {
+	ArrayUtil,
+	btn, Button, comp,
+	Component, ComponentEventMap,
+	InputFieldEventMap,
+	Menu,
+	Observable,
+	searchbtn,
+	TextField,
+	textfield
+} from "@intermesh/goui";
 import {modules} from "../Modules.js";
 import {router} from "../Router.js";
 import {client} from "../jmap/index.js";
 
-export class Launcher extends Component {
+export class Launcher extends Menu {
+	private searchFld;
+	private allButtons;
+	private modulesContainer;
 	constructor() {
 		super();
 
@@ -14,23 +27,72 @@ export class Launcher extends Component {
 			this.hide();
 		})
 
-		ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).forEach(async (m) => {
+		this.items.add(
+			this.searchFld = textfield({
+				cls: "launcher-search-field",
+				flex: 1,
+				icon: "search",
+				buttons: [
+					btn({
+						icon: "clear",
+						handler: btn => {
+							const tf = btn.findAncestorByType(TextField)!
+							tf.reset()
+							tf.focus();
+						}
+					})]
+			})
+				.on("render", ({target})=> {
+					target.input.addEventListener("focus", ev => {
+						ev.stopPropagation();
+					})
 
-			// Add button to the route
-			this.items.add(
-				btn({
-					style: {
-						backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
-					},
-					itemId: m.id,
-
-					text: m.title,
-					handler: () => {
-						router.goto(m.id);
-					}
+					target.input.on("keydown", e => {
+						if(e.key == "Enter") {
+							const first = this.modulesContainer.items.first();
+							if(first)
+								first.el.click();
+						}
+					})
 				})
-			);
-			// }
-		});
+				.on("input", ({value}) => {
+					this.modulesContainer.items.replace(...this.allButtons.filter((b) => {
+						// console.log(b.te)
+						return b.text.toLowerCase().startsWith(value.toLowerCase());
+					}));
+				}, {buffer: 300})
+
+
+			,
+
+			this.modulesContainer = comp({cls: "modules-container"})
+
+		)
+
+		this.on("show", () => {
+			this.searchFld.value = "";
+			this.modulesContainer.items.add(...this.allButtons);
+
+			this.searchFld.focus();
+		})
+
+
+		this.allButtons = ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).map(m => {
+			return btn({
+				style: {
+					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
+				},
+				itemId: m.id,
+
+				text: m.title,
+				handler: () => {
+					router.goto(m.id);
+				}
+			})
+		})
+
+
+
+
 	}
 }
