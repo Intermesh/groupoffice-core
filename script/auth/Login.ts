@@ -153,6 +153,15 @@ export class Login extends Window<LoginEventMap> {
 					name: "otp_code",
 					required: true,
 					autocomplete: "one-time-code"
+				}).on('render', ({target}) => {
+					target.el.inputMode = 'numeric';
+					target.el.attr('maxlength', '6');
+					target.el.attr('pattern', '[0-9]*');
+					target.el.on('paste', e => {
+						e.preventDefault();
+						const text = e.clipboardData?.getData('text') || '';
+						target.value = text.replace(/\D/g, '').slice(0, 6);
+					})
 				})
 			),
 
