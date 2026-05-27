@@ -1,4 +1,4 @@
-import {Component, ComponentEventMap, Filter, hiddenfield, HiddenField} from "@intermesh/goui";
+import {Component, Filter, hiddenfield, HiddenField} from "@intermesh/goui";
 
 export abstract class VariableFilterType extends Component {
 	public valueField: HiddenField;

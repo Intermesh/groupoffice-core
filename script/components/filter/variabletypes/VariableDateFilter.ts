@@ -1,12 +1,12 @@
 import {VariableFilterType} from "./VariableFilterType.js";
-import {datefield, Filter, t} from "@intermesh/goui";
+import {daterangefield, Filter, t} from "@intermesh/goui";
 
 export class VariableDateFilter extends VariableFilterType {
 	constructor(filter: Filter) {
 		super(filter);
 
 		this.items.add(
-			datefield({
+			daterangefield({
 				label: t(filter.title),
 				listeners: {
 					change: ({newValue}) => {
