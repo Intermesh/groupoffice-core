@@ -6,15 +6,16 @@ import {VariableStringFilter} from "./variabletypes/VariableStringFilter.js";
 import {VariableNumberFilter} from "./variabletypes/VariableNumberFilter.js";
 import {VariableDateFilter} from "./variabletypes/VariableDateFilter.js";
 import {VariableSelectFilter} from "./variabletypes/VariableSelectFilter.js";
+import {VariableLinkFilter} from "./variabletypes/VariableLinkFilter.js";
 
 
 export interface VariableFilterGridEventMap extends ListEventMap {
-	variablefiltersetvalue: { filter: Filter, value: string }
+	variablefiltersetvalue: { filter: Filter, value?: string | { entity: string } }
 }
 
 export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap> {
 	private readonly entity: Entity;
-	public filterValues: { filter: Filter, value: string }[] = [];
+	public filterValues: { filter: Filter, value?: string | { entity: string } }[] = [];
 
 
 	constructor(entityName: string) {
@@ -52,19 +53,48 @@ export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap>
 						case "select":
 							filterField = new VariableSelectFilter(filter);
 							break;
+						case "link":
+						case "go.links.FilterLinkEntityCombo": // backwards compatibility
+							filterField = new VariableLinkFilter(filter);
+							break;
 					}
 
 					if (filterField) {
 						filterField.valueField.on("setvalue", ({newValue}) => {
 							const existingIndex = this.filterValues.findIndex(fv => fv.filter === filter);
 
-							if (existingIndex !== -1) {
-								this.filterValues[existingIndex].value = newValue;
+							if (filter.type == "link" || filter.type == "go.links.FilterLinkEntityCombo") {
+								if (newValue.length) {
+									(newValue as string[]).forEach((v) => {
+										const filterValue = {entity: v ?? ""};
+
+										if (existingIndex !== -1) {
+											this.filterValues[existingIndex].value = filterValue;
+										} else {
+											this.filterValues.push({filter: filter, value: filterValue});
+										}
+
+										this.fire("variablefiltersetvalue", ({filter: filter, value: filterValue}));
+									});
+								} else {
+									if (existingIndex !== -1) {
+										this.filterValues[existingIndex].value = undefined;
+									} else {
+										this.filterValues.push({filter: filter, value: undefined});
+									}
+
+									this.fire("variablefiltersetvalue", ({filter: filter, value: undefined}));
+								}
 							} else {
-								this.filterValues.push({filter: filter, value: newValue});
+								if (existingIndex !== -1) {
+									this.filterValues[existingIndex].value = newValue;
+								} else {
+									this.filterValues.push({filter: filter, value: newValue});
+								}
+
+								this.fire("variablefiltersetvalue", ({filter: filter, value: newValue}));
 							}
 
-							this.fire("variablefiltersetvalue", ({filter: filter, value: newValue}));
 						});
 					}
 
