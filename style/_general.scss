@@ -47,6 +47,10 @@
 	}
 }
 
+
+.goui.table-title {
+	min-width: 0;
+}
 //@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
 	//.goui-module-panel {
 	//	top : 0;
