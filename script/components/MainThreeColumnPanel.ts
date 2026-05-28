@@ -1,4 +1,4 @@
-import {Component, splitter, btn, t, router} from "@intermesh/goui";
+import {Component, splitter, btn, t, router, browser, checkbox, Config, Button, ComponentState} from "@intermesh/goui";
 
 /**
  * MainThreeColumnPanel class
@@ -24,6 +24,7 @@ export abstract class MainThreeColumnPanel extends Component {
 		super("section");
 
 		this.id = idAndRoute;
+		this.stateId = "main-3-col-" + idAndRoute
 
 		this.cls = "hbox fit mobile-cards";
 
@@ -79,18 +80,38 @@ export abstract class MainThreeColumnPanel extends Component {
 		);
 	}
 
+
 	/**
 	 * Button to show the west panel. Use in overrides.
 	 *
 	 * @protected
 	 */
-	protected showWestButton() {
+	protected showWestButton(cfg:Config<Button> = {}) {
 		return btn({
-			cls: "for-small-device",
-			title: t("Menu"),
-			icon: "menu",
+			...cfg,
+			cls: "small",
+			title: t("Show sidebar"),
+			icon: browser.isMobile() ? "menu" : "left_panel_open",
+			listeners: {
+				render: ({target}) => {
+					this.west.on('show', () => {
+						target.hide();
+					})
+
+					this.west.on('hide', () => {
+						target.show();
+					})
+
+					target.hidden = !this.west.hidden;
+				}
+			},
 			handler: (button, ev) => {
 				this.activatePanel(this.west);
+
+				if(button.icon == "left_panel_open") {
+					this.west.hidden = false;
+					this.saveState();
+				}
 			}
 		})
 	}
@@ -101,14 +122,53 @@ export abstract class MainThreeColumnPanel extends Component {
 	 */
 	protected showCenterButton() {
 		return btn({
-			cls: "for-small-device",
-			title: t("Close"),
-			icon: "close",
+			cls: "small",
+			title: t("Close sidebar"),
+			icon: browser.isMobile() ? "close" : "left_panel_close",
+			listeners: {
+				render: ({target}) => {
+
+					if(this.west.findChild(target)) {
+						this.west.on('show', () => {
+							target.show();
+						})
+
+						this.west.on('hide', () => {
+							target.hide();
+						})
+					} else {
+						target.icon = "close";
+						target.cls = target.cls + " for-small-device";
+					}
+
+					// target.hidden = !this.west.hidden;
+				}
+			},
 			handler: (button, ev) => {
 				this.activatePanel(this.center);
 				router.setPath(this.id);
+
+				if(button.icon == "left_panel_close") {
+					this.west.hidden = true;
+					this.saveState();
+				}
 			}
 		})
+	}
+
+	protected buildState(){
+		const s = super.buildState();
+
+		s.westHidden = this.west.hidden;
+
+		return s;
+	}
+
+
+	protected restoreState(state: ComponentState) {
+		super.restoreState(state);
+
+		this.west.hidden = state.westHidden;
 	}
 
 	/**
