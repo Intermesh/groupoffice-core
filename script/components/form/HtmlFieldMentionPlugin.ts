@@ -1,4 +1,4 @@
-import {btn, HtmlField, menu, Menu, root, t} from "@intermesh/goui";
+import {btn, HtmlField, menu, Menu, p, root, t} from "@intermesh/goui";
 
 export type HtmlFieldMentionProvider = (input: string) => Promise<{value:string, display:string }[]>;
 export class HtmlFieldMentionPlugin {
@@ -12,6 +12,7 @@ export class HtmlFieldMentionPlugin {
 			handler: () => {
 				const lastChar = this.getPreviousChar();
 				let insert = "@";
+				// check if last typed char is not a space or nbsp;
 				if(lastChar != 160 && lastChar != 32) {
 					insert = " " + insert;
 				}
@@ -58,17 +59,17 @@ export class HtmlFieldMentionPlugin {
 	private trackMention(ev: KeyboardEvent) {
 
 		if(ev.key == "@") {
-
 			const lastChar = this.getPreviousChar();
 			if(!lastChar || lastChar == 32 || lastChar == 160) {
 				this.mentionSequence = "";
+				this.onMention("");
 				return;
 			}
 		}
 
 		if(this.mentionSequence === undefined) {
 			return;
-		} else if (ev.key == "Enter" || ev.key == "Tab" || ev.key == " " || ev.key == "@") {
+		} else if (ev.key == "Enter" || ev.key == "Tab" || ev.key == " " || ev.key == "@" || ev.key == "Escape"  || ev.key == "Delete" || ev.key == "ArrowUp") {
 			this.mentionSequence = undefined;
 			this.menu?.hide();
 		} else {
@@ -114,10 +115,21 @@ export class HtmlFieldMentionPlugin {
 		if (!selection || !selection.rangeCount) return undefined;
 
 		const range = selection.getRangeAt(0).cloneRange();
-		// Collapse the range to the caret (insertion point)
-		range.collapse(true);
-		// Get the client rects (bounding box) for the caret
-		return range.getBoundingClientRect();
+
+		let coords;
+		if(range.startOffset === 0) {
+			// somehow getting the coords for the first char doesn't work.
+			coords = this.field.getEditor().getBoundingClientRect();
+			coords.x += 30;
+		} else {
+			// Collapse the range to the caret (insertion point)
+			range.collapse(true);
+			// Get the client rects (bounding box) for the caret
+			coords = range.getBoundingClientRect();
+			coords.x += 10;
+		}
+
+		return coords;
 	}
 
 	private onMention(mention: string) {
@@ -130,22 +142,28 @@ export class HtmlFieldMentionPlugin {
 		}
 
 		const coords = this.getCaretCoordinates();
+		console.log(coords);
 		if(!coords) {
 			return;
 		}
 		this.menu.showAt(coords);
 
 		this.provider(mention).then((names) => {
-			this.menu!.items.replace(
-				...names.map(a => {
 
-					return btn({text: a.display, dataSet: {value: a.value}})
-						.on("click", ({target}) =>{
-							this.autocomplete(target.dataSet.value, mention);
-							this.menu!.hide();
-						})
-				})
-			);
+			if(names.length) {
+				this.menu!.items.replace(
+					...names.map(a => {
+
+						return btn({text: a.display, dataSet: {value: a.value}})
+							.on("click", ({target}) => {
+								this.autocomplete(target.dataSet.value, mention);
+								this.menu!.hide();
+							})
+					})
+				);
+			} else {
+				this.menu!.items.replace(p({text: t("No results found")}));
+			}
 
 			this.menu!.showAt(coords);
 		})
