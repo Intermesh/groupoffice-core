@@ -444,6 +444,12 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		if (config.init) {
 			config.init();
 		}
+
+		// if(window.go) {
+
+		// TODO, some old modules don't end up in the menu
+			this.registerInExtjs(config);
+		// }
 	}
 
 
