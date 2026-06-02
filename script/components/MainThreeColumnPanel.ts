@@ -42,7 +42,7 @@ export abstract class MainThreeColumnPanel extends Component {
 		this.center.el.classList.add("active");
 
 		this.west = this.createWest();
-		this.west.itemId = "west";
+		this.west.stateId = "west";
 
 		if(!this.west.minWidth) {
 			this.west.minWidth = 140;
@@ -110,7 +110,7 @@ export abstract class MainThreeColumnPanel extends Component {
 
 				if(button.icon == "left_panel_open") {
 					this.west.hidden = false;
-					this.saveState();
+					this.west.saveState();
 				}
 			}
 		})
@@ -150,26 +150,13 @@ export abstract class MainThreeColumnPanel extends Component {
 
 				if(button.icon == "left_panel_close") {
 					this.west.hidden = true;
-					this.saveState();
+					this.west.saveState();
 				}
 			}
 		})
 	}
 
-	protected buildState(){
-		const s = super.buildState();
 
-		s.westHidden = this.west.hidden;
-
-		return s;
-	}
-
-
-	protected restoreState(state: ComponentState) {
-		super.restoreState(state);
-
-		this.west.hidden = state.westHidden;
-	}
 
 	/**
 	 * Create west panel
