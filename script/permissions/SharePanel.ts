@@ -2,13 +2,14 @@ import {
 	avatar,
 	column,
 	comp,
-	ComponentEventMap,
 	Config,
 	createComponent,
 	datasourcestore,
-	DataSourceStore, EntityID,
+	DataSourceStore,
+	EntityID,
 	Field,
-	FieldValue, Filter,
+	FieldValue,
+	Filter,
 	radio,
 	searchbtn,
 	select,
@@ -22,7 +23,7 @@ import {entities} from "../Entities.js";
 
 
 class GroupTable extends Table<DataSourceStore> {
-	value: any;
+	value: any = null;
 
 	levels?:{ [key: string]: any }[]
 
