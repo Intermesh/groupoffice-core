@@ -2,6 +2,9 @@
 @use '@intermesh/goui/style/config' as *;
 @use '@intermesh/goui/style/layout';
 
+body#goui {
+	overflow:hidden;
+}
 
 .groupoffice-logo {
 	// 210 x 43
@@ -69,9 +72,10 @@
 		button.goui-button {
 			color: white;
 			font-weight: normal;
-			opacity: .8;
 			min-width: 10rem;
-
+			font-size: .9em;
+			opacity: .7;
+			letter-spacing: .022em;
 			&.active {
 				opacity: 1;
 			}
@@ -113,64 +117,75 @@
 	width: 357px;
 	z-index: 102;
 
-	background-image: linear-gradient(90deg, transparent 0%, var(--bg-pressed) 80%, var(--bg-pressed) 100%);
-
+	background-image: linear-gradient(90deg, transparent 0%, var(--bg-layer) 80%, var(--bg-layer) 100%);
+	border-left: 1px solid var(--fg-divider);
 	padding-right: dp(8);
+	padding-left: dp(8);
 	overflow:visible;
 	margin-left:dp(6);
 	backdrop-filter: blur(6px);
 	-webkit-backdrop-filter: blur(6px);
 
+	transition: transform 200ms cubic-bezier(0.4, 0.0, 0.6, 1);
+	&[hidden] {
+		display:initial !important;
+		transform: translateX(100%);
+	}
 	i.entity::before{margin-top: dp(-22);}
+	ul {
+		//higher than window 9003 and lower than menu's 15000
+		background:transparent;
+		> li > div { // message
+			padding: dp(4) dp(8);
+			@extend .z1;
+			font-size: dp(16);
+			line-height: dp(36);
+			border-radius: $borderRadius;
+			border: 1px solid var(--fg-line);
+			background-color: var(--bg-lowest);
+			cursor: pointer;
+			pointer-events:auto;
+			max-width: dp(480);
+			min-height: dp(40);
+			margin: dp(8) auto 0;
+			color: var(--fg-text);
+			h3 {
+				margin: dp(2) 0;
+				color: var(--fg-text);
+				> button {
+					padding:.2rem !important;
+					float:right;
+					transform: scale(.8);
+				}
+				> i {
+					float:left;
+					font-size: .8em;
+					margin-right: dp(8);
+				}
+			}
+			progress {width:100%;}
+			img { float:left;}
+		}
+		.icon:hover {
+			color: var(--fg-hint-text);
+		}
+
+	}
 }
+// notifier counter
 button[data-count]::before {
 	content: attr(data-count);
 	position: absolute;
 	top: 0;
 	right: 0;
-	font-size: 12px;
+	font-size: 11px;
+	line-height: dp(18);
 	background: var(--c-accent);
 	color: white;
 	min-width:dp(18);
 	border-radius: 999px;
 }
 
-.notifications ul {
-	//higher than window 9003 and lower than menu's 15000
-	background:transparent;
-	> li > div { // message
-		@extend .z4;
-		font-size: dp(16);
-		line-height: dp(36);
-		border-radius: $borderRadius;
-		border: 1px solid var(--fg-divider);
-		background-color: var(--bg-layer);
-		cursor: pointer;
-		pointer-events:auto;
-		max-width: dp(480);
-		min-height: dp(40);
-		margin: dp(8) auto 0;
-		color: var(--fg-text);
-		h3 {
-			color: var(--fg-text);
-			> button {
-				padding:0;
-				float:right;
-				transform: scale(.8);
-			}
-			> i {
-				float:left;
-				margin-right: dp(12);
-			}
-			height: dp(40);
-		}
-		img { float:left;}
-	}
-	.icon:hover {
-		color: var(--fg-hint-text);
-	}
-
-}
 @keyframes blink {
 	0% {opacity: 0;}
 	100% { opacity:1;}

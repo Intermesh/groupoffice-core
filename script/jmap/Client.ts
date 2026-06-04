@@ -4,13 +4,20 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {DateTime, EntityID, Format, FunctionUtil, Observable, ObservableEventMap, Timezone} from "@intermesh/goui";
+import {
+	DateTime,
+	EntityID,
+	Format,
+	FunctionUtil, INotification,
+	Notifier,
+	Observable,
+	ObservableEventMap, t,
+	Timezone
+} from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
-import {customFields} from "../customfields/CustomFields.js";
-import {modules} from "../Modules";
 
 
 export interface LoginData {
@@ -56,7 +63,7 @@ export type JmapSession = {
 	version: string
 	auth: any
 	accounts: any[]
-	capabilities: any[]
+	capabilities: any
 	apiUrl: string
 	downloadUrl: string
 	pageUrl: string
@@ -167,12 +174,13 @@ export class Client extends Observable<ClientEventMap> {
 	/**
 	 * Get the current user.
 	 *
-	 * this.authenticate() as to be called first.
+	 * this.authenticate() has to be called first.
 	 */
 	get user() : User {
-		// We assume a user is here but this is not always true. When not authenticated yet the user is undefined.
-		// But because it's annoying to have to do client.user!.id everywhere we pretend to always have user.
-		return this._user!;
+		if (!this._user) {
+			throw new Error("Not authenticated");
+		}
+		return this._user;
 	}
 
 	/**
@@ -470,28 +478,64 @@ export class Client extends Observable<ClientEventMap> {
 	/**
 	 * Upload a file to the API
 	 *
-	 * @todo Progress. Not possible ATM with fetch() so we probably need XMLHttpRequest()
+	 * XMLHttpRequest because Progress not possible ATM with fetch()
 	 * @param file
 	 */
 	public upload(file: File): Promise<UploadResponse> {
-
-		return fetch(this.uri + "upload.php" + (this.debugParam ? '?'+this.debugParam : ''), { // Your POST endpoint
-			method: 'POST',
-			credentials: "include",
-			headers: this.buildHeaders({
-				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
-				'Content-Type': file.type,
-				'X-File-LastModified': Math.round(file['lastModified'] / 1000).toString()
-			}),
-			body: file
-		}).then((response) => {
-			if (response.status > 201) {
-				throw response.statusText;
+		return new Promise((resolve, reject) => {
+			const maxFileSize = this.session?.capabilities['maxSizeUpload'];
+			if(maxFileSize && file.size > maxFileSize) {
+				reject(new Error("Max size is too large"));
+				Notifier.notify({category:"status",variant:'error', title:file.name, text: t('File size exceeds the maximum of {max}.').replace('{max}', Format.fileSize(maxFileSize))})
+				return;
 			}
 
-			return response;
-		}).then(response => response.json())
-			.then(response => Object.assign(response, {file: file}))
+			const xhr = new XMLHttpRequest();
+			xhr.open(
+				'POST',
+				this.uri + "upload.php" + (this.debugParam ? '?' + this.debugParam : '')
+			);
+			xhr.withCredentials = true;
+
+			Object.entries(this.buildHeaders({
+				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
+				'Content-Type': file.type,
+				'X-File-LastModified': Math.round(file.lastModified / 1000).toString()
+			})).forEach(([key, value]) => xhr.setRequestHeader(key, value))
+			const notification:INotification = {category:'progress',icon:{name:'upload'}, title:'Uploading', text: file.name};
+			notification.onClose = () => {
+				xhr.abort();
+				Notifier.notify({category:"status",variant:'info', text: 'Upload aborted'});
+			};
+			xhr.upload.onprogress = e => {
+				if (e.lengthComputable) {
+					notification.onProcessed?.(e.loaded, e.total);
+					console.log(e.loaded, e.total);
+				}
+			};
+			xhr.onload = () => {
+				if (xhr.status > 201) {
+					const text = xhr.statusText || 'Upload failed';
+					Notifier.notify({category:"status",variant:'error', text})
+					reject(text);
+					return;
+				}
+				try {
+					Notifier.notify({category:"status",variant:'success', text: 'Upload success'});
+					resolve(Object.assign(JSON.parse(xhr.responseText), {file: file}))
+				}
+				catch (err) {
+					Notifier.notify({category:"status",variant:'warning', text: 'Invalid upload response'})
+					reject(err);
+				}
+			};
+			xhr.onerror = () => {
+				Notifier.notify({category:"status",variant:'error', text: 'Upload network error'})
+				reject('Network error')
+			};
+			Notifier.notify(notification);
+			xhr.send(file);
+		});
 	}
 
 	/**

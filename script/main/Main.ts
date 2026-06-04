@@ -6,7 +6,7 @@ import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
-import {Notify} from "./Notifier";
+import {Notifier} from "./Notifier";
 
 /**
  * Main view
@@ -17,7 +17,7 @@ class Main extends Component {
 	private readonly menu
 	private readonly container
 	private _launcher?: Launcher
-	private declare readonly notify
+	notifier: Notifier
 	constructor() {
 		super();
 
@@ -34,7 +34,7 @@ class Main extends Component {
 			cardContainer: this.container
 		});
 
-		this.notify = new Notify();
+		this.notifier = new Notifier();
 
 		// default route opens first module
 		router.add(() => {
@@ -92,8 +92,7 @@ class Main extends Component {
 	 * Load all module panels and sets up routes
 	 */
 	public load() {
-
-
+		this.notifier.load();
 		this.items.add(
 			comp({cls: "header hbox"},
 				comp({
@@ -101,7 +100,7 @@ class Main extends Component {
 				}),
 				this.menu,
 				tbar({cls: "header-right"},
-					this.notify.btn,
+					this.notifier.btn,
 					btn({icon: "search"}).on('click',() => {
 						const m = new MainSearchWindow();
 						m.show();
