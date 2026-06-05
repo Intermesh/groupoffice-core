@@ -1,4 +1,4 @@
-import {btn, HtmlField, menu, Menu, root, t} from "@intermesh/goui";
+import {btn, HtmlField, menu, Menu, p, root, t} from "@intermesh/goui";
 
 export type HtmlFieldMentionProvider = (input: string) => Promise<{value:string, display:string }[]>;
 export class HtmlFieldMentionPlugin {
@@ -12,12 +12,16 @@ export class HtmlFieldMentionPlugin {
 			handler: () => {
 				const lastChar = this.getPreviousChar();
 				let insert = "@";
+				// check if last typed char is not a space or nbsp;
 				if(lastChar != 160 && lastChar != 32) {
 					insert = " " + insert;
 				}
 				field.insertHtml(insert);
-				this.mentionSequence = "";
-				this.onMention("");
+				field.focus();
+				setTimeout(() => {
+					this.mentionSequence = "";
+					this.onMention("");
+				}, 100)
 			}
 		});
 
@@ -58,34 +62,49 @@ export class HtmlFieldMentionPlugin {
 	private trackMention(ev: KeyboardEvent) {
 
 		if(ev.key == "@") {
-
 			const lastChar = this.getPreviousChar();
 			if(!lastChar || lastChar == 32 || lastChar == 160) {
 				this.mentionSequence = "";
+				this.onMention("");
 				return;
 			}
 		}
 
 		if(this.mentionSequence === undefined) {
 			return;
-		} else if (ev.key == "Enter" || ev.key == "Tab" || ev.key == " " || ev.key == "@") {
-			this.mentionSequence = undefined;
-			this.menu?.hide();
 		} else {
 
-			if(ev.key == "Backspace") {
-				if(!this.mentionSequence.length) {
+			switch(ev.key) {
+				case " ":
+				case "@":
+				case "Enter":
+				case "Tab":
+				case "Escape":
+				case "Delete":
+				case "ArrowUp":
 					this.mentionSequence = undefined;
 					this.menu?.hide();
-					return;
-				} else {
-					this.mentionSequence = this.mentionSequence.substring(0, this.mentionSequence.length - 1);
-				}
-			} else {
-				this.mentionSequence += ev.key;
-			}
+					break;
 
-			this.onMention(this.mentionSequence);
+				case "Backspace":
+					if(!this.mentionSequence.length) {
+						this.mentionSequence = undefined;
+						this.menu?.hide();
+						return;
+					} else {
+						this.mentionSequence = this.mentionSequence.substring(0, this.mentionSequence.length - 1);
+					}
+					this.onMention(this.mentionSequence);
+					break;
+
+				default:
+					// only handle characters with 1 char length (No CapsLoc, Shift etc.)
+					if(ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey) {
+						this.mentionSequence += ev.key;
+						this.onMention(this.mentionSequence);
+					}
+					break;
+			}
 		}
 	}
 
@@ -114,10 +133,22 @@ export class HtmlFieldMentionPlugin {
 		if (!selection || !selection.rangeCount) return undefined;
 
 		const range = selection.getRangeAt(0).cloneRange();
+
 		// Collapse the range to the caret (insertion point)
 		range.collapse(true);
 		// Get the client rects (bounding box) for the caret
-		return range.getBoundingClientRect();
+		let coords = range.getBoundingClientRect();
+
+		if(coords.x === 0) {
+			// fallback on start of editor
+			// somehow getting the coords for the first char doesn't work.
+			coords = this.field.getEditor().getBoundingClientRect();
+			coords.x += 30;
+		} else {
+			coords.x += 10;
+		}
+
+		return coords;
 	}
 
 	private onMention(mention: string) {
@@ -130,22 +161,28 @@ export class HtmlFieldMentionPlugin {
 		}
 
 		const coords = this.getCaretCoordinates();
+		console.log(coords);
 		if(!coords) {
 			return;
 		}
 		this.menu.showAt(coords);
 
 		this.provider(mention).then((names) => {
-			this.menu!.items.replace(
-				...names.map(a => {
 
-					return btn({text: a.display, dataSet: {value: a.value}})
-						.on("click", ({target}) =>{
-							this.autocomplete(target.dataSet.value, mention);
-							this.menu!.hide();
-						})
-				})
-			);
+			if(names.length) {
+				this.menu!.items.replace(
+					...names.map(a => {
+
+						return btn({text: a.display, dataSet: {value: a.value}})
+							.on("click", ({target}) => {
+								this.autocomplete(target.dataSet.value, mention);
+								this.menu!.hide();
+							})
+					})
+				);
+			} else {
+				this.menu!.items.replace(p({text: t("No results found")}));
+			}
 
 			this.menu!.showAt(coords);
 		})
@@ -154,6 +191,7 @@ export class HtmlFieldMentionPlugin {
 	private autocomplete(text: string, typed: string) {
 
 		if(typed.length) {
+			//remove typed text and replace with result
 			const sel = window.getSelection();
 			const range = sel!.getRangeAt(0);
 			const clone = range.cloneRange();
@@ -165,6 +203,7 @@ export class HtmlFieldMentionPlugin {
 
 		this.field.insertHtml(text + "&nbsp;");
 		this.field.focus();
+
 		this.mentionSequence = undefined;
 	}
 }

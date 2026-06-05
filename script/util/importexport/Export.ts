@@ -1,5 +1,5 @@
 import {client, JmapDataSource} from "../../jmap/index.js";
-import {Window} from "@intermesh/goui";
+import {t, Window} from "@intermesh/goui";
 import {ColumnSelectDialog} from "./ColumnSelectDialog.js";
 import {Entity} from "../../Entities.js";
 
@@ -27,7 +27,9 @@ export abstract class Export {
 				ids: result.ids,
 				columns: columns
 			}).then((result) => {
-				document.location = client.downloadUrl(result.blobId);
+				// document.location = client.downloadUrl(result.blobId);
+				void Window.alert(t("Export in progress"), t("You will be notified when the export is complete. You can close this window now."));
+
 			}).catch((result) => {
 				Window.alert(result);
 			})
