@@ -16,7 +16,7 @@ import {Notifier} from "./Notifier";
 class Main extends Component {
 	private readonly menu
 	private readonly container
-	private _launcher?: Launcher
+	// private _launcher?: Launcher
 	notifier: Notifier
 	constructor() {
 		super();

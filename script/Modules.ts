@@ -427,14 +427,11 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		const id = config.package + "/" + config.name;
 
-		// console.log(id); // why no legacy modules?????
-
 		if(this.clientModules[id]) {
 			return; //already registered
 		}
 
 		this.clientModules[id] = config;
-
 
 		if(window.go) {
 			go.Translate.package = config.package;
@@ -444,12 +441,6 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		if (config.init) {
 			config.init();
 		}
-
-		// if(window.go) {
-
-		// TODO, some old modules don't end up in the menu
-			this.registerInExtjs(config);
-		// }
 	}
 
 
