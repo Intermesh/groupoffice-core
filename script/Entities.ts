@@ -1,6 +1,5 @@
 import {EntityLink, modules} from "./Modules.js";
-import {EntityID, Filter} from "@intermesh/goui";
-import {customFields} from "./customfields/index.js";
+import {EntityID} from "@intermesh/goui";
 
 export interface Entity {
 	/**
