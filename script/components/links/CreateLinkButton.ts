@@ -5,21 +5,14 @@
  */
 
 
-import {ButtonEventMap, Config, createComponent, OverlayToolbarButton, t} from "@intermesh/goui";
+import {ButtonEventMap, Config, createComponent, OverlayToolbarButton, t, ToolbarItems} from "@intermesh/goui";
 import {createlinkfield, CreateLinkField} from "./CreateLinkField";
 
 
 export class CreateLinkButton extends OverlayToolbarButton {
-	readonly createLinkField: CreateLinkField;
+	protected getTbarItems(): ToolbarItems[] {
 
-	constructor() {
-		super();
-
-		this.icon = "link";
-
-		this.title = t("Create links");
-
-		this.createLinkField = createlinkfield({
+		const createLinkField = createlinkfield({
 			flex: 1,
 			listeners: {
 				setvalue: ({newValue}) => {
@@ -28,11 +21,16 @@ export class CreateLinkButton extends OverlayToolbarButton {
 			}
 		})
 
-		this.items.add(this.createLinkField)
-
 		this.on("open", () => {
-			this.createLinkField.focus();
+			createLinkField.focus();
 		})
+		return [createLinkField];
+	}
+	constructor() {
+		super();
+
+		this.icon = "link";
+		this.title = t("Create links");
 	}
 }
 
