@@ -223,6 +223,16 @@ export class Client extends Observable<ClientEventMap> {
 			})
 			])
 
+		userDS.on("change", async ( {target, changes}) => {
+			if(this._user && changes.updated && changes.updated.indexOf(this._user.id) > -1) {
+				const user =  await target.single(this._user.id);
+				if(user) {
+					this.setUser(user);
+				}
+			}
+		})
+
+
 		this.fire("authenticated", {session: this._session});
 
 		return true;
@@ -239,17 +249,6 @@ export class Client extends Observable<ClientEventMap> {
 		Format.currency = this._user.currency;
 		Format.thousandsSeparator = this._user.thousandsSeparator;
 		Format.decimalSeparator = this._user.decimalSeparator;
-
-
-		userDS.on("change", async ( {target, changes}) => {
-
-			if(changes.updated && changes.updated.indexOf(this._user!.id) > -1) {
-				const user =  await target.single(this._user!.id);
-				if(user) {
-					this.setUser(user);
-				}
-			}
-		})
 	}
 
 	/**

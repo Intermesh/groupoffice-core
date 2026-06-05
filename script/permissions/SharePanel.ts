@@ -23,7 +23,7 @@ import {entities} from "../Entities.js";
 
 
 class GroupTable extends Table<DataSourceStore> {
-	value: any;
+	value: any = null;
 
 	levels?:{ [key: string]: any }[]
 
