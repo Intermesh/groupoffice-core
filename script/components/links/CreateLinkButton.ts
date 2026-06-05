@@ -10,9 +10,18 @@ import {createlinkfield, CreateLinkField} from "./CreateLinkField";
 
 
 export class CreateLinkButton extends OverlayToolbarButton {
+	public readonly createLinkField: CreateLinkField;
 	protected getTbarItems(): ToolbarItems[] {
 
-		const createLinkField = createlinkfield({
+		return [this.createLinkField];
+	}
+	constructor() {
+		super();
+
+		this.icon = "link";
+		this.title = t("Create links");
+
+		this.createLinkField = createlinkfield({
 			flex: 1,
 			listeners: {
 				setvalue: ({newValue}) => {
@@ -22,15 +31,8 @@ export class CreateLinkButton extends OverlayToolbarButton {
 		})
 
 		this.on("open", () => {
-			createLinkField.focus();
+			this.createLinkField.focus();
 		})
-		return [createLinkField];
-	}
-	constructor() {
-		super();
-
-		this.icon = "link";
-		this.title = t("Create links");
 	}
 }
 
