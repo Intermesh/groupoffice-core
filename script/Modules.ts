@@ -80,6 +80,7 @@ export interface EntityConfig {
 	 * Custom filters for the entity
 	 */
 	filters?: EntityFilter[];
+	permissions?: any[]
 }
 export type ModuleConfig = {
 	/**

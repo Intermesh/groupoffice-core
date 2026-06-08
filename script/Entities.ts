@@ -11,6 +11,19 @@ export interface Entity {
 	goto: (id:EntityID)=>void,
 	module: string
 	package: string
+	/**
+	 * options if not provided the default is:
+	 * [
+	 * 	{value: "", name: ""},
+	 * 	{value: 10, name: t("Read")},
+	 * 	{value: 20, name: t("Create")},
+	 * 	{value: 30, name: t("Write")},
+	 * 	{value: 40, name: t("Delete")},
+	 * 	{value: 50, name: t("Manage")}
+	 * ]
+	 */
+
+	permissions?: any[]
 	title: string
 }
 
