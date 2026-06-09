@@ -52,6 +52,12 @@ export interface JmapDataSourceEventMap extends DataSourceEventMap {
 export class JmapDataSource<EntityType extends DefaultEntity = DefaultEntity> extends AbstractDataSource<EntityType, JmapDataSourceEventMap> {
 
 	constructor(id:string) {
+
+		// always be a singleton. Via new JmapDataSource() or jmapds
+		if(stores[id]){
+			return stores[id];
+		}
+
 		super(id);
 
 		stores[id] = this;
