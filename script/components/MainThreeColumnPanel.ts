@@ -1,4 +1,4 @@
-import {Component, splitter, btn, t, router, browser, checkbox, Config, Button, ComponentState} from "@intermesh/goui";
+import {browser, btn, Button, Component, Config, router, splitter, t} from "@intermesh/goui";
 
 /**
  * MainThreeColumnPanel class
@@ -20,7 +20,7 @@ export abstract class MainThreeColumnPanel extends Component {
 	 * @param idAndRoute Used for state saving and also as the route to the main panel
 	 * @protected
 	 */
-	protected constructor(idAndRoute:string) {
+	protected constructor(idAndRoute: string) {
 		super("section");
 
 		this.id = idAndRoute;
@@ -30,11 +30,11 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		this.center = this.createCenter();
 		this.center.itemId = "center";
-		if(!this.center.minWidth) {
+		if (!this.center.minWidth) {
 			this.center.minWidth = 300;
 		}
 
-		if(!this.center.width) {
+		if (!this.center.width) {
 			this.center.width = 500;
 		}
 
@@ -44,23 +44,22 @@ export abstract class MainThreeColumnPanel extends Component {
 		this.west = this.createWest();
 		this.west.stateId = "west";
 
-		if(!this.west.minWidth) {
+		if (!this.west.minWidth) {
 			this.west.minWidth = 140;
 		}
-		if(!this.west.width) {
+		if (!this.west.width) {
 			this.west.width = 300;
 		}
 
 		this.east = this.createEast();
 		this.east.itemId = "east";
 		this.east.flex = 1;
-		if(!this.east.minWidth) {
+		if (!this.east.minWidth) {
 			this.east.minWidth = 140;
 		}
 
 
 		this.items.add(
-
 			this.west,
 
 			splitter({
@@ -76,7 +75,6 @@ export abstract class MainThreeColumnPanel extends Component {
 			}),
 
 			this.east
-
 		);
 	}
 
@@ -86,7 +84,7 @@ export abstract class MainThreeColumnPanel extends Component {
 	 *
 	 * @protected
 	 */
-	protected showWestButton(cfg:Config<Button> = {}) {
+	protected showWestButton(cfg: Config<Button> = {}) {
 		return btn({
 			...cfg,
 			cls: "small",
@@ -96,19 +94,22 @@ export abstract class MainThreeColumnPanel extends Component {
 				render: ({target}) => {
 					this.west.on('show', () => {
 						target.hide();
-					})
+					});
 
 					this.west.on('hide', () => {
 						target.show();
-					})
+					});
 
-					target.hidden = !this.west.hidden;
+
+					if (!browser.isMobile()) {
+						target.hidden = !this.west.hidden;
+					}
 				}
 			},
 			handler: (button, ev) => {
 				this.activatePanel(this.west);
 
-				if(button.icon == "left_panel_open") {
+				if (button.icon == "left_panel_open") {
 					this.west.hidden = false;
 					this.west.saveState();
 				}
@@ -128,7 +129,7 @@ export abstract class MainThreeColumnPanel extends Component {
 			listeners: {
 				render: ({target}) => {
 
-					if(this.west.findChild(target)) {
+					if (this.west.findChild(target)) {
 						this.west.on('show', () => {
 							target.show();
 						})
@@ -148,14 +149,13 @@ export abstract class MainThreeColumnPanel extends Component {
 				this.activatePanel(this.center);
 				router.setPath(this.id);
 
-				if(button.icon == "left_panel_close") {
+				if (button.icon == "left_panel_close") {
 					this.west.hidden = true;
 					this.west.saveState();
 				}
 			}
 		})
 	}
-
 
 
 	/**
@@ -184,7 +184,7 @@ export abstract class MainThreeColumnPanel extends Component {
 	 *
 	 * @param active
 	 */
-	public activatePanel(active:Component) {
+	public activatePanel(active: Component) {
 		this.center.el.classList.remove("active");
 		this.east.el.classList.remove("active");
 		this.west.el.classList.remove("active");
