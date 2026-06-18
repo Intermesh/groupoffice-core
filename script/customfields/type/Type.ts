@@ -10,6 +10,8 @@ import {
 } from "@intermesh/goui";
 import {FieldDialog} from "../FieldDialog.js";
 import {Field} from "../CustomFields.js";
+import {EntityFilter, EntityFilterType} from "../../Modules.js";
+import {EntityRelation} from "../../Entities.js";
 
 export abstract class Type {
 
@@ -78,6 +80,24 @@ export abstract class Type {
 			hidden: field.hiddenInGrid,
 			resizable: true
 		}
+	}
+
+	getFilter (field:Field) : EntityFilter | undefined {
+		if(!field.databaseName) {
+			return undefined;
+		}
+		return {
+			name: field.databaseName,
+			type: "string",
+			wildcards: true,
+			multiple: true,
+			title: field.name,
+			customfield: field
+		}
+	}
+
+	getRelations(customField:Field) : Record<string, EntityRelation> {
+		return {};
 	}
 
 	abstract getDialog(): FieldDialog;

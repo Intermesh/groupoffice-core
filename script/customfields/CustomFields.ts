@@ -2,6 +2,8 @@ import {EntityID, TableColumn} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index.js";
 import {AclItemEntity, AclOwnerEntity} from "../auth/index.js";
 import {Type} from "./type/index.js";
+import {EntityFilter} from "../Modules.js";
+import {EntityRelation} from "../Entities.js";
 
 
 export interface FieldSet extends AclOwnerEntity {
@@ -141,6 +143,40 @@ class CustomFields {
 			return this.getType(f.type).createTableColumn(f);
 		}).filter(c => c !== undefined);
 	}
+
+	getFilters(entity: string) : EntityFilter[] {
+		const defs:EntityFilter[] = [];
+
+		this.getEntityFields(entity).forEach((field) => {
+			const type = this.getType(field.type);
+			const def = type.getFilter(field);
+			if(def) {
+				defs.push(def);
+			}
+
+		});
+		return defs;
+	}
+
+
+		/**
+		 * Get filter definitions for tbsearch and user filter dialogs
+		 *
+		 */
+		getRelations(entity:string) : Record<string, EntityRelation>  {
+			const relations = {};
+
+			this.getEntityFields(entity).forEach((field) => {
+				const type = this.getType(field.type);
+				if(!type) {
+					console.error("Custom field type " + field.type + " not found");
+					return;
+				}
+				Ext.apply(relations,  type.getRelations(field));
+
+			});
+			return relations;
+		}
 
 }
 

@@ -42,6 +42,7 @@ class Main extends Component {
 			router.setPath(firstId);
 			this.openPanel(firstId);
 		});
+
 	}
 
 	private accountMenu?: Menu;
@@ -133,7 +134,6 @@ class Main extends Component {
 
 		// Get all registered panels
 		modules.getMainPanels().forEach(async (m) => {
-
 			// Add route to the panel
 			router.add(new RegExp(`^${RegExp.escape(m.id)}$`), () => {
 				return this.openPanel(m.id)
@@ -160,50 +160,60 @@ class Main extends Component {
 	 * @private
 	 */
 	private addLegacyDefaultRoutes() {
+			//default route for legacy entities
 		router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, async (entity, id) => {
 
 			const entityObj = entities.get(entity);
-			if(!entityObj) {
-				console.log("Entity ("+entity+") not found in default entity route")
+			if (!entityObj) {
+				console.log("Entity (" + entity + ") not found in default entity route")
 				return false;
+			}
+
+			const module = entityObj.module,
+				mainPanel = await main.getPanelById(module);
+
+			if (!mainPanel || !(mainPanel instanceof ExtJSWrapper)) {
+				return;
 			}
 
 			const detailViewName = entity.charAt(0).toLowerCase() + entity.slice(1) + "Detail";
 
-			const mainPanelCmp = await this.openPanel(entityObj.package + "/" + entityObj.module) as ExtJSWrapper;
-
-			if(!mainPanelCmp) {
-				console.error("mainpanel not found!");
-				return;
-			}
-
-			if (mainPanelCmp.extJSComp.route) {
-				mainPanelCmp.extJSComp.route(id, entityObj);
-			} else if(mainPanelCmp.extJSComp[detailViewName]) {
-				mainPanelCmp.show();
-				mainPanelCmp.extJSComp[detailViewName].load(id);
-				mainPanelCmp.extJSComp[detailViewName].show();
+			if (mainPanel.extJSComp.route) {
+				mainPanel.show();
+				mainPanel.extJSComp.route(id, entityObj);
+			} else if (mainPanel.extJSComp[detailViewName]) {
+				mainPanel.show();
+				mainPanel.extJSComp[detailViewName][detailViewName].load(id);
+				mainPanel.extJSComp[detailViewName][detailViewName].show();
 			} else {
-				console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + entityObj.module + ":", mainPanelCmp);
+				console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + module + ":", mainPanel);
 				console.log(arguments);
 			}
 		});
+
 	}
 
-	public async openPanel(panelId:string) {
+	public getPanelById(panelId:string) {
 
 		const m = modules.getPanelById(panelId);
-		if(!m) {
+		if (!m) {
 			throw "notfound";
 		}
 
 		let cmp = this.container.findChild(panelId);
-		if(!cmp) {
-			cmp = await m.callback();
+		if (!cmp) {
+			cmp = m.callback();
 			cmp.itemId = panelId;
 			this.container.items.add(cmp);
 		}
 
+		return cmp;
+
+	}
+
+	public openPanel(panelId:string) {
+
+		let cmp = this.getPanelById(panelId)
 
 		//extjs3 panels have this func
 		//@ts-ignore

@@ -11,13 +11,14 @@ import {
 	FunctionUtil, INotification,
 	Notifier,
 	Observable,
-	ObservableEventMap, t,
+	ObservableEventMap, p, t,
 	Timezone
 } from "@intermesh/goui";
 
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
+import {entities} from "../Entities.js";
 
 
 export interface LoginData {

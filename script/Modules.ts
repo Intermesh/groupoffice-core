@@ -1,17 +1,28 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, root, t, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, p, root, t, translate} from "@intermesh/goui";
 import {client, JmapDataSource} from "./jmap/index.js";
-import {Entity} from "./Entities.js";
+import {entities, Entity, EntityRelation} from "./Entities.js";
 import {User} from "./auth";
-import {DetailPanel, extjswrapper, LanguageField} from "./components/index";
+import {DetailPanel} from "./components/DetailPanel.js";
+import {ExtJSWrapper, extjswrapper} from "./components/ExtJSWrapper.js";
+import {LanguageField} from "./components/form/LanguageField.js";
 import {main} from "./main/index.js";
 import {router} from "./Router.js";
+import {Field} from "./customfields/index.js";
+import {callback} from "chart.js/helpers";
 
+export type EntityFilterType = "string" | "number" | "date" | "select";
 export interface EntityFilter {
 	name: string,
-	type: string,
+	type: EntityFilterType | string, // todo: custom components from modules?
 	typeConfig?: Record<string, any>,
 	title: string,
-	multiple: boolean
+	multiple: boolean,
+	wildcards?: boolean,
+	customfield?: Field,
+	options?: {
+		value: any,
+		title: string
+	}[]
 }
 
 export interface EntityLink {
@@ -37,7 +48,7 @@ export interface EntityLink {
 	 * @param entity
 	 * @param entityId
 	 */
-	linkWindow?: (entityName: string, entityId: EntityID, entity:BaseEntity, detailPanel:DetailPanel) => any;
+	linkWindow?: (entityName: string, entityId: EntityID, entity:any, detailPanel:DetailPanel) => any;
 
 
 	/**
@@ -70,7 +81,9 @@ export interface EntityConfig {
 	/**
 	 * Custom filters for the entity
 	 */
-	filters?: EntityFilter[];
+	filters?: EntityFilter[]
+
+	relations?: Record<string, EntityRelation>
 }
 export type ModuleConfig = {
 	/**
@@ -89,6 +102,24 @@ export type ModuleConfig = {
 	 * Registered module entities
 	 */
 	entities?: (string | EntityConfig)[];
+
+	/**
+	 * Used by legacy ExtJS module. It will render as a main panel
+	 * @deprecated
+	 */
+	mainPanel?:any
+	/**
+	 * used as main panel title
+	 *
+	 * @deprecated
+	 */
+	title?:string,
+
+	/**
+	 * Main panel config
+	 * @deprecated
+	 */
+	panelConfig?:any
 };
 
 export type MainPanel = {
@@ -96,7 +127,7 @@ export type MainPanel = {
 	module: string,
 	id: string,
 	title: string
-	callback: () => Component | Promise<Component>
+	callback: () => Component
 }
 
 
@@ -122,116 +153,40 @@ declare global {
 
 let GouiMainPanel : any, GouiSystemSettingsPanel : any, GouiAccountSettingsPanel: any;
 
-if(window.GO) {
-
-	GO.mainLayout.on("authenticated", () => {
-		// client.sse(go.Entities.getAll().filter((e:any) => e.package != "legacy").map((e:any) => e.name));
-	})
-
-	 GouiMainPanel = Ext.extend(go.modules.ModulePanel, {
-
-		callback: undefined,
-
-		initComponent () {
-			this.cls = 'goui-module-panel';
-			GouiMainPanel.superclass.initComponent.call(this);
-
-			this.on("afterrender", () => {
-				translate.setDefaultModule(this.package, this.module);
-				const comp = this.callback();
-				comp.render(this.el.dom);
-			}, this);
-		},
-
-		 setSize (_w:number, _h:number){
-			// dont
-		 }
-
-	});
-
-	GouiSystemSettingsPanel = Ext.extend(Ext.BoxComponent, {
-
-		callback: undefined,
-
-		comp: undefined,
-
-		initComponent: function () {
-
-			GouiSystemSettingsPanel.superclass.initComponent.call(this);
-
-			this.on("afterrender", async () => {
-
-				translate.setDefaultModule(this.package, this.module);
-
-				this.comp = await this.callback();
-				this.comp.render(this.el.dom);
-			}, this);
-		},
-
-		onSubmit: async function (cb:any, scope: any) {
-			if(this.comp.onSubmit) {
-				await this.comp.onSubmit();
-			}
-			cb.call(scope, this, true);
-		},
-
-	});
-
-
-
-	GouiAccountSettingsPanel = Ext.extend(Ext.BoxComponent, {
-
-
-		comp: undefined,
-
-		initComponent: function () {
-
-			GouiSystemSettingsPanel.superclass.initComponent.call(this);
-
-			this.on("afterrender", () => {
-				if(!this.comp) {
-					this.comp = this.callback();
-				}
-				this.comp.render(this.el.dom);
-			}, this);
-		},
-
-		onSubmit: async function () {
-			if(this.comp.onSubmit) {
-				await this.comp.onSubmit();
-			}
-		},
-
-		destroy : () => {},
-
-		onLoad: async function(user:User) {
-			if(!this.comp) {
-				this.comp = this.callback();
-			}
-			if(this.comp.onLoad) {
-				await this.comp.onLoad(user);
-			}
-		}
-
-	});
-}
-
-
 export interface Module extends BaseEntity {
 	id: EntityID
 	title: string
 	name: string,
 	package: string,
+	/**
+	 * Available rights.
+	 *
+	 * eg. "mayRead", "mayManage", "mayChangeGroups" etc
+	 */
 	rights: string[],
 	settings: Record<string, any>
+
+	/**
+	 * Available rights of the current user
+	 */
 	userRights: Record<string, boolean>,
+
+	/**
+	 * Rights per groupId (groupId is the key)
+	 */
+	permissions: Record<EntityID, Record<string, boolean>>
 	version: number,
+
+	/**
+	 * Entities of the module
+	 */
 	entities: Record<string, Entity>,
 	enabled: boolean
 	/**
 	 * goui, extjs3
 	 */
-	views: string[]
+	views: string[],
+
 }
 
 export const moduleDS = new JmapDataSource<Module>("Module");
@@ -244,12 +199,7 @@ class Modules {
 	private mainPanels: Record<string,MainPanel> = {};
 
 
-	private async legacyInit(): Promise<any> {
-
-		if(window.GOUI) {
-			// already initialized in old MainLayout.js UI
-			return;
-		}
+	private async  legacyInit(): Promise<any> {
 
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
 
@@ -259,6 +209,17 @@ class Modules {
 
 		window.GOUI = await import(goui);
 		window.groupofficeCore = await import(groupofficeCore);
+
+		await new Promise((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src = "views/goui/legacyscripts.php";
+			script.onload = resolve;
+			script.onerror = reject;
+			document.head.appendChild(script);
+		});
+
+		// all entities should be registered now so we populate them with server info
+		entities.init()
 
 		await go.User.onLoad(client.session);
 
@@ -285,17 +246,20 @@ class Modules {
 
 		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
-		return Promise.all([
-			go.Modules.init(), // TODO jmapds() and userDS two separate stores??
-			go.User.loadLegacyModuleScripts(),
-		]). then( async () => {
-			// this init depends on modules being loaded
-			await go.customfields.CustomFields.init()
-			go.Entities.init()
-			go.User.loadLegacyModules()
+		// // manually call the document ready
+		Ext.fireDocReady();
 
-		})
+		await go.User.loadLegacyModuleScripts();
+		// this init depends on modules being loaded
+		await go.customfields.CustomFields.init()
+		go.User.loadLegacyModules()
+
+		//todo: bridge to new FW
+		GO.checker = new GO.Checker();
+
+		GO.mainLayout.fireReady();
 	}
+
 
 	/**
 	 * Loads module script before being authenticated
@@ -357,50 +321,147 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 
 	/**
-	 * The legacyscript.php is loaded by index.html. We transform the old modules into GOUI wrapped panels here.
-	 *
-	 * the user must be authenticated at this point in contrast to the new goui modules
-	 *
-	 * @private
-	 */
-	public loadLegacyUI() {
-
-		GO.moduleManager.getAllPanelConfigs().forEach((m:any) => {
-
-			const id = (m.package ?? "legacy") + "/" + m.moduleName;
-
-			this.mainPanels[id] = {
-				package: m.package,
-				module: m.moduleName,
-				id: id,
-				title: m.title,
-				callback: () => {
-
-					const pnl = GO.moduleManager.getPanel(m.moduleName);
-					pnl.header = false;
-
-					return extjswrapper({
-						cls: "fit",
-						title: m.title,
-						comp: Ext.create(pnl)
-					});
-				}
-			};
-
-		})
-	}
-
-	/**
 	 * Initializes after the user is authenticated.
 	 *
 	 * It populates the serverModules entities from the JMAP server.
 	 */
 	public async init() {
 
+		this.register({
+			name: "core",
+			package: "core",
+			entities: [
+				{
+					name: 'Alert',
+					relations: {
+						user: {store: "Principal", fk:'userId'}
+					}
+				},
+				{
+					name: 'Group',
+					relations: {
+						users: {store: "Principal", fk: "users"},
+						user: {store: "Principal", fk:'isUserGroupFor'}
+					}
+				},
+
+				{
+					name: 'User',
+					filters: [
+						{
+							wildcards: false,
+							name: 'text',
+							type: "string",
+							multiple: false,
+							title: t("Query")
+						},
+						{
+							title: t("Comment"),
+							name: 'comment',
+							multiple: true,
+							type: 'string'
+						},
+						{
+							title: t("Commented at"),
+							name: 'commentedat',
+							multiple: false,
+							type: 'date'
+						}, {
+							title: t("Modified at"),
+							name: 'modifiedat',
+							multiple: false,
+							type: 'date'
+						}, {
+							title: t("Modified by"),
+							name: 'modifiedBy',
+							multiple: true,
+							type: 'string'
+						}, {
+							title: t("Created at"),
+							name: 'createdat',
+							multiple: false,
+							type: 'date'
+						}, {
+							title: t("Created by"),
+							name: 'createdby',
+							multiple: true,
+							type: 'string'
+						},
+						{
+							title: t("Username"),
+							name: 'username',
+							multiple: true,
+							type: 'string'
+						},{
+							title: t("Display name"),
+							name: 'displayName',
+							multiple: true,
+							type: 'string'
+						},{
+							title: t("E-mail"),
+							name: 'email',
+							multiple: true,
+							type: 'string'
+						},
+					]
+
+				},
+				'Principal',
+				'Field',
+				{
+					name: 'FieldSet',
+					title: t("Custom field set")
+				},
+				'Module',
+				{
+					name: 'Link',
+					relations: {
+						to: {store: "Search", fk: "toSearchId"}
+					}
+				},
+				'Search',
+				'EntityFilter',
+				'SmtpAccount',
+				'EmailTemplate',
+				'PdfTemplate',
+				'ImportMapping',
+				'CronJobSchedule',
+				{
+					name: 'AuthAllowGroup',
+					relations: {
+						group: {store: "Group", fk:'groupId'}
+					}
+				},
+				'OauthClient',
+				'SpreadSheetExport'
+			],
+
+
+			//
+			// customFieldTypes: [
+			// 	"go.customfields.type.Checkbox",
+			// 	"go.customfields.type.Date",
+			// 	"go.customfields.type.DateTime",
+			// 	"go.customfields.type.EncryptedText",
+			// 	"go.customfields.type.FunctionField",
+			// 	"go.customfields.type.Group",
+			// 	"go.customfields.type.Html",
+			// 	"go.customfields.type.MultiSelect",
+			// 	"go.customfields.type.Attachments",
+			// 	"go.customfields.type.Notes",
+			// 	"go.customfields.type.Number",
+			// 	"go.customfields.type.Select",
+			// 	"go.customfields.type.Text",
+			// 	"go.customfields.type.TextArea",
+			// 	"go.customfields.type.Data",
+			// 	"go.customfields.type.User",
+			// 	"go.customfields.type.YesNo",
+			// 	"go.customfields.type.TemplateField"
+			// ]
+
+		});
+
 		return Promise.all([
-
-			this.legacyInit(),
-
 			moduleDS.get().then( serverMods => {
 				serverMods.list.map(m => {
 					if (!m.package) {
@@ -409,8 +470,12 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 					const id = m.package + "/" + m.name;
 					this.serverModules[id] = m;
 				})
+			}),
 
-			})
+			this.legacyInit(),
+
+
+
 		]);
 	}
 
@@ -428,18 +493,34 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		const id = config.package + "/" + config.name;
 
 		if(this.clientModules[id]) {
+			console.warn(id + " already registered", config)
+
+			if(config.mainPanel) {
+				modules.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+			}
 			return; //already registered
 		}
 
 		this.clientModules[id] = config;
 
-		if(window.go) {
-			go.Translate.package = config.package;
-			go.Translate.module = config.name;
+
+		if (config.entities) {
+			config.entities.forEach(function (entityCfg) {
+
+				if(typeof entityCfg == "string") {
+					entityCfg = {name: entityCfg};
+				}
+
+				entities.register({...entityCfg, package: config.package, module: config.name});
+			});
 		}
 
 		if (config.init) {
 			config.init();
+		}
+
+		if(config.mainPanel) {
+			modules.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 		}
 	}
 
@@ -453,25 +534,9 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	 * @param title
 	 * @param callback
 	 */
-	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component | Promise<Component>) {
+	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component) {
 
 		translate.setDefaultModule(pkg, module);
-
-		if(!router.newMainLayout) {
-			go.Translate.package = go.package = pkg;
-			go.Translate.module = go.module = module;
-			// @ts-ignore
-			const proto = Ext.extend(GouiMainPanel, {
-				id: id,
-				title: title,
-				callback: callback
-			});
-
-			proto.package = pkg;
-			proto.module = module;
-
-			go.Modules.addPanel(proto);
-		}
 
 		this.mainPanels[id] ={
 			package: pkg,
@@ -480,8 +545,46 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			title,
 			callback
 		};
-
 	}
+
+	public addLegacyMainpanel(pkg:string, module:string, title: string, panelClass:any, panelConfig?:any) {
+
+		Ext.onReady(() => {
+
+			if(!panelConfig) {
+				panelConfig = {};
+			}
+			panelConfig.moduleName = module;
+
+			panelConfig.id='go-module-panel-' + pkg + "-" + panelConfig.module;
+
+			if(!panelConfig.cls)
+				panelConfig.cls = 'go-module-panel';
+
+			if(typeof panelClass == "string") {
+				try {
+					panelClass = GO.util.stringToFunction(panelClass);
+				} catch(e) {
+					console.error("Could not find class " + panelClass, e);
+					return;
+				}
+			}
+
+			if(!panelConfig.iconCls) {
+				panelConfig.iconCls = panelClass.prototype.iconCls || "go-tab-icon-" + module;
+			}
+
+			this.addMainPanel(pkg, module, module, title, () => {
+
+				return extjswrapper({
+					cls: "fit",
+					title: panelConfig.title,
+					comp: new panelClass(panelConfig)
+				});
+			})
+		}, this, {delay:0})
+	}
+
 
 	public getMainPanels() {
 		return Object.values(this.mainPanels);
@@ -500,50 +603,10 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	 */
 	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component | Promise<Component>) {
 
-		if(!window.go) {
-
-			//todo
-			return;
-		}
-		go.Translate.package = go.package = pkg;
-		go.Translate.module = go.module = module;
-
-		// @ts-ignore
-		const proto = new GouiSystemSettingsPanel();
-		proto.callback= callback;
-		proto.title = title;
-		proto.iconCls = "ic-" + icon.replace('_','-');
-		proto.itemId = id;
-
-		GO.systemSettingsPanels.push(proto);
+		console.error("Deprecated addSystemSettings() call")
 	}
 
-	/**
-	 * Add a system settings panel
-	 *
-	 * @param pkg
-	 * @param module
-	 * @param id
-	 * @param title
-	 * @param icon
-	 * @param callback
-	 */
-	public addAccountSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component) {
 
-		go.Translate.package = go.package = pkg;
-		go.Translate.module = go.module = module;
-
-		// @ts-ignore
-		const proto = new GouiAccountSettingsPanel({
-			callback: callback,
-			title: title,
-			iconCls: "ic-" + icon.replace('_', '-'),
-			itemId: id
-		});
-
-		GO.userSettingsPanels.push(proto);
-
-	}
 
 	/**
 	 * Open a main panel
@@ -552,20 +615,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	 * @deprecated use main.openPanel()
 	 */
 	public openMainPanel(id: string) {
-		// old extjs mainlayout
-		if(!main.rendered) {
-			GO.mainLayout.openModule(id);
-		} else {
 			return main.openPanel(id);
-		}
-	}
-
-	private registerInExtjs(config: ModuleConfig) {
-		go.Translate.setModule(config.package, config.name);
-		go.Modules.register(config.package, config.name, {
-			entities: config.entities,
-			title: t('name')
-		});
 	}
 
 	/**
@@ -576,13 +626,37 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	}
 
 	/**
-	 * Check if the current user has this module
-	 *
-	 * @param pkg
-	 * @param name
+	 * Get all modules
 	 */
-	public isAvailable(pkg:string, name:string) : boolean {
-		return !!this.get(pkg, name);
+	public getAvailable(user?:User, right:string = "mayRead") : Module[] {
+		const av = Object.values(this.serverModules).filter(m => this.isAvailable(m.package, m.name, user, right));
+		return av;
+	}
+
+	/**
+	 * Check if the current user has this module
+	 */
+	public isAvailable(pkg:string, name:string, user?:User, right:string = "mayRead") : boolean {
+		const mod = this.get(pkg, name);
+		if(!mod) {
+			return false;
+		}
+
+		if(!user || user.id === client.user.id) {
+			// checking for current user
+			return mod.userRights[right];
+		} else {
+			//if a user is given we must check the groups
+			for(let groupId in mod.permissions) {
+				const allowed = mod.permissions[groupId]?.[right];
+
+				if(allowed && user.groups.indexOf(groupId) != -1) {
+					return true;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -594,15 +668,12 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	public get(pkg:string, name:string) : Module | undefined {
 		return this.serverModules[pkg + "/" + name];
 	}
-
-
 }
 
 export const modules = new Modules();
 
-//
-// //For 6.8 but not 6.9
-// GO.mainLayout.on("authenticated", () => {
-// 	client.fireAuth();
-//
-// })
+
+
+
+
+

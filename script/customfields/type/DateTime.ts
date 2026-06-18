@@ -28,5 +28,12 @@ export class DateTime extends Type {
 	createDetailField(field:Field) {
 		return displaydatefield({withTime: true,icon: undefined, ...this.getDetailFieldConfig(field)});
 	}
+
+	getFilter(field: Field) {
+		const f =  super.getFilter(field)!;
+		f.type = "date";
+		f.multiple = false;
+		return f;
+	}
 }
 customFields.registerType(new DateTime);

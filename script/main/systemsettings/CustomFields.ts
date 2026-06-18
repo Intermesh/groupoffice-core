@@ -89,7 +89,7 @@ class CustomFields extends AbstractSystemSettingsPanel {
 					continue;
 				}
 
-				if (entity.customFields) {
+				if (entity.supportsCustomFields) {
 					const cfEntity: EntityWithCustomfields = {
 						entityName: entity.name,
 						moduleTitle: mod.name

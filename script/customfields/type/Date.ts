@@ -28,6 +28,13 @@ export class Date extends Type {
 	createDetailField(field:Field) {
 		return displaydatefield({...this.getDetailFieldConfig(field), icon: undefined});
 	}
+
+	getFilter(field: Field) {
+		const f =  super.getFilter(field)!;
+		f.type = "date";
+		f.multiple = false;
+		return f;
+	}
 }
 
 customFields.registerType(new Date());

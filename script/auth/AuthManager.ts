@@ -27,13 +27,9 @@ class AuthManager {
 
 			await client.authenticate();
 
-			if(client.isLoggedIn()) {
-				resolve(client.user!);
-			}
-
 			root.unmask();
 
-			while (!client.user) {
+			while(!client.isLoggedIn()) {
 				await this.showLogin();
 			}
 

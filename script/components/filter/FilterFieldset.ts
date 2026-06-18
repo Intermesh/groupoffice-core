@@ -33,7 +33,7 @@ export class FilterFieldset extends Fieldset {
 
 		this.flex = 1;
 
-		this.entity = entities.get(entityName);
+		this.entity = entities.get(entityName)!;
 
 		this.items.add(
 			this.form = form({},

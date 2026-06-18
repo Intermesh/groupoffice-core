@@ -14,7 +14,8 @@ import {
 	EntityID,
 	t,
 	tbar,
-	Toolbar, translate,
+	Toolbar,
+	translate,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";

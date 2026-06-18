@@ -1,4 +1,4 @@
-import {Component, ComponentEventMap, Config, createComponent} from "@intermesh/goui";
+import {btn, Component, ComponentEventMap, Config, createComponent, Window} from "@intermesh/goui";
 import {DetailPanel} from "./DetailPanel.js";
 
 export class FilesButton extends Component {
@@ -15,8 +15,15 @@ export class FilesButton extends Component {
 
 		})
 
-		this.items.add(new GO.files.DetailFileBrowserButton({
-			// detailView: this.detailView
+		// this.items.add(new GO.files.DetailFileBrowserButton({
+		// 	// detailView: this.detailView
+		// }))
+
+		this.items.add(btn({
+			icon: "folder",
+			handler: () => {
+				Window.alert("TODO");
+			}
 		}))
 	}
 }

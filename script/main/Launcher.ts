@@ -1,14 +1,4 @@
-import {
-	ArrayUtil,
-	btn, Button, comp,
-	Component, ComponentEventMap,
-	InputFieldEventMap,
-	Menu,
-	Observable,
-	searchbtn,
-	TextField,
-	textfield
-} from "@intermesh/goui";
+import {ArrayUtil, btn, comp, Menu, TextField, textfield} from "@intermesh/goui";
 import {modules} from "../Modules.js";
 import {router} from "../Router.js";
 import {client} from "../jmap/index.js";
@@ -22,9 +12,24 @@ export class Launcher extends Menu {
 
 		this.cls = "launcher";
 		this.hidden = true;
+		this.removeOnClose = false;
 
 		this.el.addEventListener("click", () => {
 			this.hide();
+		})
+
+		this.allButtons = ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).map(m => {
+			return comp({}, btn({
+				style: {
+					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
+				},
+				itemId: m.id,
+
+				text: m.title,
+				handler: () => {
+					router.goto(m.id);
+				}
+			}))
 		})
 
 		this.items.add(
@@ -79,24 +84,6 @@ export class Launcher extends Menu {
 
 			this.searchFld.focus();
 		})
-
-
-		this.allButtons = ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).map(m => {
-			return comp({}, btn({
-				style: {
-					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
-				},
-				itemId: m.id,
-
-				text: m.title,
-				handler: () => {
-					router.goto(m.id);
-				}
-			}))
-		})
-
-
-
 
 	}
 }
