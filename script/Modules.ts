@@ -124,8 +124,8 @@ export type ModuleConfig = {
 
 export type MainPanel = {
 	package: string
-	module: string,
-	id: string,
+	module: string
+	id: string
 	title: string
 	callback: () => Component
 }
