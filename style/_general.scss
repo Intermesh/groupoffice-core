@@ -165,18 +165,20 @@ h4.goui {
 		overflow: auto;
 	}
 
+	$tileSize: 12rem;
+
 	.modules-container {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(12rem, 1fr));
-		grid-template-rows: 12rem;
+		grid-template-columns: repeat(3, minmax($tileSize, 1fr));
+		grid-template-rows: $tileSize ;
 		justify-content: space-between;
 		align-content: center;
 		grid-gap: 1.6rem;
 
 		div {
 			position:relative;
-			height: 12rem;
-			width: 12rem;
+			height: $tileSize;
+			width: $tileSize;
 		}
 		.goui-button {
 			position: absolute;
@@ -184,10 +186,10 @@ h4.goui {
 			left: 0;
 			align-items: end;
 			//height: 11.8rem;
-			width: 12rem;
+			width: $tileSize;
 			background-position: center 0.8rem;
 			background-repeat: no-repeat;
-			background-size: 7.2rem 7.2rem;
+			background-size: $tileSize  * .5 $tileSize * .5;
 			display:block;
 			text-align: center;
 			font-size: 1.4rem;
@@ -197,7 +199,7 @@ h4.goui {
 			.text {
 				display:block;
 				//position: absolute;
-				margin-top: 8rem;
+				margin-top: $tileSize * .5;
 				//left: 1.8rem;
 				//width: 8.4rem;
 			}
