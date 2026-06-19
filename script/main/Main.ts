@@ -1,23 +1,56 @@
-import {avatar, btn, cardmenu, cards, comp, Component, h4, Menu, menu, root, t, tbar, Window} from "@intermesh/goui";
-import {modules} from "../Modules.js";
+import {
+	avatar,
+	btn,
+	cardmenu,
+	cards,
+	comp,
+	Component,
+	ComponentEventMap,
+	h4,
+	Menu,
+	menu,
+	t,
+	tbar,
+	translate,
+	Window
+} from "@intermesh/goui";
 import {entities} from "../Entities.js";
-import {ExtJSWrapper} from "../components/ExtJSWrapper.js";
+import {extjswrapper, ExtJSWrapper} from "../components/ExtJSWrapper.js";
 import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
 import {Notifier} from "./Notifier";
+import {callback} from "chart.js/helpers";
+import {MainPanelConfig} from "../Modules.js";
 
+
+type MainPanel = {
+	package: string
+	module: string
+	id: string
+	title: string,
+	pinned: number|undefined,
+	callback: () => Component<any>,
+	routes?: Record<string, any>
+}
+
+
+export interface MainPanelEventMap extends ComponentEventMap {
+	mainpanelcreated: {panel:Component}
+}
 /**
  * Main view
  *
  * Top level component holding the main toolbar with logo and launcher and the module interfaces
  */
-class Main extends Component {
+class Main extends Component<MainPanelEventMap> {
 	private readonly menu
 	private readonly container
-	// private _launcher?: Launcher
-	notifier: Notifier
+	public readonly notifier: Notifier
+
+	private mainPanels: Record<string,MainPanel> = {};
+
 	constructor() {
 		super();
 
@@ -133,26 +166,106 @@ class Main extends Component {
 		);
 
 		// Get all registered panels
-		modules.getMainPanels().forEach(async (m) => {
+		this.getMainPanels().forEach(async (m) => {
 			// Add route to the panel
 			router.add(new RegExp(`^${RegExp.escape(m.id)}$`), () => {
 				return this.openPanel(m.id)
 			});
 
 			// Add button to the route
-			this.menu.items.add(
-				btn({
-					itemId: m.id,
-					text: m.title,
-					handler: () => {
-						router.goto(m.id);
-					}
-				})
-			);
-			// }
+			if(m.pinned) {
+				this.menu.items.add(
+					btn({
+						itemId: m.id,
+						text: m.title,
+						handler: () => {
+							router.goto(m.id);
+						}
+					})
+				);
+			}
 		});
 
 		this.addLegacyDefaultRoutes();
+	}
+
+	/**
+	 * Add a main panel that is accessible through the main menu and tabs
+	 *
+
+	 */
+	public addMainPanel(pkg: string, module: string, panelCfg: Omit<MainPanelConfig, "cmp"> & {callback: () => Component<any>}) {
+
+		translate.setDefaultModule(pkg, module);
+
+		// temporary
+		let pinned = undefined;
+		switch(module) {
+			case 'email':
+				pinned = 1;
+			case 'calendar':
+				pinned = 1;
+			case 'addressbook':
+				pinned = 1;
+		}
+
+		this.mainPanels[panelCfg.id] = {
+			package: pkg,
+			module: module,
+			pinned: pinned,
+			id: panelCfg.id,
+			title: panelCfg.title,
+			callback: panelCfg.callback,
+			routes: panelCfg.routes
+		};
+	}
+
+
+	public getMainPanels() {
+		return Object.values(this.mainPanels);
+	}
+
+
+	public addLegacyMainpanel(pkg:string, module:string, title: string, panelClass:any, panelConfig?:any) {
+
+		Ext.onReady(() => {
+
+			if(!panelConfig) {
+				panelConfig = {};
+			}
+			panelConfig.moduleName = module;
+
+			panelConfig.id='go-module-panel-' + pkg + "-" + panelConfig.module;
+
+			if(!panelConfig.cls)
+				panelConfig.cls = 'go-module-panel';
+
+			if(typeof panelClass == "string") {
+				try {
+					panelClass = GO.util.stringToFunction(panelClass);
+				} catch(e) {
+					console.error("Could not find class " + panelClass, e);
+					return;
+				}
+			}
+
+			if(!panelConfig.iconCls) {
+				panelConfig.iconCls = panelClass.prototype.iconCls || "go-tab-icon-" + module;
+			}
+
+			this.addMainPanel(pkg, module, {
+				id: module,
+				title,
+			 	callback: () => {
+
+					return extjswrapper({
+						cls: "fit",
+						title: panelConfig.title,
+						comp: new panelClass(panelConfig)
+					});
+				}
+			})
+		}, this, {delay:0})
 	}
 
 	/**
@@ -170,7 +283,7 @@ class Main extends Component {
 			}
 
 			const module = entityObj.module,
-				mainPanel = await main.getPanelById(module);
+				mainPanel = main.getPanelById(module);
 
 			if (!mainPanel || !(mainPanel instanceof ExtJSWrapper)) {
 				return;
@@ -195,7 +308,7 @@ class Main extends Component {
 
 	public getPanelById(panelId:string) {
 
-		const m = modules.getPanelById(panelId);
+		const m = this.mainPanels[panelId];
 		if (!m) {
 			throw "notfound";
 		}
@@ -203,8 +316,17 @@ class Main extends Component {
 		let cmp = this.container.findChild(panelId);
 		if (!cmp) {
 			cmp = m.callback();
+			cmp.title = m.title;
 			cmp.itemId = panelId;
 			this.container.items.add(cmp);
+
+			if(m.routes) {
+				for(let route in m.routes) {
+					router.add(new RegExp(route), m.routes[route].bind(cmp));
+				}
+			}
+
+			this.fire("mainpanelcreated", {panel:cmp})
 		}
 
 		return cmp;

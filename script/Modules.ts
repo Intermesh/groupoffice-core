@@ -5,7 +5,14 @@ import {User} from "./auth";
 import {DetailPanel} from "./components/DetailPanel.js";
 import {ExtJSWrapper, extjswrapper} from "./components/ExtJSWrapper.js";
 import {LanguageField} from "./components/form/LanguageField.js";
-import {main} from "./main/index.js";
+import {
+	AbstractSystemSettingsPanel,
+	AppSettingsPanel,
+	main,
+	moduleSettings,
+	settingsPanels,
+	systemSettingsPanels
+} from "./main/index.js";
 import {router} from "./Router.js";
 import {Field} from "./customfields/index.js";
 import {callback} from "chart.js/helpers";
@@ -85,7 +92,15 @@ export interface EntityConfig {
 
 	relations?: Record<string, EntityRelation>
 }
-export type ModuleConfig = {
+
+export type MainPanelConfig<T extends typeof Component<any> = typeof Component<any>> = {
+	id: string
+	title: string,
+	cmp: T,
+	routes?: Record<string, (this: InstanceType<T>, ...args: string[]) => Promise<any> | any>
+}
+
+export interface ModuleConfig<T extends MainPanelConfig<any>[]>  {
 	/**
 	 * Module package name
 	 */
@@ -102,6 +117,13 @@ export type ModuleConfig = {
 	 * Registered module entities
 	 */
 	entities?: (string | EntityConfig)[];
+
+
+	panels?: [...T]
+
+	settingsPanels?: (typeof AppSettingsPanel)[]
+
+	systemSettingsPanels?: (new () => AbstractSystemSettingsPanel)[]
 
 	/**
 	 * Used by legacy ExtJS module. It will render as a main panel
@@ -121,14 +143,6 @@ export type ModuleConfig = {
 	 */
 	panelConfig?:any
 };
-
-export type MainPanel = {
-	package: string
-	module: string
-	id: string
-	title: string
-	callback: () => Component
-}
 
 
 // interface LegacyPanel extends typeof Component {
@@ -193,13 +207,10 @@ export const moduleDS = new JmapDataSource<Module>("Module");
 
 class Modules {
 
-	private clientModules: Record<string, ModuleConfig> = {};
+	private clientModules: Record<string, ModuleConfig<any>> = {};
 	private serverModules: Record<string, Module> = {};
 
-	private mainPanels: Record<string,MainPanel> = {};
-
-
-	private async  legacyInit(): Promise<any> {
+	private async legacyInit(): Promise<any> {
 
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso, 'Authorization': 'Bearer ' + client.accessToken};
 
@@ -231,7 +242,6 @@ class Modules {
 			});
 		});
 
-
 		//load state
 		if(!GO.util.isMobileOrTablet()) {
 			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
@@ -241,12 +251,13 @@ class Modules {
 				expires: new Date(new Date().getTime()+(1000*60*60*24*30)), //30 days
 			}));
 		}
+
 		// document.documentElement.cls('compact',go.User.theme === 'Compact');
 		window.GOUI.DateTime.staticInit(go.User.language.substring(0,2), go.User.firstWeekday);
 
 		GO.util.density = parseFloat(window.getComputedStyle(document.documentElement).fontSize) / 10;
 
-		// // manually call the document ready
+		// manually call the document ready
 		Ext.fireDocReady();
 
 		await go.User.loadLegacyModuleScripts();
@@ -479,16 +490,13 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		]);
 	}
 
-	public getPanelById(id:string) : MainPanel|undefined {
-		return this.mainPanels[id] ?? undefined;
-	}
 
 	/**
 	 * Register a module so it's functionally is added to the GUI
 	 *
 	 * @param config
 	 */
-	public register(config: ModuleConfig) {
+	public register<T extends MainPanelConfig<any>[]>(config: ModuleConfig<T>) {
 
 		const id = config.package + "/" + config.name;
 
@@ -496,7 +504,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			console.warn(id + " already registered", config)
 
 			if(config.mainPanel) {
-				modules.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+				main.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 			}
 			return; //already registered
 		}
@@ -515,80 +523,45 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			});
 		}
 
+
+		client.on("authenticated", ( {session}) => {
+			if (!session.capabilities[`go:${config.package}:${config.name}`]) {
+				// User has no access to this module
+				return;
+			}
+
+			translate.load(GO.lang[config.package]?.[config.name], config.package, config.name);
+
+			config.panels?.forEach(p => {
+
+				main.addMainPanel(config.package, config.name, {...p, callback: new p.cmp});
+			})
+
+			config.settingsPanels?.forEach(p => {
+				moduleSettings.addPanel(p);
+			})
+
+			config.systemSettingsPanels?.forEach(p => {
+				systemSettingsPanels.add(p);
+			})
+
+
+		});
+
 		if (config.init) {
 			config.init();
 		}
 
 		if(config.mainPanel) {
-			modules.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+			main.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 		}
 	}
 
 
-	/**
-	 * Add a main panel that is accessible through the main menu and tabs
-	 *
-	 * @param pkg
-	 * @param module
-	 * @param id
-	 * @param title
-	 * @param callback
-	 */
-	public addMainPanel(pkg: string, module: string, id: string, title: string, callback: () => Component) {
-
-		translate.setDefaultModule(pkg, module);
-
-		this.mainPanels[id] ={
-			package: pkg,
-			module: module,
-			id,
-			title,
-			callback
-		};
-	}
-
-	public addLegacyMainpanel(pkg:string, module:string, title: string, panelClass:any, panelConfig?:any) {
-
-		Ext.onReady(() => {
-
-			if(!panelConfig) {
-				panelConfig = {};
-			}
-			panelConfig.moduleName = module;
-
-			panelConfig.id='go-module-panel-' + pkg + "-" + panelConfig.module;
-
-			if(!panelConfig.cls)
-				panelConfig.cls = 'go-module-panel';
-
-			if(typeof panelClass == "string") {
-				try {
-					panelClass = GO.util.stringToFunction(panelClass);
-				} catch(e) {
-					console.error("Could not find class " + panelClass, e);
-					return;
-				}
-			}
-
-			if(!panelConfig.iconCls) {
-				panelConfig.iconCls = panelClass.prototype.iconCls || "go-tab-icon-" + module;
-			}
-
-			this.addMainPanel(pkg, module, module, title, () => {
-
-				return extjswrapper({
-					cls: "fit",
-					title: panelConfig.title,
-					comp: new panelClass(panelConfig)
-				});
-			})
-		}, this, {delay:0})
-	}
 
 
-	public getMainPanels() {
-		return Object.values(this.mainPanels);
-	}
+
+
 
 
 	/**
@@ -604,18 +577,6 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	public addSystemSettingsPanel(pkg: string, module: string, id:string, title: string,  icon: MaterialIcon, callback: () => Component | Promise<Component>) {
 
 		console.error("Deprecated addSystemSettings() call")
-	}
-
-
-
-	/**
-	 * Open a main panel
-	 *
-	 * @param id
-	 * @deprecated use main.openPanel()
-	 */
-	public openMainPanel(id: string) {
-			return main.openPanel(id);
 	}
 
 	/**
