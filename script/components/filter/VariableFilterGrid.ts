@@ -136,8 +136,5 @@ export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap>
 		this.cls = "no-row-lines";
 
 		this.entity = entities.get(entityName);
-		if(!this.entity){
-			throw ` Entity ${entityName} not found!`;
-		}
 	}
 }

@@ -17,9 +17,6 @@ export class VariableFilterDialog extends FormWindow {
 		this.addSharePanel();
 
 		this.entity = entities.get(entityName);
-		if(!this.entity) {
-			throw `Entity ${entityName} does not exist`
-		}
 
 		this.generalTab.items.add(
 			fieldset({},

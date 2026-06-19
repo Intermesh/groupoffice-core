@@ -21,7 +21,6 @@ import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
 import {Notifier} from "./Notifier";
-import {callback} from "chart.js/helpers";
 import {MainPanelConfig} from "../Modules.js";
 
 
@@ -194,7 +193,7 @@ class Main extends Component<MainPanelEventMap> {
 	 *
 
 	 */
-	public addMainPanel(pkg: string, module: string, panelCfg: Omit<MainPanelConfig, "cmp"> & {callback: () => Component<any>}) {
+	public addMainPanel(pkg: string, module: string, panelCfg: Omit<MainPanelConfig<any>, "cmp"> & {id:string, callback: () => Component<any>}) {
 
 		translate.setDefaultModule(pkg, module);
 

@@ -2,6 +2,7 @@ import {ArrayUtil, btn, comp, Menu, TextField, textfield} from "@intermesh/goui"
 import {modules} from "../Modules.js";
 import {router} from "../Router.js";
 import {client} from "../jmap/index.js";
+import {main} from "./Main.js";
 
 export class Launcher extends Menu {
 	private searchFld;
@@ -18,7 +19,7 @@ export class Launcher extends Menu {
 			this.hide();
 		})
 
-		this.allButtons = ArrayUtil.multiSort(modules.getMainPanels(), [{property:"title"}]).map(m => {
+		this.allButtons = ArrayUtil.multiSort(main.getMainPanels(), [{property:"title"}]).map(m => {
 			return comp({}, btn({
 				style: {
 					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`

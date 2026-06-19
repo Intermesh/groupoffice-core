@@ -209,8 +209,16 @@ class Entities {
 	}
 
 
-	public get(name: string) : Entity | undefined {
-		return this.entities[name.toLowerCase()];
+	public get(name: string) : Entity {
+		const e=  this.entities[name.toLowerCase()];
+		if(!e) {
+			throw ` Entity ${name} not found!`;
+		}
+		return e;
+	}
+
+	public exists(name: string) {
+		return !!this.entities[name.toLowerCase()];
 	}
 
 	public getAvailable() : Entity[] {

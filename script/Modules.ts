@@ -7,7 +7,7 @@ import {ExtJSWrapper, extjswrapper} from "./components/ExtJSWrapper.js";
 import {LanguageField} from "./components/form/LanguageField.js";
 import {
 	AbstractSystemSettingsPanel,
-	AppSettingsPanel,
+	AppSettingsPanel, appSystemSettings,
 	main,
 	moduleSettings,
 	settingsPanels,
@@ -91,16 +91,25 @@ export interface EntityConfig {
 	filters?: EntityFilter[]
 
 	relations?: Record<string, EntityRelation>
+
+
+	permissions?: { value:number, name: string }[]
 }
 
 export type MainPanelConfig<T extends typeof Component<any> = typeof Component<any>> = {
-	id: string
+	// id: string
 	title: string,
 	cmp: T,
 	routes?: Record<string, (this: InstanceType<T>, ...args: string[]) => Promise<any> | any>
 }
 
-export interface ModuleConfig<T extends MainPanelConfig<any>[]>  {
+type CmpMap = Record<string, typeof Component<any>>
+
+type PanelsMap<T extends CmpMap> = {
+	[K in keyof T]: MainPanelConfig<T[K]>
+}
+
+export interface ModuleConfig<T extends CmpMap>  {
 	/**
 	 * Module package name
 	 */
@@ -118,12 +127,11 @@ export interface ModuleConfig<T extends MainPanelConfig<any>[]>  {
 	 */
 	entities?: (string | EntityConfig)[];
 
-
-	panels?: [...T]
+	panels?: PanelsMap<T>
 
 	settingsPanels?: (typeof AppSettingsPanel)[]
 
-	systemSettingsPanels?: (new () => AbstractSystemSettingsPanel)[]
+	systemSettingsPanels?: (new () => Component)[]
 
 	/**
 	 * Used by legacy ExtJS module. It will render as a main panel
@@ -496,7 +504,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	 *
 	 * @param config
 	 */
-	public register<T extends MainPanelConfig<any>[]>(config: ModuleConfig<T>) {
+	public register<T extends CmpMap>(config: ModuleConfig<T>) {
 
 		const id = config.package + "/" + config.name;
 
@@ -532,17 +540,24 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 			translate.load(GO.lang[config.package]?.[config.name], config.package, config.name);
 
-			config.panels?.forEach(p => {
+			if(config.panels) {
+				for(let panelId in config.panels) {
+					const p = config.panels[panelId];
+					main.addMainPanel(config.package, config.name, {...p, id: panelId, callback: () => new p.cmp});
 
-				main.addMainPanel(config.package, config.name, {...p, callback: new p.cmp});
-			})
+					// add default panel route
+					router.add(new RegExp(`^${panelId}$`), ()=> {
+						main.getPanelById(panelId).show();
+					})
+				}
+			}
 
 			config.settingsPanels?.forEach(p => {
 				moduleSettings.addPanel(p);
 			})
 
 			config.systemSettingsPanels?.forEach(p => {
-				systemSettingsPanels.add(p);
+				appSystemSettings.addPanel(config.package, config.name, p);
 			})
 
 
