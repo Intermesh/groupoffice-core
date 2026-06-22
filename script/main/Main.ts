@@ -13,7 +13,7 @@ import {
 	tbar,
 	translate,
 	Window,
-	router
+	router, hr, ComponentState, p
 } from "@intermesh/goui";
 import {entities} from "../Entities.js";
 import {extjswrapper, ExtJSWrapper} from "../components/ExtJSWrapper.js";
@@ -29,7 +29,6 @@ type MainPanel = {
 	module: string
 	id: string
 	title: string,
-	pinned: number|undefined,
 	callback: () => Component<any>,
 	routes?: Record<string, any>
 }
@@ -50,10 +49,19 @@ class Main extends Component<MainPanelEventMap> {
 
 	private mainPanels: Record<string,MainPanel> = {};
 
+
+	/**
+	 * Pinned panels will show in the tab bar when loading
+	 *
+	 * @private
+	 */
+	private pinned:string[] = ["summary", "email", "calendar", "tasks", "addressbook", "files"];
+
 	constructor() {
 		super();
 
 		this.cls = "fit vbox main-container";
+		this.stateId = "groupoffice-main";
 
 		this.container = cards({
 			flex: 1
@@ -75,6 +83,24 @@ class Main extends Component<MainPanelEventMap> {
 			this.openPanel(firstId);
 		});
 
+	}
+
+	protected buildState(): ComponentState {
+		const s = super.buildState();
+
+		s.pinned = this.pinned;
+
+		return s;
+	}
+
+	protected restoreState(state: ComponentState) {
+		super.restoreState(state);
+
+		if(state.pinned) {
+			this.pinned = state.pinned;
+		}
+
+		console.log(this.pinned);
 	}
 
 	private accountMenu?: Menu;
@@ -109,6 +135,9 @@ class Main extends Component<MainPanelEventMap> {
 	 * Load all module panels and sets up routes
 	 */
 	public load() {
+
+		main.initState();
+
 		this.notifier.load();
 		this.items.add(
 			comp({cls: "header hbox"},
@@ -155,21 +184,85 @@ class Main extends Component<MainPanelEventMap> {
 				return this.openPanel(m.id)
 			});
 
+			console.log("is pinned " + m.id);
 			// Add button to the route
-			if(m.pinned) {
-				this.menu.items.add(
-					btn({
-						itemId: m.id,
-						text: m.title,
-						handler: () => {
-							router.goto(m.id);
-						}
-					})
-				);
+			if(this.pinned.indexOf(m.id) !== -1) {
+				this.addPanelMenuItem(m);
 			}
 		});
 
+		this.menu.items.add(hr({itemId: "pinned-plitter"}));
+
 		this.addLegacyDefaultRoutes();
+	}
+
+	private addPanelMenuItem(m: MainPanel) {
+
+		const menuItem = comp({cls: "hbox", itemId: m.id},
+			btn({
+
+				text: m.title,
+				handler: () => {
+					router.goto(m.id);
+				}
+			}),
+
+			btn({
+				cls: "menu small",
+				icon: "more_vert",
+				menu: menu({
+						listeners: {
+							show: ({target}) => {
+								const pinned = this.pinned.indexOf(m.id) !== -1;
+
+								this.findChild("pin")!.hidden = pinned;
+								this.findChild("unpin")!.hidden = !pinned;
+							}
+						}
+					},
+					btn({
+						itemId: "pin",
+						icon: "keep",
+						text: t("Pin"),
+						handler: () => {
+							this.pinned.push(m.id);
+							this.saveState();
+
+							menuItem.remove();
+
+							const i = this.menu.findItemIndex("pinned-plitter");
+
+							this.menu.items.insert(i, menuItem);
+						}
+					}),
+					btn({
+						itemId: "unpin",
+						icon: "keep_off",
+						text: t("Unpin"),
+						handler: () => {
+							this.pinned = this.pinned.filter(p => p !== m.id)
+							this.saveState();
+
+							menuItem.remove();
+
+							this.menu.items.add(menuItem);
+						}
+					}),
+					btn({
+						itemId: "close",
+						icon: "close",
+						text: t("Close"),
+						handler: (btn => {
+							this.pinned = this.pinned.filter(p => p !== m.id)
+							this.saveState();
+							menuItem.remove();
+						})
+					})
+
+				)
+			})
+		);
+		this.menu.items.add(menuItem);
 	}
 
 	/**
@@ -181,21 +274,9 @@ class Main extends Component<MainPanelEventMap> {
 
 		translate.setDefaultModule(pkg, module);
 
-		// temporary
-		let pinned = undefined;
-		switch(module) {
-			case 'email':
-				pinned = 1;
-			case 'calendar':
-				pinned = 1;
-			case 'addressbook':
-				pinned = 1;
-		}
-
 		this.mainPanels[panelCfg.id] = {
 			package: pkg,
 			module: module,
-			pinned: pinned,
 			id: panelCfg.id,
 			title: panelCfg.title,
 			callback: panelCfg.callback,
@@ -328,6 +409,11 @@ class Main extends Component<MainPanelEventMap> {
 			cmp = m.callback();
 			cmp.title = m.title;
 			cmp.itemId = panelId;
+
+			if(!this.menu.findItem(panelId)) {
+				this.addPanelMenuItem(m);
+			}
+
 			this.container.items.add(cmp);
 
 			this.fire("mainpanelcreated", {panel:cmp})

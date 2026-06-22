@@ -59,7 +59,6 @@ body#goui {
 		padding: 0 1.6rem 0 0;
 	}
 	menu.goui-toolbar.goui-cardmenu.main-menu {
-
 		padding:0;
 
 		// scroll but hide scrollbar
@@ -69,10 +68,38 @@ body#goui {
 			display: none; /* For Chrome, Safari, and Opera */
 		}
 
+		hr {
+			color: white;
+			opacity: .7;
+			&:last-child {
+				display: none;
+			}
+		}
+
+		> *:not(hr) {
+			min-width: 10rem;
+
+			position: relative;
+			.menu {
+				position: absolute;
+				right: -.4rem;
+				top: .4rem;
+				display:none;
+				padding-right: 0;
+				padding-left: 0;
+			}
+
+			&:hover {
+				.menu {
+					display: block;
+				}
+			}
+		}
+
 		button.goui-button {
+			flex: 1;
 			color: white;
 			font-weight: normal;
-			min-width: 10rem;
 			font-size: .9em;
 			opacity: .7;
 			letter-spacing: .022em;
