@@ -1,21 +1,11 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, p, root, t, translate} from "@intermesh/goui";
+import {BaseEntity, Component, EntityID, MaterialIcon, router, t, translate} from "@intermesh/goui";
 import {client, JmapDataSource} from "./jmap/index.js";
 import {entities, Entity, EntityRelation} from "./Entities.js";
 import {User} from "./auth";
 import {DetailPanel} from "./components/DetailPanel.js";
-import {ExtJSWrapper, extjswrapper} from "./components/ExtJSWrapper.js";
 import {LanguageField} from "./components/form/LanguageField.js";
-import {
-	AbstractSystemSettingsPanel,
-	AppSettingsPanel, appSystemSettings,
-	main,
-	moduleSettings,
-	settingsPanels,
-	systemSettingsPanels
-} from "./main/index.js";
-import {router} from "./Router.js";
+import {AppSettingsPanel, appSystemSettings, main, moduleSettings,} from "./main/index.js";
 import {Field} from "./customfields/index.js";
-import {callback} from "chart.js/helpers";
 
 export type EntityFilterType = "string" | "number" | "date" | "select";
 export interface EntityFilter {
@@ -549,6 +539,16 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 					router.add(new RegExp(`^${panelId}$`), ()=> {
 						main.getPanelById(panelId).show();
 					})
+
+					if(p.routes) {
+						for(let route in p.routes) {
+
+							router.add(new RegExp(route), (...args) =>{
+								// @ts-ignore
+								p.routes![route].bind(main.getPanelById(panelId) as unknown as T)(...args);
+							});
+						}
+					}
 				}
 			}
 

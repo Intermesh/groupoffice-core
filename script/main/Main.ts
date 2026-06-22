@@ -12,11 +12,11 @@ import {
 	t,
 	tbar,
 	translate,
-	Window
+	Window,
+	router
 } from "@intermesh/goui";
 import {entities} from "../Entities.js";
 import {extjswrapper, ExtJSWrapper} from "../components/ExtJSWrapper.js";
-import {router} from "../Router.js";
 import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
@@ -319,11 +319,7 @@ class Main extends Component<MainPanelEventMap> {
 			cmp.itemId = panelId;
 			this.container.items.add(cmp);
 
-			if(m.routes) {
-				for(let route in m.routes) {
-					router.add(new RegExp(route), m.routes[route].bind(cmp));
-				}
-			}
+
 
 			this.fire("mainpanelcreated", {panel:cmp})
 		}

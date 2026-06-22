@@ -1,5 +1,4 @@
-import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window} from "@intermesh/goui";
-import {router} from "../../Router.js";
+import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window,router} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
@@ -115,9 +114,7 @@ class SettingsPanels  {
 
 export const settingsPanels = new SettingsPanels();
 
-if(router.newMainLayout) {
-	router.add(/^settings\/?([^\/]+)?/, (selectedItemId) => {
-		const s = new SettingsWindow(selectedItemId);
-		s.show();
-	});
-}
+router.add(/^settings\/?([^\/]+)?/, (selectedItemId) => {
+	const s = new SettingsWindow(selectedItemId);
+	s.show();
+});

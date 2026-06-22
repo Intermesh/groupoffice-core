@@ -1,6 +1,4 @@
-import {ArrayUtil, btn, comp, Menu, TextField, textfield} from "@intermesh/goui";
-import {modules} from "../Modules.js";
-import {router} from "../Router.js";
+import {ArrayUtil, btn, comp, Menu, TextField, textfield,router} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
 import {main} from "./Main.js";
 

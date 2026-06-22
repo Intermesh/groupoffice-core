@@ -1,9 +1,8 @@
-import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window} from "@intermesh/goui";
-import {router} from "../../Router.js";
+import {btn, CardContainer, cardmenu, cards, comp, Component, router, t, tbar, Window} from "@intermesh/goui";
+
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
-import {settingsPanels} from "../settings/index.js";
 
 class SystemSettingsWindow extends Window {
 
@@ -108,9 +107,7 @@ class SystemSettingsPanels  {
 
 export const systemSettingsPanels = new SystemSettingsPanels();
 
-if(router.newMainLayout) {
-	router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
-		const s = new SystemSettingsWindow(selectedItemId);
-		s.show();
-	});
-}
+router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
+	const s = new SystemSettingsWindow(selectedItemId);
+	s.show();
+});
