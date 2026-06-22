@@ -105,22 +105,6 @@ class Main extends Component<MainPanelEventMap> {
 		);
 	}
 
-	// private getLauncher() {
-	// 	return new Promise<Launcher>(resolve => {
-	// 		if (!this._launcher) {
-	// 			this._launcher = new Launcher();
-	// 			root.items.add(this._launcher);
-	// 			setTimeout(() => {
-	// 				// give browser time to render menu and the animation can run
-	// 				resolve(this._launcher!);
-	// 			})
-	// 		} else {
-	// 			resolve(this._launcher);
-	// 		}
-	// 	})
-	// }
-
-
 	/**
 	 * Load all module panels and sets up routes
 	 */
@@ -220,6 +204,9 @@ class Main extends Component<MainPanelEventMap> {
 	}
 
 
+	/**
+	 * Get all panels registered by the modules
+	 */
 	public getMainPanels() {
 		return Object.values(this.mainPanels);
 	}
@@ -234,7 +221,7 @@ class Main extends Component<MainPanelEventMap> {
 			}
 			panelConfig.moduleName = module;
 
-			panelConfig.id='go-module-panel-' + pkg + "-" + panelConfig.module;
+			panelConfig.id='go-module-panel-' + pkg + "-" + module;
 
 			if(!panelConfig.cls)
 				panelConfig.cls = 'go-module-panel';
@@ -252,13 +239,12 @@ class Main extends Component<MainPanelEventMap> {
 				panelConfig.iconCls = panelClass.prototype.iconCls || "go-tab-icon-" + module;
 			}
 
-			panelConfig.headers = false;
+			panelConfig.header = false;
 
 			this.addMainPanel(pkg, module, {
 				id: module,
 				title,
 			 	callback: () => {
-
 					return extjswrapper({
 						cls: "fit",
 						title: panelConfig.title,
@@ -277,16 +263,23 @@ class Main extends Component<MainPanelEventMap> {
 			//default route for legacy entities
 		router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, async (entity, id) => {
 
-			const entityObj = entities.get(entity);
-			if (!entityObj) {
+			if (!entities.exists(entity)) {
 				console.log("Entity (" + entity + ") not found in default entity route")
+
+				// fallback on old router
+				go.Router.check();
+
 				return false;
 			}
+
+			const entityObj = entities.get(entity);
 
 			const module = entityObj.module,
 				mainPanel = main.getPanelById(module);
 
 			if (!mainPanel || !(mainPanel instanceof ExtJSWrapper)) {
+				// fallback on old router
+				go.Router.check();
 				return;
 			}
 
@@ -302,11 +295,27 @@ class Main extends Component<MainPanelEventMap> {
 			} else {
 				console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + module + ":", mainPanel);
 				console.log(arguments);
+
+				// fallback on old router
+				go.Router.check();
 			}
 		});
 
+		router.add(() => {
+			// fallback on legacy router
+			go.Router.check();
+		})
+
 	}
 
+
+	/**
+	 * Get panel by ID
+	 *
+	 * This method will also create an instance of registered panels it's not created yet.
+	 *
+	 * @param panelId
+	 */
 	public getPanelById(panelId:string) {
 
 		const m = this.mainPanels[panelId];
@@ -321,8 +330,6 @@ class Main extends Component<MainPanelEventMap> {
 			cmp.itemId = panelId;
 			this.container.items.add(cmp);
 
-
-
 			this.fire("mainpanelcreated", {panel:cmp})
 		}
 
@@ -330,6 +337,11 @@ class Main extends Component<MainPanelEventMap> {
 
 	}
 
+
+	/**
+	 * Open a panel
+	 * @param panelId
+	 */
 	public openPanel(panelId:string) {
 
 		let cmp = this.getPanelById(panelId)
