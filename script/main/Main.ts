@@ -252,6 +252,8 @@ class Main extends Component<MainPanelEventMap> {
 				panelConfig.iconCls = panelClass.prototype.iconCls || "go-tab-icon-" + module;
 			}
 
+			panelConfig.headers = false;
+
 			this.addMainPanel(pkg, module, {
 				id: module,
 				title,

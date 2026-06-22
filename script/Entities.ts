@@ -212,7 +212,8 @@ class Entities {
 	public get(name: string) : Entity {
 		const e=  this.entities[name.toLowerCase()];
 		if(!e) {
-			throw ` Entity ${name} not found!`;
+			debugger;
+			throw ` Entity '${name}' not found!`;
 		}
 		return e;
 	}
