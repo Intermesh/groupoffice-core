@@ -140,6 +140,12 @@ export interface ModuleConfig<T extends CmpMap>  {
 	 * @deprecated
 	 */
 	panelConfig?:any
+
+	/**
+	 * Init function. Is called when the main Group-Office page loads
+	 * @deprecated
+	 */
+	initModule?: () => void;
 };
 
 
@@ -504,6 +510,10 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			if(config.mainPanel) {
 				main.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 			}
+
+			if(config.initModule) {
+				config.initModule();
+			}
 			return; //already registered
 		}
 
@@ -521,6 +531,11 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			});
 		}
 
+		//legacy
+		if(config.initModule) {
+
+			config.initModule.call(go.Modules);
+		}
 
 		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities[`go:${config.package}:${config.name}`]) {

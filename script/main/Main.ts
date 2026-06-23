@@ -184,7 +184,6 @@ class Main extends Component<MainPanelEventMap> {
 				return this.openPanel(m.id)
 			});
 
-			console.log("is pinned " + m.id);
 			// Add button to the route
 			if(this.pinned.indexOf(m.id) !== -1) {
 				this.addPanelMenuItem(m);
@@ -215,8 +214,8 @@ class Main extends Component<MainPanelEventMap> {
 							show: ({target}) => {
 								const pinned = this.pinned.indexOf(m.id) !== -1;
 
-								this.findChild("pin")!.hidden = pinned;
-								this.findChild("unpin")!.hidden = !pinned;
+								target.findChild("pin")!.hidden = pinned;
+								target.findChild("unpin")!.hidden = !pinned;
 							}
 						}
 					},
