@@ -13,7 +13,7 @@ import {
 	tbar,
 	translate,
 	Window,
-	router, hr, ComponentState, p
+	router, hr, ComponentState, p, Sortable, sortable
 } from "@intermesh/goui";
 import {entities} from "../Entities.js";
 import {extjswrapper, ExtJSWrapper} from "../components/ExtJSWrapper.js";
@@ -24,7 +24,7 @@ import {Notifier} from "./Notifier";
 import {MainPanelConfig} from "../Modules.js";
 
 
-type MainPanel = {
+type MainPanelCreator = {
 	package: string
 	module: string
 	id: string
@@ -47,7 +47,7 @@ class Main extends Component<MainPanelEventMap> {
 	private readonly container
 	public readonly notifier: Notifier
 
-	private mainPanels: Record<string,MainPanel> = {};
+	private panelConfigs: Record<string, MainPanelCreator> = {};
 
 
 	/**
@@ -75,6 +75,27 @@ class Main extends Component<MainPanelEventMap> {
 			cardContainer: this.container
 		});
 
+		sortable({
+			component: this.menu,
+			sortableChildSelector: ".sortable",
+			dropBetween: true,
+			horizontal: true,
+			updateDom: false,
+			listeners: {
+				sort: ({fromIndex, toIndex}) =>
+				{
+
+					this.menu.items.move(fromIndex, toIndex);
+
+					//everything left from the splitter is pinned
+					const splitter = this.menu.findItemIndex("pinned-splitter");
+					const pins = this.menu.items.all().slice(0, splitter);
+					this.pinned = pins.map(p => p.itemId.toString());
+					this.saveState();
+				}
+			}
+		});
+
 		this.notifier = new Notifier();
 
 		// default route opens first module
@@ -89,9 +110,7 @@ class Main extends Component<MainPanelEventMap> {
 
 	protected buildState(): ComponentState {
 		const s = super.buildState();
-
 		s.pinned = this.pinned;
-
 		return s;
 	}
 
@@ -180,29 +199,25 @@ class Main extends Component<MainPanelEventMap> {
 			this.container
 		);
 
-		// Get all registered panels
-		this.getPanels().forEach(async (m) => {
-			// Add route to the panel
-			router.add(new RegExp(`^${RegExp.escape(m.id)}$`), () => {
-				return this.openPanel(m.id)
-			});
 
-			// Add button to the route
-			if(this.pinned.indexOf(m.id) !== -1) {
-				this.addPanelMenuItem(m);
+		this.pinned.forEach(panelId => {
+		if(this.panelConfigs[panelId]) {
+				this.addPanelMenuItem(this.panelConfigs[panelId]);
 			}
-		});
+		})
 
-		this.menu.items.add(hr({itemId: "pinned-plitter"}));
+		this.menu.items.add(hr({itemId: "pinned-splitter", cls: "sortable"}));
 
 		this.addLegacyDefaultRoutes();
-
-		// this.setPanelBadge("email", 6);
 	}
 
-	private addPanelMenuItem(m: MainPanel) {
+	private addPanelMenuItem(m: MainPanelCreator) {
 
-		const menuItem = comp({cls: "pinned-item", itemId: m.id},
+		const menuItem = comp({
+				cls: "pinned-item sortable",
+				itemId: m.id,
+				draggable: true
+			},
 			btn({
 
 				text: m.title,
@@ -234,7 +249,7 @@ class Main extends Component<MainPanelEventMap> {
 
 							menuItem.remove();
 
-							const i = this.menu.findItemIndex("pinned-plitter");
+							const i = this.menu.findItemIndex("pinned-splitter");
 
 							this.menu.items.insert(i, menuItem);
 						}
@@ -281,7 +296,7 @@ class Main extends Component<MainPanelEventMap> {
 
 		translate.setDefaultModule(pkg, module);
 
-		this.mainPanels[panelCfg.id] = {
+		this.panelConfigs[panelCfg.id] = {
 			package: pkg,
 			module: module,
 			id: panelCfg.id,
@@ -289,6 +304,11 @@ class Main extends Component<MainPanelEventMap> {
 			callback: panelCfg.callback,
 			routes: panelCfg.routes
 		};
+
+		// Add route to the panel
+		router.add(new RegExp(`^${RegExp.escape(panelCfg.id)}$`), () => {
+			return this.openPanel(panelCfg.id)
+		});
 	}
 
 
@@ -296,7 +316,7 @@ class Main extends Component<MainPanelEventMap> {
 	 * Get all panels registered by the modules
 	 */
 	public getPanels() {
-		return Object.values(this.mainPanels);
+		return Object.values(this.panelConfigs);
 	}
 
 
@@ -406,7 +426,7 @@ class Main extends Component<MainPanelEventMap> {
 	 */
 	public getPanelById(panelId:string) {
 
-		const m = this.mainPanels[panelId];
+		const m = this.panelConfigs[panelId];
 		if (!m) {
 			throw "notfound";
 		}

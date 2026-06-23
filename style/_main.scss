@@ -76,32 +76,32 @@ body#goui {
 			}
 		}
 
-		 .pinned-item {
-				min-width: 10rem;
-				display: flex;
-				position: relative;
 
-			 .goui-badge {
-				 right: .2rem;
-				 top: .6rem;
-			 }
+		.pinned-item {
+			min-width: 10rem;
+			display: flex;
+			position: relative;
 
+		 .goui-badge {
+			 right: .2rem;
+			 top: .6rem;
+		 }
+
+			.menu {
+				position: absolute;
+				right: -0.4rem;
+				top: 0.4rem;
+				display:none;
+				padding-right: 0;
+				padding-left: 0;
+				z-index: 1;
+			}
+
+			&:hover {
 				.menu {
-					position: absolute;
-					right: -0.4rem;
-					top: 0.4rem;
-					display:none;
-					padding-right: 0;
-					padding-left: 0;
-					z-index: 1;
+					display: block;
 				}
-
-				&:hover {
-
-					.menu {
-						display: block;
-					}
-				}
+			}
 		}
 
 		button.goui-button {
