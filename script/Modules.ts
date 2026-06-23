@@ -87,9 +87,31 @@ export interface EntityConfig {
 }
 
 export type MainPanelConfig<T extends typeof Component<any> = typeof Component<any>> = {
-	// id: string
+
+	/**
+	 * Panel title used in launcher and pinned tabs
+	 */
 	title: string,
+
+	/**
+	 * The panel component
+	 */
 	cmp: T,
+
+	/**
+	 * The routes that belong to this panel
+	 * The this type of the router functiuon will be scoped to the panel component you pass.
+	 *
+	 * Note that the index of the routes map is a regex string and you need to escape backslashes.
+	 *
+	 * ```
+	 * routes: {
+	 * 				'^calendar/(month|list|week|day|year)/(\\d{4}-\\d{2}-\\d{2})$'(span, ymd){
+	 *
+	 * 				}
+	 * }
+	 * ```
+	 */
 	routes?: Record<string, (this: InstanceType<T>, ...args: string[]) => Promise<any> | any>
 }
 
@@ -99,6 +121,9 @@ type PanelsMap<T extends CmpMap> = {
 	[K in keyof T]: MainPanelConfig<T[K]>
 }
 
+/**
+ * Module configuration
+ */
 export interface ModuleConfig<T extends CmpMap>  {
 	/**
 	 * Module package name
@@ -117,10 +142,19 @@ export interface ModuleConfig<T extends CmpMap>  {
 	 */
 	entities?: (string | EntityConfig)[];
 
+	/**
+	 * Panels added to the main screen
+	 */
 	panels?: PanelsMap<T>
 
+	/**
+	 * Panels added to the user settings dialog
+	 */
 	settingsPanels?: (typeof AppSettingsPanel)[]
 
+	/**
+	 * Panels added to the sustem settings dialog
+	 */
 	systemSettingsPanels?: (new () => Component)[]
 
 	/**
@@ -146,17 +180,7 @@ export interface ModuleConfig<T extends CmpMap>  {
 	 * @deprecated
 	 */
 	initModule?: () => void;
-};
-
-
-// interface LegacyPanel extends typeof Component {
-// 	cls: string
-// 	id: string
-// 	moduleName: string
-// 	package: string
-// 	sort_order: number
-// 	title: string
-// }
+}
 
 // for using old components in GOUI
 declare global {
@@ -169,7 +193,6 @@ declare global {
 	var groupofficeCore: any;
 }
 
-let GouiMainPanel : any, GouiSystemSettingsPanel : any, GouiAccountSettingsPanel: any;
 
 export interface Module extends BaseEntity {
 	id: EntityID
@@ -508,7 +531,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			console.warn(id + " already registered", config)
 
 			if(config.mainPanel) {
-				main.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+				main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 			}
 
 			if(config.initModule) {
@@ -548,7 +571,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			if(config.panels) {
 				for(let panelId in config.panels) {
 					const p = config.panels[panelId];
-					main.addMainPanel(config.package, config.name, {...p, id: panelId, callback: () => new p.cmp});
+					main.addPanel(config.package, config.name, {...p, id: panelId, callback: () => new p.cmp});
 
 					// add default panel route
 					router.add(new RegExp(`^${panelId}$`), ()=> {
@@ -583,7 +606,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		}
 
 		if(config.mainPanel) {
-			main.addLegacyMainpanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+			main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 		}
 	}
 
@@ -597,6 +620,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	/**
 	 * Add a system settings panel
 	 *
+	 * @deprecated
 	 * @param pkg
 	 * @param module
 	 * @param id
@@ -620,8 +644,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	 * Get all modules
 	 */
 	public getAvailable(user?:User, right:string = "mayRead") : Module[] {
-		const av = Object.values(this.serverModules).filter(m => this.isAvailable(m.package, m.name, user, right));
-		return av;
+		return Object.values(this.serverModules).filter(m => this.isAvailable(m.package, m.name, user, right));
 	}
 
 	/**

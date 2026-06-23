@@ -17,7 +17,7 @@ export class Launcher extends Menu {
 			this.hide();
 		})
 
-		this.allButtons = ArrayUtil.multiSort(main.getMainPanels(), [{property:"title"}]).map(m => {
+		this.allButtons = ArrayUtil.multiSort(main.getPanels(), [{property:"title"}]).map(m => {
 			return comp({}, btn({
 				style: {
 					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`

@@ -56,6 +56,7 @@ class Main extends Component<MainPanelEventMap> {
 	 * @private
 	 */
 	private pinned:string[] = ["summary", "email", "calendar", "tasks", "addressbook", "files"];
+	private launcher: Launcher;
 
 	constructor() {
 		super();
@@ -83,6 +84,43 @@ class Main extends Component<MainPanelEventMap> {
 			this.openPanel(firstId);
 		});
 
+		this.items.add(
+			comp({cls: "header hbox"},
+				comp({
+					cls: "groupoffice-logo"
+				}),
+				this.menu,
+				tbar({cls: "header-right"},
+					this.notifier.btn,
+					btn({icon: "search"}).on('click',() => {
+						const m = new MainSearchWindow();
+						m.show();
+					}),
+
+					btn({
+						title: t("Launcher"),
+						icon: "apps",
+						menu: this.launcher = new Launcher()
+					}),
+
+					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
+						target.displayName = client.user.displayName
+						if(client.user.avatarId) {
+							target.backgroundImage = client.downloadUrl(client.user.avatarId);
+						}
+						target.el.on("click", () => {
+							if(!this.accountMenu) {
+								this.accountMenu = this.createAccountMenu();
+								this.accountMenu.alignTo = target.el;
+							}
+
+							this.accountMenu.show();
+						})
+					})
+				)
+			),
+			this.container
+		);
 	}
 
 	protected buildState(): ComponentState {
@@ -139,46 +177,9 @@ class Main extends Component<MainPanelEventMap> {
 		main.initState();
 
 		this.notifier.load();
-		this.items.add(
-			comp({cls: "header hbox"},
-				comp({
-					cls: "groupoffice-logo"
-				}),
-				this.menu,
-				tbar({cls: "header-right"},
-					this.notifier.btn,
-					btn({icon: "search"}).on('click',() => {
-						const m = new MainSearchWindow();
-						m.show();
-					}),
-
-					btn({
-						title: t("Launcher"),
-						icon: "apps",
-						menu: new Launcher()
-					}),
-
-					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
-						target.displayName = client.user.displayName
-						if(client.user.avatarId) {
-							target.backgroundImage = client.downloadUrl(client.user.avatarId);
-						}
-						target.el.on("click", () => {
-							if(!this.accountMenu) {
-								this.accountMenu = this.createAccountMenu();
-								this.accountMenu.alignTo = target.el;
-							}
-
-							this.accountMenu.show();
-						})
-					})
-				)
-			),
-			this.container
-		);
 
 		// Get all registered panels
-		this.getMainPanels().forEach(async (m) => {
+		this.getPanels().forEach(async (m) => {
 			// Add route to the panel
 			router.add(new RegExp(`^${RegExp.escape(m.id)}$`), () => {
 				return this.openPanel(m.id)
@@ -269,7 +270,7 @@ class Main extends Component<MainPanelEventMap> {
 	 *
 
 	 */
-	public addMainPanel(pkg: string, module: string, panelCfg: Omit<MainPanelConfig<any>, "cmp"> & {id:string, callback: () => Component<any>}) {
+	public addPanel(pkg: string, module: string, panelCfg: Omit<MainPanelConfig<any>, "cmp"> & {id:string, callback: () => Component<any>}) {
 
 		translate.setDefaultModule(pkg, module);
 
@@ -287,12 +288,12 @@ class Main extends Component<MainPanelEventMap> {
 	/**
 	 * Get all panels registered by the modules
 	 */
-	public getMainPanels() {
+	public getPanels() {
 		return Object.values(this.mainPanels);
 	}
 
 
-	public addLegacyMainpanel(pkg:string, module:string, title: string, panelClass:any, panelConfig?:any) {
+	public addLegacyPanel(pkg:string, module:string, title: string, panelClass:any, panelConfig?:any) {
 
 		Ext.onReady(() => {
 
@@ -321,7 +322,7 @@ class Main extends Component<MainPanelEventMap> {
 
 			panelConfig.header = false;
 
-			this.addMainPanel(pkg, module, {
+			this.addPanel(pkg, module, {
 				id: module,
 				title,
 			 	callback: () => {
@@ -440,6 +441,10 @@ class Main extends Component<MainPanelEventMap> {
 		cmp.show();
 
 		return cmp;
+	}
+
+	public setPanelBadge(panelId:string, count:number|undefined) {
+
 	}
 }
 
