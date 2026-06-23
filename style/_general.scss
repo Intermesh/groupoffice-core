@@ -152,65 +152,22 @@ h4.goui {
 	}
 }
 
-.goui.launcher {
-	padding: 1.6rem;
-	border-radius: 3.2rem;
-	overflow: hidden;
-	.launcher-search-field {
-		margin: .8rem;
-	}
 
-	li:nth-child(2) {
-		max-height: 50vh;
-		overflow: auto;
-	}
 
-	$tileSize: 12rem;
-
-	.modules-container {
-		display: grid;
-		grid-template-columns: repeat(3, minmax($tileSize, 1fr));
-		grid-template-rows: $tileSize ;
-		justify-content: space-between;
-		align-content: center;
-		grid-gap: 1.6rem;
-
-		div {
-			position:relative;
-			height: $tileSize;
-			width: $tileSize;
-		}
-		.goui-button {
-			position: absolute;
-			top: 0;
-			left: 0;
-			align-items: end;
-			//height: 11.8rem;
-			width: $tileSize;
-			background-position: center 0.8rem;
-			background-repeat: no-repeat;
-			background-size: $tileSize  * .5 $tileSize * .5;
-			display:block;
-			text-align: center;
-			font-size: 1.4rem;
-			font-weight: normal;
-			//overflow: visible;
-
-			.text {
-				display:block;
-				//position: absolute;
-				margin-top: $tileSize * .5;
-				//left: 1.8rem;
-				//width: 8.4rem;
-			}
-
-			&:hover {
-				.text {
-					white-space: wrap;
-					overflow:visible;
-					word-break: break-all;
-				}
-			}
-		}
-	}
+.goui-badge {
+	display: inline-block;
+	background-color: #E53935;
+	font-weight: bold;
+	font-size: util.sp(13);
+	color: white;
+	min-width: util.dp(21);
+	height: util.dp(21);
+	padding: 0 util.dp(4);
+	line-height: util.dp(21);
+	letter-spacing: 0;
+	text-align: center;
+	border-radius: util.dp(10.5);
+	position: absolute;
+	top: 0.4rem;
+	right: 0.4rem;
 }

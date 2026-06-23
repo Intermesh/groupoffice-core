@@ -56,7 +56,7 @@ class Main extends Component<MainPanelEventMap> {
 	 * @private
 	 */
 	private pinned:string[] = ["summary", "email", "calendar", "tasks", "addressbook", "files"];
-	private launcher: Launcher;
+	private launcher?: Launcher;
 
 	constructor() {
 		super();
@@ -84,43 +84,7 @@ class Main extends Component<MainPanelEventMap> {
 			this.openPanel(firstId);
 		});
 
-		this.items.add(
-			comp({cls: "header hbox"},
-				comp({
-					cls: "groupoffice-logo"
-				}),
-				this.menu,
-				tbar({cls: "header-right"},
-					this.notifier.btn,
-					btn({icon: "search"}).on('click',() => {
-						const m = new MainSearchWindow();
-						m.show();
-					}),
 
-					btn({
-						title: t("Launcher"),
-						icon: "apps",
-						menu: this.launcher = new Launcher()
-					}),
-
-					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
-						target.displayName = client.user.displayName
-						if(client.user.avatarId) {
-							target.backgroundImage = client.downloadUrl(client.user.avatarId);
-						}
-						target.el.on("click", () => {
-							if(!this.accountMenu) {
-								this.accountMenu = this.createAccountMenu();
-								this.accountMenu.alignTo = target.el;
-							}
-
-							this.accountMenu.show();
-						})
-					})
-				)
-			),
-			this.container
-		);
 	}
 
 	protected buildState(): ComponentState {
@@ -178,6 +142,44 @@ class Main extends Component<MainPanelEventMap> {
 
 		this.notifier.load();
 
+		this.items.add(
+			comp({cls: "header hbox"},
+				comp({
+					cls: "groupoffice-logo"
+				}),
+				this.menu,
+				tbar({cls: "header-right"},
+					this.notifier.btn,
+					btn({icon: "search"}).on('click',() => {
+						const m = new MainSearchWindow();
+						m.show();
+					}),
+
+					btn({
+						title: t("Launcher"),
+						icon: "apps",
+						menu: this.launcher = new Launcher()
+					}),
+
+					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
+						target.displayName = client.user.displayName
+						if(client.user.avatarId) {
+							target.backgroundImage = client.downloadUrl(client.user.avatarId);
+						}
+						target.el.on("click", () => {
+							if(!this.accountMenu) {
+								this.accountMenu = this.createAccountMenu();
+								this.accountMenu.alignTo = target.el;
+							}
+
+							this.accountMenu.show();
+						})
+					})
+				)
+			),
+			this.container
+		);
+
 		// Get all registered panels
 		this.getPanels().forEach(async (m) => {
 			// Add route to the panel
@@ -194,11 +196,13 @@ class Main extends Component<MainPanelEventMap> {
 		this.menu.items.add(hr({itemId: "pinned-plitter"}));
 
 		this.addLegacyDefaultRoutes();
+
+		// this.setPanelBadge("email", 6);
 	}
 
 	private addPanelMenuItem(m: MainPanel) {
 
-		const menuItem = comp({cls: "hbox", itemId: m.id},
+		const menuItem = comp({cls: "pinned-item", itemId: m.id},
 			btn({
 
 				text: m.title,
@@ -260,7 +264,10 @@ class Main extends Component<MainPanelEventMap> {
 					})
 
 				)
-			})
+			}),
+
+			comp({cls: "goui-badge", hidden:true, itemId: "badge"})
+
 		);
 		this.menu.items.add(menuItem);
 	}
@@ -444,9 +451,18 @@ class Main extends Component<MainPanelEventMap> {
 	}
 
 	public setPanelBadge(panelId:string, count:number|undefined) {
+		this.launcher!.setBadge(panelId, count);
 
+		const pinned = this.menu.findChild(panelId);
+
+		if(pinned) {
+			const badge = pinned.findChild("badge")!;
+			badge.text = count?.toString() ?? "";
+			badge.hidden = !count;
+		}
 	}
 }
 
 export const main = new Main();
+
 

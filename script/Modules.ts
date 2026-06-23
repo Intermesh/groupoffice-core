@@ -294,6 +294,7 @@ class Modules {
 
 		//todo: bridge to new FW
 		GO.checker = new GO.Checker();
+		GO.checker.init();
 
 		GO.mainLayout.fireReady();
 	}

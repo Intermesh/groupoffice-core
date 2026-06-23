@@ -76,24 +76,32 @@ body#goui {
 			}
 		}
 
-		> *:not(hr) {
-			min-width: 10rem;
+		 .pinned-item {
+				min-width: 10rem;
+				display: flex;
+				position: relative;
 
-			position: relative;
-			.menu {
-				position: absolute;
-				right: -.4rem;
-				top: .4rem;
-				display:none;
-				padding-right: 0;
-				padding-left: 0;
-			}
+			 .goui-badge {
+				 right: .2rem;
+				 top: .6rem;
+			 }
 
-			&:hover {
 				.menu {
-					display: block;
+					position: absolute;
+					right: -0.4rem;
+					top: 0.4rem;
+					display:none;
+					padding-right: 0;
+					padding-left: 0;
+					z-index: 1;
 				}
-			}
+
+				&:hover {
+
+					.menu {
+						display: block;
+					}
+				}
 		}
 
 		button.goui-button {
@@ -241,4 +249,76 @@ button[data-count]::before {
 	transform: scale(0.7);
 	cursor: pointer;
 
+}
+
+
+
+
+.goui.launcher {
+	padding: 1.6rem;
+	border-radius: 3.2rem;
+	overflow: hidden;
+	.launcher-search-field {
+		margin: .8rem;
+	}
+
+	li:nth-child(2) {
+		max-height: 50vh;
+		overflow: auto;
+	}
+
+	$tileSize: 12rem;
+
+	.modules-container {
+		display: grid;
+		grid-template-columns: repeat(3, minmax($tileSize, 1fr));
+		grid-template-rows: $tileSize;
+		justify-content: space-between;
+		align-content: center;
+		grid-gap: 1.6rem;
+
+		div.launcher-item {
+			position: relative;
+			height: $tileSize;
+			width: $tileSize;
+
+			.goui-badge {
+				right: 1.8rem;
+				top: 1.0rem;
+			}
+
+			.goui-button {
+				position: absolute;
+				top: 0;
+				left: 0;
+				align-items: end;
+				//height: 11.8rem;
+				width: $tileSize;
+				background-position: center 0.8rem;
+				background-repeat: no-repeat;
+				background-size: $tileSize  * .5 $tileSize * .5;
+				display: block;
+				text-align: center;
+				font-size: 1.4rem;
+				font-weight: normal;
+				//overflow: visible;
+
+				.text {
+					display: block;
+					//position: absolute;
+					margin-top: $tileSize * .5;
+					//left: 1.8rem;
+					//width: 8.4rem;
+				}
+
+				&:hover {
+					.text {
+						white-space: wrap;
+						overflow: visible;
+						word-break: break-all;
+					}
+				}
+			}
+		}
+	}
 }

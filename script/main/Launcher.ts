@@ -18,17 +18,23 @@ export class Launcher extends Menu {
 		})
 
 		this.allButtons = ArrayUtil.multiSort(main.getPanels(), [{property:"title"}]).map(m => {
-			return comp({}, btn({
-				style: {
-					backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
+			return comp({
+					itemId: m.id,
+					cls: "launcher-item"
 				},
-				itemId: m.id,
+				btn({
+					style: {
+						backgroundImage: `url(${client.downloadUrl("core/moduleIcon/" + (m.package ?? "legacy") + "/" + m.module)})`
+					},
+					itemId: "btn",
 
-				text: m.title,
-				handler: () => {
-					router.goto(m.id);
-				}
-			}))
+					text: m.title,
+					handler: () => {
+						router.goto(m.id);
+					}
+				}),
+				comp({cls: "goui-badge", hidden:true, itemId: "badge"})
+			)
 		})
 
 		this.items.add(
@@ -62,17 +68,14 @@ export class Launcher extends Menu {
 				.on("input", ({value}) => {
 					if(value) {
 						this.modulesContainer.items.replace(...this.allButtons.filter((b) => {
-							// console.log(b.te)
+							console.log(b)
 							return b.text.toLowerCase().startsWith(value.toLowerCase());
 						}));
 					} else {
 						this.modulesContainer.items.replace(...this.allButtons);
 					}
 				}, {buffer: 300})
-
-
 			,
-
 			this.modulesContainer = comp({cls: "modules-container"})
 
 		)
@@ -84,5 +87,20 @@ export class Launcher extends Menu {
 			this.searchFld.focus();
 		})
 
+	}
+
+	public setBadge(panelId:string, count:number|undefined) {
+		const cmp = this.allButtons.find(b => {
+			return b.itemId == panelId;
+		})
+
+		if(!cmp) {
+			throw "Not found";
+		}
+
+		const badge =cmp.findChild("badge")!;
+
+		badge.hidden = !count;
+		badge.text = count ? count?.toString() : "";
 	}
 }
