@@ -1,22 +1,20 @@
 import {
 	btn,
+	Button,
+	ButtonEventMap,
 	checkbox,
 	comp,
 	Component,
-	ComponentEventMap, displayfield,
-	fieldset,
+	ComponentEventMap,
 	h4,
 	img,
 	p,
-	Panel,
 	t,
 	tbar,
 	Window
 } from "@intermesh/goui";
 import {client, jmapds} from "../../jmap/index.js";
 import {ModuleInfo} from "./Apps.js";
-import {Module} from "../../Modules.js";
-import {FormWindow} from "../../components/index.js";
 import {AppDialog} from "./AppDialog.js";
 
 
@@ -28,6 +26,7 @@ export interface InstallModuleTileEventMap extends ComponentEventMap {
 
 
 export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
+	private deleteBtn: Button;
 	constructor(m:ModuleInfo) {
 		super();
 
@@ -54,13 +53,17 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 					type: "switch",
 					name: "enabled",
 					hidden: !m.installed,
+					disabled: !m.available,
 					value: m.enabled,
 					listeners:{
-						change: async ({newValue}) => {
+						change: async ({newValue, target}) => {
 							this.mask();
 							try {
-								void jmapds("core/ModuleInfo").update(m.id, {enabled: newValue});
+								await jmapds("core/ModuleInfo").update(m.id, {enabled: newValue});
+
+								this.deleteBtn.hidden = newValue
 							}catch (e) {
+								target.reset();
 								void Window.error(e);
 							}
 							finally {
@@ -82,6 +85,7 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 					title: t("Settings"),
 					icon: "settings",
 					hidden: !m.installed,
+					disabled: !m.available,
 					handler: () => {
 						const d = new AppDialog(m);
 						d.load(m.model.id);
@@ -96,15 +100,33 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 						d.show();
 					}
 				}),
+
+				this.deleteBtn = btn({
+					title: t("Delete"),
+					icon: "delete",
+					hidden: !m.installed || m.enabled,
+					handler: async () => {
+
+						try {
+							await jmapds("core/ModuleInfo").confirmDestroy([m.id]);
+							this.fire("install", {module:m});
+						}catch (e) {
+							void Window.error(e);
+						}
+
+					}
+				}),
+
+
 				btn({
 					cls: "filled primary",
 					hidden: m.installed,
 					text: t("Install"),
-					handler: () => {
+					handler: async () => {
 
 						this.mask();
 						try {
-							void jmapds("core/ModuleInfo").update(m.id, {installed: true});
+							await jmapds("core/ModuleInfo").update(m.id, {installed: true});
 							this.fire("install", {module:m});
 						}catch (e) {
 							void Window.error(e);

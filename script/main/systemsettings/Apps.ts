@@ -18,7 +18,7 @@ export interface ModuleInfo {
 	enabled: boolean
 	installed: boolean
 	model: any
-	installable: boolean
+	available: boolean
 	documentationUrl: string
 }
 
