@@ -4,7 +4,7 @@ import {entities, Entity, EntityRelation} from "./Entities.js";
 import {User} from "./auth";
 import {DetailPanel} from "./components/DetailPanel.js";
 import {LanguageField} from "./components/form/LanguageField.js";
-import {AppSettingsPanel, appSystemSettings, main, moduleSettings,} from "./main/index.js";
+import {AppSettingsPanel, moduleSystemSettings, main, moduleSettings,} from "./main/index.js";
 import {Field} from "./customfields/index.js";
 
 export type EntityFilterType = "string" | "number" | "date" | "select";
@@ -577,7 +577,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			})
 
 			config.systemSettingsPanels?.forEach(p => {
-				appSystemSettings.addPanel(config.package, config.name, p);
+				moduleSystemSettings.addPanel(config.package, config.name, p);
 			})
 
 

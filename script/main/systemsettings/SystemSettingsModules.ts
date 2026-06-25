@@ -22,7 +22,7 @@ export interface ModuleInfo {
 	documentationUrl: string
 }
 
-class SystemSettingsApps extends AbstractSystemSettingsPanel {
+class SystemSettingsModules extends AbstractSystemSettingsPanel {
 	private appContainer: Component;
 	constructor() {
 		super("modules", t("Modules"), "apps");
@@ -184,7 +184,7 @@ class InstallWindow extends Window {
 
 
 
-class AppSystemSettings {
+class ModuleSystemSettings {
 	private panels: Record<string, (new () => Component)[]> = {};
 
 	public addPanel(modulePackage:string, moduleName:string, cmp: (new () => Component)) {
@@ -200,6 +200,6 @@ class AppSystemSettings {
 	}
 }
 
-export const appSystemSettings = new AppSystemSettings();
+export const moduleSystemSettings = new ModuleSystemSettings();
 
-systemSettingsPanels.add(SystemSettingsApps);
+systemSettingsPanels.add(SystemSettingsModules);

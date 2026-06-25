@@ -15,7 +15,7 @@ import {
 } from "@intermesh/goui";
 import {client, jmapds} from "../../jmap/index.js";
 import {ModuleInfo} from "./Apps.js";
-import {AppDialog} from "./AppDialog.js";
+import {ModuleDialog} from "./ModuleDialog.js";
 
 
 export interface InstallModuleTileEventMap extends ComponentEventMap {
@@ -88,7 +88,7 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 					hidden: !m.installed,
 					disabled: !m.available,
 					handler: () => {
-						const d = new AppDialog(m);
+						const d = new ModuleDialog(m);
 						d.load(m.model.id);
 						d.form.on('beforesave', ({data}) => {
 							// In settings tables, arrays are always saved as comma-separated strings

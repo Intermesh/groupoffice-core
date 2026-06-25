@@ -1,28 +1,23 @@
 import {
-	avatar, checkbox, checkboxcolumn,
+	avatar,
+	checkbox,
+	checkboxcolumn,
 	column,
 	comp,
-	Config,
-	createComponent,
 	datasourcestore,
 	DataSourceStore,
-	EntityID,
 	Field,
 	FieldValue,
 	Filter,
 	radio,
 	searchbtn,
-	select,
 	small,
 	t,
 	Table,
 	tbar
 } from "@intermesh/goui";
 import {client, jmapds} from "../../jmap/index.js";
-import {entities} from "../../Entities.js";
-import {SharePanel} from "../../permissions/index.js";
-import {Module} from "../../Modules.js";
-import {ModuleInfo} from "./Apps.js";
+import {ModuleInfo} from "./SystemSettingsModules.js";
 
 
 class GroupTable extends Table<DataSourceStore> {
@@ -30,7 +25,7 @@ class GroupTable extends Table<DataSourceStore> {
 
 	levels?:{ [key: string]: any }[]
 
-	constructor(sharePanel: AppPermissionPanel, module:ModuleInfo) {
+	constructor(sharePanel: ModulePermissionPanel, module:ModuleInfo) {
 
 
 		const columns = [
@@ -164,7 +159,7 @@ class GroupTable extends Table<DataSourceStore> {
 }
 
 
-export class AppPermissionPanel extends Field {
+export class ModulePermissionPanel extends Field {
 	private readonly groupTable: GroupTable;
 
 	public levels?:{ [key: string]: any }[]

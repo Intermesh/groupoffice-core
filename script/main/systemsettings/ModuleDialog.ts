@@ -1,9 +1,9 @@
 import {FormWindow} from "../../components/index.js";
 import {displayfield, fieldset, t} from "@intermesh/goui";
-import {appSystemSettings, ModuleInfo} from "./Apps.js";
-import {AppPermissionPanel} from "./AppPermissionsPanel.js";
+import {moduleSystemSettings, ModuleInfo} from "./SystemSettingsModules.js";
+import {ModulePermissionPanel} from "./ModulePermissionPanel.js";
 
-export class AppDialog extends FormWindow {
+export class ModuleDialog extends FormWindow {
 	constructor(moduleInfo:ModuleInfo) {
 		super("Module");
 
@@ -28,9 +28,9 @@ export class AppDialog extends FormWindow {
 			)
 		);
 
-		this.generalTab.items.add(...appSystemSettings.getPanels(moduleInfo.package, moduleInfo.name).map(c => new c));
+		this.generalTab.items.add(...moduleSystemSettings.getPanels(moduleInfo.package, moduleInfo.name).map(c => new c));
 
-		const permissionPanel = new AppPermissionPanel(moduleInfo);
+		const permissionPanel = new ModulePermissionPanel(moduleInfo);
 		permissionPanel.cls = "fit";
 		this.cards.items.add(permissionPanel);
 
