@@ -83,11 +83,11 @@ class CustomFields extends AbstractSystemSettingsPanel {
 
 		for (const mod of mods) {
 			for (const entityName in mod.entities) {
-				const entity = entities.get(entityName.toString());
-
-				if (entity == undefined) {
+				if(!entities.exists(entityName.toString())) {
+					console.warn(`${entityName.toString()} not found`)
 					continue;
 				}
+				const entity = entities.get(entityName.toString());
 
 				if (entity.supportsCustomFields) {
 					const cfEntity: EntityWithCustomfields = {
