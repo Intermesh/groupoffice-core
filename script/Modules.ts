@@ -84,6 +84,15 @@ export interface EntityConfig {
 
 
 	permissions?: { value:number, name: string }[]
+
+	/**
+	 * Override field set dialog for an entity
+	 * @deprecated
+	 */
+	customFields?: {
+		fieldSetDialog: string
+	}
+
 }
 
 export type MainPanelConfig<T extends typeof Component<any> = typeof Component<any>> = {
@@ -180,6 +189,20 @@ export interface ModuleConfig<T extends CmpMap>  {
 	 * @deprecated
 	 */
 	initModule?: () => void;
+
+
+	/**
+	 * Extra custom field types classes
+	 *
+	 * @deprecated
+	 */
+	customFieldTypes?: string[]
+
+	/**
+	 * @deprecated
+	 */
+	selectDialogPanels?: any
+
 }
 
 // for using old components in GOUI
