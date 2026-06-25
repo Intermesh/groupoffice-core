@@ -16,6 +16,7 @@ export class CreateLinkButton extends OverlayToolbarButton {
 	public get createLinkField() {
 		if(!this._createLinkField) {
 			this._createLinkField = createlinkfield({
+				style: {height: "100%"},
 				flex: 1,
 				listeners: {
 					setvalue: ({newValue}) => {
