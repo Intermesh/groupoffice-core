@@ -523,7 +523,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		});
 
-		return Promise.all([
+		await Promise.all([
 			moduleDS.get().then( serverMods => {
 				serverMods.list.map(m => {
 					if (!m.package) {
@@ -534,59 +534,23 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 				})
 			}),
 
-			this.legacyInit(),
+			this.legacyInit()
+		])
 
-
-
-		]);
+		this.initModules();
 	}
 
+	private initModules() {
 
-	/**
-	 * Register a module so it's functionally is added to the GUI
-	 *
-	 * @param config
-	 */
-	public register<T extends CmpMap>(config: ModuleConfig<T>) {
+		this.getAvailable().forEach(m => {
 
-		const id = config.package + "/" + config.name;
+			const id = m.package + "/" + m.name,  config = this.clientModules[id];
 
-		if(this.clientModules[id]) {
-			console.warn(id + " already registered", config)
-
-			if(config.mainPanel) {
-				main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
-			}
-
-			// if(config.initModule) {
-			// 	config.initModule();
-			// }
-			return; //already registered
-		}
-
-		this.clientModules[id] = config;
-
-
-		if (config.entities) {
-			config.entities.forEach(function (entityCfg) {
-
-				if(typeof entityCfg == "string") {
-					entityCfg = {name: entityCfg};
-				}
-
-				entities.register({...entityCfg, package: config.package, module: config.name});
-			});
-		}
-
-
-		// Not sure if there's a race condition with modules not being loaded yet???
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities[`go:${config.package}:${config.name}`]) {
-				// User has no access to this module
+			if(!config) {
 				return;
 			}
 
-			translate.load(GO.lang[config.package]?.[config.name], config.package, config.name);
+			translate.load(GO.lang[m.package]?.[m.name], m.package, m.name);
 
 			if(config.panels) {
 				for(let panelId in config.panels) {
@@ -630,17 +594,55 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		});
 
+
+	}
+
+
+	public getConfig(pkg:string, name:string) {
+		return this.clientModules[pkg + "/" +name] ?? undefined;
+	}
+
+
+	/**
+	 * Register a module so it's functionally is added to the GUI
+	 *
+	 * @param config
+	 */
+	public register<T extends CmpMap>(config: ModuleConfig<T>) {
+
+		const id = config.package + "/" + config.name;
+
+		if(this.clientModules[id]) {
+			console.warn(id + " already registered", config)
+
+			if(config.mainPanel) {
+				main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+			}
+
+			// if(config.initModule) {
+			// 	config.initModule();
+			// }
+			return; //already registered
+		}
+
+		this.clientModules[id] = config;
+
+
+		if (config.entities) {
+			config.entities.forEach(function (entityCfg) {
+
+				if(typeof entityCfg == "string") {
+					entityCfg = {name: entityCfg};
+				}
+
+				entities.register({...entityCfg, package: config.package, module: config.name});
+			});
+		}
+
 		if(config.mainPanel) {
 			main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 		}
 	}
-
-
-
-
-
-
-
 
 	/**
 	 * Add a system settings panel
@@ -676,6 +678,13 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	 * Check if the current user has this module
 	 */
 	public isAvailable(pkg:string, name:string, user?:User, right:string = "mayRead") : boolean {
+
+		if(!this.getConfig(pkg, name)) {
+			// no client module
+			return false;
+		}
+
+
 		const mod = this.get(pkg, name);
 		if(!mod) {
 			return false;
