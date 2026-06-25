@@ -555,11 +555,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			});
 		}
 
-		//legacy
-		if(config.initModule) {
 
-			config.initModule.call(go.Modules);
-		}
 
 		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities[`go:${config.package}:${config.name}`]) {
@@ -600,11 +596,16 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			})
 
 
-		});
+			//legacy
+			if(config.initModule) {
+				config.initModule.call(go.Modules);
+			}
 
-		if (config.init) {
-			config.init();
-		}
+			if (config.init) {
+				config.init();
+			}
+
+		});
 
 		if(config.mainPanel) {
 			main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});

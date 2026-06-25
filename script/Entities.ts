@@ -89,6 +89,7 @@ class Entities {
 	 */
 	init() {
 
+
 		for(let lcName in this.registered) {
 
 			const entity = this.registered[lcName] as unknown as Entity;
@@ -97,7 +98,7 @@ class Entities {
 
 			if(!module) {
 				console.warn("Module not found for entity: ", entity)
-				return;
+				continue;
 			}
 
 			if (!entity.title) {
