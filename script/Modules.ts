@@ -522,19 +522,18 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		});
 
-		await Promise.all([
-			moduleDS.get().then( serverMods => {
-				serverMods.list.map(m => {
-					if (!m.package) {
-						m.package = "legacy";
-					}
-					const id = m.package + "/" + m.name;
-					this.serverModules[id] = m;
-				})
-			}),
+		await moduleDS.get().then( serverMods => {
+			serverMods.list.map(m => {
+				if (!m.package) {
+					m.package = "legacy";
+				}
+				const id = m.package + "/" + m.name;
+				this.serverModules[id] = m;
+			})
+		});
 
-			this.legacyInit()
-		])
+
+		await this.legacyInit();
 
 		this.initModules();
 	}
