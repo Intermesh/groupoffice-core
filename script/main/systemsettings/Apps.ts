@@ -1,7 +1,7 @@
 import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, TextField, textfield, Window} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
-import {client} from "../../jmap/index.js";
+import {client, jmapds} from "../../jmap/index.js";
 import {InstallModuleTile} from "./InstallModuleTile.js";
 
 export interface ModuleInfo {
@@ -26,9 +26,6 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 	private appContainer: Component;
 	constructor() {
 		super("modules", t("Modules"), "apps");
-
-
-		// this.items.add(...appSystemSettings.getPanels().map(p => new p))
 
 		this.cls = "fit vbox";
 		this.items.add(
@@ -84,7 +81,12 @@ class SystemSettingsApps extends AbstractSystemSettingsPanel {
 				lastCategory = m.category;
 			}
 
-			this.appContainer.items.add(new InstallModuleTile(m));
+			const tile = new InstallModuleTile(m);
+			tile.on("destroy", () => {
+				this.reload();
+			})
+
+			this.appContainer.items.add(tile);
 		})
 	}
 }
@@ -142,7 +144,7 @@ class InstallWindow extends Window {
 	}
 
 	async load(text:string = "") {
-		this.appContainer.items.clear();
+
 
 		if(!response) {
 			this.mask();
@@ -156,6 +158,7 @@ class InstallWindow extends Window {
 
 		}
 
+		this.appContainer.items.clear();
 		const sorted = ArrayUtil.multiSort(response.list, [{property: "category"}, {property: "title"}]) as ModuleInfo[];
 
 		let lastCategory = "";

@@ -22,6 +22,7 @@ export interface InstallModuleTileEventMap extends ComponentEventMap {
 
 	install: {module: ModuleInfo}
 
+	destroy: {module: ModuleInfo}
 }
 
 
@@ -109,7 +110,7 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 
 						try {
 							await jmapds("core/ModuleInfo").confirmDestroy([m.id]);
-							this.fire("install", {module:m});
+							this.fire("destroy", {module:m});
 						}catch (e) {
 							void Window.error(e);
 						}
