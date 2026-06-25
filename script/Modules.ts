@@ -535,9 +535,9 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 				main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
 			}
 
-			if(config.initModule) {
-				config.initModule();
-			}
+			// if(config.initModule) {
+			// 	config.initModule();
+			// }
 			return; //already registered
 		}
 
@@ -556,7 +556,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		}
 
 
-
+		// Not sure if there's a race condition with modules not being loaded yet???
 		client.on("authenticated", ( {session}) => {
 			if (!session.capabilities[`go:${config.package}:${config.name}`]) {
 				// User has no access to this module
