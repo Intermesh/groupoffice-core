@@ -1,19 +1,21 @@
 import {
+	btn,
 	checkbox,
-	comp,
-	datasourceform,
-	fieldset,
+	comp, containerfield,
+	datasourceform, DateTime, displayfield,
+	fieldset, hiddenfield, MapField, mapfield,
 	numberfield,
-	passwordfield,
+	passwordfield, selectfield,
 	t,
 	TextField,
 	textfield
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {settingsPanels} from "./SettingsWindow.js";
-import {imagefield} from "../../components/index.js";
-import {User, userDS} from "../../auth/index.js";
+import {imagefield} from "../../components";
+import {userDS} from "../../auth";
 import {modules} from "../../Modules";
+import {client} from "../../jmap";
 
 settingsPanels.add(class Account extends AbstractSettingsPanel {
 	constructor() {
@@ -43,10 +45,9 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 					numberfield({
 						name:'disk_quota', label: t('Disk quota'),
 						suffix:'MB',
-						prefix: '€',
 						decimals:0,
 						hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
-					numberfield({name:'disk_usage', label: t('Space used'), readOnly:true})
+					numberfield({name:'disk_usage',decimals:0, label: t('Space used'),suffix:'b', readOnly:true})
 				),
 				fieldset({flex:1,legend: t('Password')},
 					passwordfield({
@@ -77,7 +78,29 @@ settingsPanels.add(class Account extends AbstractSettingsPanel {
 				)
 			),
 			fieldset({legend: t("Authorized clients")},
+				mapfield({name:'clients', buildField: record =>
+					containerfield(({cls:'group'}),
+						hiddenfield({name:'lastSeen'}),
+						hiddenfield({name:'platform'}),
+						hiddenfield({name:'name'}),
+						displayfield({name:'ip', flex:1, htmlEncode:false, renderer: _ => [
+								record.ip || "?",
+								(record.platform || "?") + ' ' + (record.name || "?"),
+								record.lastSeen ? (new DateTime(record.lastSeen)).format(client.user.dateFormat + " " + client.user.timeFormat) : "?"
+							].join('<br>')
+						}),
+						selectfield({name:'status', width:140, options: [
+							{value:'new', text: t('New')},
+							{value:'allowed', text: t('Allowed')},
+							{value:'denied', text: t('Denied')}
+						]})
+					),
 
+				}),
+				btn({text: t('Logout all')}).on('click', ({target}) => {
+					const clientFld = target.previousSibling() as MapField;
+					clientFld.value = {};
+				})
 			)
 		))
 	}
