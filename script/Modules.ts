@@ -315,7 +315,6 @@ class Modules {
 		await go.customfields.CustomFields.init()
 		go.User.loadLegacyModules()
 
-		//todo: bridge to new FW
 		GO.checker = new GO.Checker();
 		GO.checker.init();
 
@@ -327,7 +326,7 @@ class Modules {
 	 * Loads module script before being authenticated
 	 */
 	public async loadCapabilities() {
-		const r =  await fetch(BaseHref+"views/goui/capabilities.php")
+		const r =  await fetch(BaseHref + "views/goui/capabilities.php")
 		const capabilities = await r.json();
 
 		LanguageField.languages = capabilities.languages;

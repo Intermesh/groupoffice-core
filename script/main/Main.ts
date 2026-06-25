@@ -21,7 +21,9 @@ import {MainSearchWindow} from "./MainSearchWindow.js";
 import {client} from "../jmap/index.js";
 import {Launcher} from "./Launcher.js";
 import {Notifier} from "./Notifier";
-import {MainPanelConfig} from "../Modules.js";
+import {MainPanelConfig, modules} from "../Modules.js";
+import {customFields} from "../customfields/index.js";
+import {authManager} from "../auth/index.js";
 
 
 type MainPanelCreator = {
@@ -153,9 +155,26 @@ class Main extends Component<MainPanelEventMap> {
 	}
 
 	/**
-	 * Load all module panels and sets up routes
+	 * Boots groupoffice
+	 *
+	 * 1. Loads available JS client modules / capabitities from server
+	 * 2. User authenticates
+	 * 3. Load custom fields and modules
+	 * 4. Populate main UI
 	 */
-	public load() {
+	public async boot() {
+
+		// Loads all module scripts before authentication
+		await modules.loadCapabilities();
+
+		// Authenticate
+		await authManager.requireLogin();
+
+		// Load custom fields and server modules
+		await Promise.all([
+			customFields.init(),
+			modules.init()
+		])
 
 		main.initState();
 
