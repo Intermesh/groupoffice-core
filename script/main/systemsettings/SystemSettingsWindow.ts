@@ -4,7 +4,7 @@ import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
 
-class SystemSettingsWindow extends Window {
+export class SystemSettingsWindow extends Window {
 
 	private cards: CardContainer;
 	constructor(selectedItemId:string|undefined, user:User = client.user) {
@@ -92,6 +92,7 @@ class SystemSettingsWindow extends Window {
 
 }
 
+
 class SystemSettingsPanels  {
 	private panels: (new () => AbstractSystemSettingsPanel)[] = [];
 
@@ -107,7 +108,4 @@ class SystemSettingsPanels  {
 
 export const systemSettingsPanels = new SystemSettingsPanels();
 
-router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
-	const s = new SystemSettingsWindow(selectedItemId);
-	s.show();
-});
+

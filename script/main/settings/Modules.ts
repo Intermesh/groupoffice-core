@@ -1,6 +1,6 @@
 import {Panel, t} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
-import {settingsPanels} from "./SettingsWindow.js";
+import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {User} from "../../auth/index.js";
 
 class Modules extends AbstractSettingsPanel {
@@ -53,4 +53,4 @@ class ModuleSettings {
 
 export const moduleSettings = new ModuleSettings();
 
-settingsPanels.add(Modules);
+userSettingsPanels.add(Modules);

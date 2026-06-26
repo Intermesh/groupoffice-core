@@ -1,9 +1,9 @@
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel";
 import {btn, checkbox, datasourceform, fieldset, Notifier, t} from "@intermesh/goui";
-import {settingsPanels} from "./SettingsWindow";
+import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {userDS} from "../../auth";
 
-settingsPanels.add(class Notifications extends AbstractSettingsPanel {
+userSettingsPanels.add(class Notifications extends AbstractSettingsPanel {
 	constructor() {
 		super("notifications", t("Notifications"), "alarm");
 

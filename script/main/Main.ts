@@ -13,7 +13,7 @@ import {
 	tbar,
 	translate,
 	Window,
-	router, hr, ComponentState, p, Sortable, sortable
+	router, hr, ComponentState, p, Sortable, sortable, win
 } from "@intermesh/goui";
 import {entities} from "../Entities.js";
 import {extjswrapper, ExtJSWrapper} from "../components/ExtJSWrapper.js";
@@ -24,6 +24,8 @@ import {Notifier} from "./Notifier";
 import {MainPanelConfig, modules} from "../Modules.js";
 import {customFields} from "../customfields/index.js";
 import {authManager} from "../auth/index.js";
+import {SystemSettingsWindow} from "./systemsettings/index.js";
+import {UserSettingsWindow} from "./settings/index.js";
 
 
 type MainPanelCreator = {
@@ -37,7 +39,16 @@ type MainPanelCreator = {
 
 
 export interface MainPanelEventMap extends ComponentEventMap {
-	mainpanelcreated: {panel:Component}
+	mainpanelcreated: {panel: Component}
+	/**
+	 * Useful for monkey patching the system settings
+	 */
+	opensystemsettings: {systemSettingsWindow: SystemSettingsWindow}
+
+	/**
+	 * Useful for monkey patching the user settings
+	 */
+	openusersettings: {userSettingsWindow: UserSettingsWindow}
 }
 /**
  * Main view
@@ -134,7 +145,7 @@ class Main extends Component<MainPanelEventMap> {
 			h4(client.user.displayName),
 			"-",
 			btn({icon: "account_circle", text: t("Account settings")}).on('click',() => {
-				void router.goto("settings");
+				void router.goto("usersettings");
 			}),
 			btn({icon: "settings", text: t("System settings")}).on('click',() => {
 				void router.goto("systemsettings");
@@ -227,7 +238,36 @@ class Main extends Component<MainPanelEventMap> {
 
 		this.menu.items.add(hr({itemId: "pinned-splitter", cls: "sortable"}));
 
+
+		this.setupRoutes();
+
+	}
+
+	private setupRoutes() {
+		router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
+			this.openSystemSettings(selectedItemId);
+		});
+
+		router.add(/^usersettings\/?([^\/]+)?/, (selectedItemId) => {
+			this.openUserSettings(selectedItemId);
+		});
+
+
 		this.addLegacyDefaultRoutes();
+	}
+
+	private openSystemSettings(selectedItemId:string|undefined) {
+		const s = new SystemSettingsWindow(selectedItemId)
+		this.fire("opensystemsettings", {systemSettingsWindow:s})
+		s.show();
+	}
+
+
+	private openUserSettings(selectedItemId:string|undefined) {
+
+		const s = new UserSettingsWindow(selectedItemId);
+		this.fire("openusersettings", {userSettingsWindow:s})
+		s.show();
 	}
 
 	private addPanelMenuItem(m: MainPanelCreator) {

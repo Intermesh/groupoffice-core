@@ -1,11 +1,11 @@
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel";
 import {t} from "@intermesh/goui";
-import {settingsPanels} from "./SettingsWindow";
+import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {SharePanel, sharepanel} from "../../permissions";
 import {modules} from "../../Modules";
 import {User} from "../../auth";
 
-settingsPanels.add(class VisibleTo extends AbstractSettingsPanel {
+userSettingsPanels.add(class VisibleTo extends AbstractSettingsPanel {
 	declare sharePanel: SharePanel
 	constructor() {
 		super("visibleto", t("Visible to"), "visibility");

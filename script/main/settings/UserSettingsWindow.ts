@@ -3,7 +3,7 @@ import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
 
-export class SettingsWindow extends Window {
+export class UserSettingsWindow extends Window {
 
 	private cards: CardContainer;
 	constructor(selectedItemId:string|undefined, user:User = client.user) {
@@ -19,12 +19,12 @@ export class SettingsWindow extends Window {
 
 		const pnls : Component[] = [];
 
-		for(const p of settingsPanels.getPanels()) {
+		for(const p of userSettingsPanels.getPanels()) {
 			const panel = new p;
 
 			panel.on("show", ({target}) => {
 				if (target.itemId) {
-					router.setPath("settings/" + target.itemId);
+					router.setPath("usersettings/" + target.itemId);
 				}
 			})
 			pnls.push(panel);
@@ -99,11 +99,10 @@ export class SettingsWindow extends Window {
 
 }
 
-class SettingsPanels  {
+class UserSettingsPanels  {
 	private panels: (new () => AbstractSettingsPanel)[] = [];
 
 	public add(cmp: (new () => AbstractSettingsPanel)) {
-
 		this.panels.push(cmp);
 	}
 
@@ -112,9 +111,5 @@ class SettingsPanels  {
 	}
 }
 
-export const settingsPanels = new SettingsPanels();
+export const userSettingsPanels = new UserSettingsPanels();
 
-router.add(/^settings\/?([^\/]+)?/, (selectedItemId) => {
-	const s = new SettingsWindow(selectedItemId);
-	s.show();
-});

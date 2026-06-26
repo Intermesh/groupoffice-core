@@ -10,7 +10,7 @@ import {
 } from "@intermesh/goui";
 import {Group, groupDS, Principal, principalDS, User, userDS} from "../../../auth/index.js";
 import {client, img} from "../../../jmap/index.js";
-import {SettingsWindow} from "../../settings/index.js";
+import {UserSettingsWindow} from "../../settings/index.js";
 import {customFields} from "../../../customfields/index.js";
 import {GroupDialog} from "./GroupDialog.js";
 

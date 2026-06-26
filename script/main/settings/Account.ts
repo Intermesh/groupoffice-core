@@ -11,13 +11,13 @@ import {
 	textfield
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
-import {settingsPanels} from "./SettingsWindow.js";
+import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {imagefield} from "../../components";
 import {userDS} from "../../auth";
 import {modules} from "../../Modules";
 import {client} from "../../jmap";
 
-settingsPanels.add(class Account extends AbstractSettingsPanel {
+userSettingsPanels.add(class Account extends AbstractSettingsPanel {
 	constructor() {
 		super("account", t("Account"), "account_box");
 		const core = modules.get("core", "core")!;

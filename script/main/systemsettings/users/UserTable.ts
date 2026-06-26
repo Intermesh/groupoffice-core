@@ -10,7 +10,7 @@ import {
 } from "@intermesh/goui";
 import {User, userDS} from "../../../auth/index.js";
 import {client, img} from "../../../jmap/index.js";
-import {SettingsWindow} from "../../settings/index.js";
+import {UserSettingsWindow} from "../../settings/index.js";
 import {customFields} from "../../../customfields/index.js";
 
 export class UserTable extends Table<DataSourceStore> {
@@ -165,7 +165,7 @@ export class UserTable extends Table<DataSourceStore> {
 	}
 
 	private edit(rowIndex: number) {
-		const win = new SettingsWindow(undefined, this.store.get(rowIndex) as User);
+		const win = new UserSettingsWindow(undefined, this.store.get(rowIndex) as User);
 		win.show();
 	}
 }

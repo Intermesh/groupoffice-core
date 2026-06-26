@@ -10,11 +10,11 @@ import {
 	t, textfield
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
-import {settingsPanels} from "./SettingsWindow.js";
+import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {moduleDS} from "../../Modules";
 import {userDS} from "../../auth";
 
-settingsPanels.add(class Appearance extends AbstractSettingsPanel {
+userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 
 	constructor() {
 		super("appearance", t("Appearance"), "palette");
