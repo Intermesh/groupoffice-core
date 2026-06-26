@@ -14,8 +14,9 @@ import {
 	Window
 } from "@intermesh/goui";
 import {client, jmapds} from "../../jmap/index.js";
-import {ModuleInfo} from "./Apps.js";
+
 import {ModuleDialog} from "./ModuleDialog.js";
+import {ModuleInfo} from "./SystemSettingsModules.js";
 
 
 export interface InstallModuleTileEventMap extends ComponentEventMap {
