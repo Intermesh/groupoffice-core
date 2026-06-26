@@ -1,22 +1,8 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
-import {
-	arrayfield,
-	btn,
-	checkbox,
-	chips,
-	comp,
-	Component, Fieldset,
-	fieldset,
-	numberfield,
-	t,
-	tbar,
-	textfield
-} from "@intermesh/goui";
-import {systemSettingsPanels} from "./SystemSettingsWindow.js";
-import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
+import {btn, checkbox, chips, comp, Component, fieldset, numberfield, t, tbar, textfield} from "@intermesh/goui";
 import {domaincombo} from "../../auth/index.js";
 import {authallowgroupgrid} from "./AuthAllowGroupGrid.js";
-import {ModuleSettingsFieldset} from "./ModuleSettingsFieldset";
+import {systemSettingsPanels} from "./SystemSettingsWindow.js";
 
 class Authentication extends AbstractModuleSystemSettingsPanel {
 
@@ -24,10 +10,6 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
 		super("authentication", t("Authentication"), "core", "core", "lock");
-		// this.items.add(authSystemSettings.getFieldsets());
-		for(const fs of authSystemSettings.getFieldsets()) {
-			this.items.add(fs);
-		}
 	}
 
 	protected formItems(): Component[] {
@@ -135,23 +117,5 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 	}
 }
 
-class AuthenticationSystemSettings {
-	// private fieldsets: Record<string, (new () => ModuleSettingsFieldset)[]> = {};
-	private fieldsets: ModuleSettingsFieldset[] = [];//Record<string, (new () => ModuleSettingsFieldset)[]> = {};
 
-	public addFieldset(modulePackage:string, moduleName:string, cmp: (new () => ModuleSettingsFieldset)) {
-		const id = modulePackage+"/"+moduleName;
-		this.fieldsets.push(new cmp);
-		// if(!this.fieldsets[id]) {
-		// 	this.fieldsets[id] = [];
-		// }
-		// this.fieldsets[id].push(cmp);
-	}
-
-	public getFieldsets() {
-		return this.fieldsets ?? [];
-	}
-
-}
-export const authSystemSettings = new AuthenticationSystemSettings();
 systemSettingsPanels.add(Authentication);

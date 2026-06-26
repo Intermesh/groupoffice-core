@@ -159,7 +159,7 @@ export interface ModuleConfig<T extends CmpMap>  {
 	/**
 	 * Panels added to the user settings dialog
 	 */
-	settingsPanels?: (typeof AppSettingsPanel)[]
+	userSettingsPanels?: (typeof AppSettingsPanel)[]
 
 	/**
 	 * Panels added to the sustem settings dialog
@@ -572,7 +572,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 				}
 			}
 
-			config.settingsPanels?.forEach(p => {
+			config.userSettingsPanels?.forEach(p => {
 				moduleSettings.addPanel(p);
 			})
 

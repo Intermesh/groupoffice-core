@@ -1,4 +1,4 @@
-import {Component, containerfield, datasourceform, MaterialIcon, ObjectUtil} from "@intermesh/goui";
+import {Component, containerfield, datasourceform, MaterialIcon} from "@intermesh/goui";
 import {moduleDS, modules} from "../../Modules.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
