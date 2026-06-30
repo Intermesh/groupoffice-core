@@ -326,8 +326,8 @@ class Modules {
 	 * Loads module script before being authenticated
 	 */
 	public async loadCapabilities() {
-		const r =  await fetch(BaseHref + "views/goui/capabilities.php")
-		const capabilities = await r.json();
+
+		const capabilities = await client.getCapabilities();
 
 		LanguageField.languages = capabilities.languages;
 

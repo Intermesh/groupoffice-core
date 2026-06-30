@@ -1,8 +1,8 @@
 import {
-	btn,
+	btn, Button,
 	CardContainer,
 	cards, checkbox,
-	comp,
+	comp, Fieldset,
 	fieldset,
 	form,
 	Form,
@@ -18,13 +18,12 @@ import {
 import {RegisterForm} from "./RegisterForm.js";
 import {client, ForgottenData} from "../jmap/index.js";
 
-
 export interface LoginEventMap extends WindowEventMap {
 	cancel: {}
 	login: {}
 }
 
-export class Login extends Window<LoginEventMap> {
+export class LoginWindow extends Window<LoginEventMap> {
 
 	private loginForm!: Form;
 
@@ -35,6 +34,13 @@ export class Login extends Window<LoginEventMap> {
 	private cardContainer!: CardContainer;
 	private registerForm!: Form;
 	private forgotPasswordForm!: Form;
+
+	private signinButtonFieldSet: Fieldset;
+
+	public addSignInButton(btn: Button) {
+		this.signinButtonFieldSet.hidden = false;
+		this.signinButtonFieldSet.items.add(btn);
+	}
 
 	protected createModalOverlayCls() {
 		return "goui-window-modal-overlay login-overlay";
@@ -53,6 +59,14 @@ export class Login extends Window<LoginEventMap> {
 		this.draggable = false;
 
 
+		this.on("show", async () => {
+			const c = await client.getCapabilities();
+
+			if(c.settings.allowRegistration) {
+				this.findChild("register")!.hidden = false;
+			}
+		})
+
 		this.on("close", async window => {
 			if (!await client.isLoggedIn()) {
 				// closed without successful login
@@ -68,6 +82,9 @@ export class Login extends Window<LoginEventMap> {
 					this.login(form);
 				}
 			},
+
+			this.signinButtonFieldSet = fieldset({hidden: true, cls: "flow border-bottom"}),
+
 			fieldset({
 					flex: "1",
 					cls:  "flow scroll"
@@ -106,11 +123,13 @@ export class Login extends Window<LoginEventMap> {
 
 
 				btn({
+					itemId: "register",
 					style: {
 						width: "100%"
 					},
 					cls: "filled",
 					type: "button",
+					hidden: true,
 					text: t("Register"),
 					handler: () => {
 						this.showRegisterForm();
@@ -123,7 +142,7 @@ export class Login extends Window<LoginEventMap> {
 						text: t("Forgot password?"),
 						type: "button",
 						handler: () => {
-							this.showForgotPassword();
+							void this.showForgotPassword();
 						}
 					})
 				),
@@ -203,7 +222,13 @@ export class Login extends Window<LoginEventMap> {
 		this.items.add(this.cardContainer);
 	}
 
-	private showForgotPassword() {
+	private async showForgotPassword() {
+
+		const c = await client.getCapabilities();
+		if(c.settings.lostPasswordURL){
+			document.location.replace(c.settings.lostPasswordURL);
+			return;
+		}
 
 		if (!this.forgotPasswordForm) {
 			this.forgotPasswordForm = form(

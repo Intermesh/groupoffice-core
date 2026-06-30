@@ -1,12 +1,16 @@
 import {User} from "./User.js";
-import {root} from "@intermesh/goui";
+import {Observable, ObservableEventMap, root} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
-import {Login} from "./Login.js";
+import {LoginWindow} from "./LoginWindow.js";
+
+interface AuthManagerEventMap extends ObservableEventMap {
+	login: {loginWindow: LoginWindow}
+}
 
 /**
  * Authentication manager
  */
-class AuthManager {
+class AuthManager extends Observable<AuthManagerEventMap> {
 
 	private _requireLogin?: Promise<User>;
 
@@ -40,14 +44,16 @@ class AuthManager {
 	}
 	private showLogin() {
 		return new Promise<void>((resolve, reject) => {
-			const login = new Login();
-			login.show();
+			const loginWindow = new LoginWindow();
 
-			login.on('login', () => {
+			this.fire("login", {loginWindow})
+			loginWindow.show();
+
+			loginWindow.on('login', () => {
 				resolve();
 			});
 
-			login.on('cancel', () => {
+			loginWindow.on('cancel', () => {
 				reject();
 			})
 		})

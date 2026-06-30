@@ -91,14 +91,14 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 					handler: () => {
 						const d = new ModuleDialog(m);
 						d.load(m.model.id);
-						d.form.on('beforesave', ({data}) => {
-							// In settings tables, arrays are always saved as comma-separated strings
-							Object.entries(data.settings).forEach(([key, value]) => {
-								if(key !== 'readOnlyKeys' && Array.isArray(value)) {
-									data.settings[key] = value.join(",");
-								}
-							})
-						})
+						// d.form.on('beforesave', ({data}) => {
+						// 	// In settings tables, arrays are always saved as comma-separated strings ?? huh?!?
+						// 	Object.entries(data.settings).forEach(([key, value]) => {
+						// 		if(key !== 'readOnlyKeys' && Array.isArray(value)) {
+						// 			data.settings[key] = value.join(",");
+						// 		}
+						// 	})
+						// })
 						d.show();
 					}
 				}),

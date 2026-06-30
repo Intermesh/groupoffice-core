@@ -19,6 +19,7 @@ import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
 import {entities} from "../Entities.js";
+import {LanguageField} from "../components/index.js";
 
 
 export interface LoginData {
@@ -98,6 +99,13 @@ export interface ResultReference  {
 	path: string
 }
 
+export interface Capabilities {
+	title:string
+	modules: {name: string, package: string, entry: string}[]
+	languages: Record<string, string>
+	settings: any
+}
+
 export class Client extends Observable<ClientEventMap> {
 	private _lastCallCounter = 0;
 
@@ -144,6 +152,21 @@ export class Client extends Observable<ClientEventMap> {
 		this.delayedJmap = FunctionUtil.buffer(0, () => {
 			this.doJmap();
 		})
+	}
+
+	private capabilities?: Capabilities;
+
+	/**
+	 * Get the public modules and settings
+	 */
+	public async getCapabilities() {
+		if(!this.capabilities) {
+			const r = await fetch(BaseHref + "views/goui/capabilities.php")
+			this.capabilities = await r.json();
+		}
+
+		return this.capabilities!;
+
 	}
 
 	set session(session: JmapSession) {
