@@ -174,7 +174,6 @@ export class Client extends Observable<ClientEventMap> {
 		if(session.accessToken) {
 			this.accessToken = session.accessToken;
 			sessionStorage.setItem("accessToken", this.accessToken);
-
 		}
 
 		this._session = session;
@@ -823,8 +822,4 @@ export class Client extends Observable<ClientEventMap> {
 }
 
 export const client = new Client();
-
-if(window.GO) {
-	client.uri = document.location.origin + BaseHref + "api/";
-}
 

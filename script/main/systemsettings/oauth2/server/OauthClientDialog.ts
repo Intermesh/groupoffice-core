@@ -1,4 +1,15 @@
-import {browser, btn, checkbox, fieldset, InputFieldEventMap, Notifier, t, TextField, textfield} from "@intermesh/goui";
+import {
+	browser,
+	btn,
+	checkbox,
+	fieldset,
+	InputFieldEventMap,
+	Notifier,
+	passwordfield,
+	t,
+	TextField,
+	textfield
+} from "@intermesh/goui";
 import {client} from "../../../../jmap/index.js";
 import {FormWindow} from "../../../../components/index.js";
 
@@ -35,17 +46,16 @@ export class OauthClientDialog extends FormWindow {
 					listeners: {
 						setvalue: ({newValue}) => {
 							this.secretField.disabled = !newValue;
+							this.secretField.required = !this.form.currentId;
 						}
 					}
 				}),
 
-				this.secretField = textfield({
+				this.secretField = passwordfield({
 					disabled: true,
-					type: "password",
 					autocomplete: 'new-password',
 					name: "secret",
-					label: t("Client secret"),
-					required: true
+					label: t("Client secret")
 				}),
 
 				textfield({
