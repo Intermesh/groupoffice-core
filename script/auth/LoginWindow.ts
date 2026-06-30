@@ -1,22 +1,24 @@
 import {
-	btn, Button,
+	btn,
+	Button,
 	CardContainer,
-	cards, checkbox,
-	comp, Fieldset,
+	cards,
+	checkbox,
+	comp,
+	Fieldset,
 	fieldset,
 	form,
-	Form,
-	Listener,
+	Form, menu,
 	Notifier,
-	Observable,
 	t,
 	tbar,
-	textfield,
+	textfield, Toolbar,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
 import {RegisterForm} from "./RegisterForm.js";
 import {client, ForgottenData} from "../jmap/index.js";
+import {LanguageField} from "../components/index.js";
 
 export interface LoginEventMap extends WindowEventMap {
 	cancel: {}
@@ -44,6 +46,36 @@ export class LoginWindow extends Window<LoginEventMap> {
 
 	protected createModalOverlayCls() {
 		return "goui-window-modal-overlay login-overlay";
+	}
+
+	protected createHeader(): Toolbar {
+		const header = super.createHeader();
+
+		header.items.insert(-1,
+			btn({
+				icon: "language",
+				menu: menu({
+						listeners: {
+							show: async ({target}) => {
+								const c = await client.getCapabilities();
+
+								target.items.add(...Object.entries(c.languages).map(([iso, text]) =>
+									btn({
+										handler: () => {
+											document.location = BaseHref + "?lang=" + iso;
+										},
+										text
+									})
+								));
+							}
+						}
+					},
+
+				)
+			})
+		)
+
+		return header;
 	}
 
 	constructor() {
