@@ -91,7 +91,7 @@ export class UserTable extends Table<DataSourceStore> {
 					sortable: false,
 					htmlEncode: false,
 					renderer: function(authenticators) {
-						return authenticators.map((method:string) => `<i title="${method}" class="icon go-module-icon-${method}"></i>`).join(" ");
+						return authenticators.map((method:string) => `<i title="${method}" class="icon go-auth-method-${method}"></i>`).join(" ");
 					}
 				}),
 

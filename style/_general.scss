@@ -1,6 +1,11 @@
 @use '@intermesh/goui/style/util';
 @use '@intermesh/goui/style/config';
 
+.go-auth-method-password {
+	background-image:url('../resources/password.png');
+}
+
+
 .goui-share-panel {
 	.goui-avatar {
 		margin-right: util.dp(16);
