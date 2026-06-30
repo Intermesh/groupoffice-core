@@ -3,6 +3,7 @@ import {btn, checkbox, chips, comp, Component, fieldset, numberfield, t, tbar, t
 import {domaincombo} from "../../auth/index.js";
 import {authallowgroupgrid} from "./AuthAllowGroupGrid.js";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {OauthClients} from "./oauth2/server/OauthClients.js";
 
 class Authentication extends AbstractModuleSystemSettingsPanel {
 
@@ -112,7 +113,10 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 					label: t("Allow creation of users through the API"),
 					hint: t("When enabled, you should restrict access for the 'Everyone' group as much as possible. Use with caution.")
 				})
-			)
+			),
+
+
+			new OauthClients()
 		];
 	}
 }
