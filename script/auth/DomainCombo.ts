@@ -21,12 +21,12 @@ export class DomainCombo extends SelectField {
 
 		const domains =  client.session!.auth.domains || [];
 
-		this.options = domains.map((domain: string) => ({
+		this.options = [{value:null, text: t("None")}, ...domains.map((domain: string) => ({
 			value: domain,
 			text: domain
-		}));
+		}))];
 
-		this.hidden = domains.length == 0;
+		this.hidden = this.options.length === 1;
 
 	}
 
