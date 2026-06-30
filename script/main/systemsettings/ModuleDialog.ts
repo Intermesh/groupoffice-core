@@ -15,8 +15,10 @@ export class ModuleDialog extends FormWindow {
 		this.width = 1000;
 		this.height = 800;
 
+		this.generalTab.cls = "fit bg-low";
+
 		this.generalTab.items.add(
-			fieldset({},
+			fieldset({cls: "card flow"},
 				displayfield({
 					label: t("Author"),
 					value: moduleInfo.author
