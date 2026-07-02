@@ -9,10 +9,8 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 	constructor() {
 		super("appearance", t("Appearance"),"core", "core", "palette");
 		this.cls = "hbox";
-	}
 
-	protected formItems(): Component[] {
-		return [
+		this.settingsForm.items.add(
 			// Light theme fieldset
 			fieldset({flex: 1},
 				comp({
@@ -50,7 +48,8 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 				this.createColorField("tertiaryDark", "Tertiary color", "--c-secondary", "F3DB00"),
 				this.createColorField("accentDark", "Accent color", "--c-accent", "FF7200")
 			)
-		];
+
+		)
 	}
 
 	private createColorField(name: string, label: string, property: string, defaultColor: string): Component {

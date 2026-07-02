@@ -11,10 +11,7 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
 		super("authentication", t("Authentication"), "core", "core", "lock");
-	}
-
-	protected formItems(): Component[] {
-		return [
+		this.settingsForm.items.add(
 			fieldset({
 					width: 400,
 					legend: t("Password")
@@ -117,7 +114,7 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 
 
 			new OauthClients()
-		];
+		)
 	}
 }
 

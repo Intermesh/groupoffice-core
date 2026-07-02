@@ -1,9 +1,10 @@
-import {Component, containerfield, datasourceform, MaterialIcon} from "@intermesh/goui";
+import {Component, ContainerField, containerfield, datasourceform, MaterialIcon} from "@intermesh/goui";
 import {moduleDS, modules} from "../../Modules.js";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 
 export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPanel {
 	protected form;
+	protected readonly settingsForm: ContainerField;
 
 	constructor( itemId:string,  title:string, protected modulePackage:string, protected moduleName:string, icon:MaterialIcon) {
 		super(itemId, title, icon);
@@ -17,11 +18,11 @@ export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPan
 				dataSource: moduleDS,
 				patchMode: true
 			},
-			containerfield({
+
+			this.settingsForm = containerfield({
 					name: "settings",
 					keepUnknownValues: false
-				},
-				...this.formItems()
+				}
 			)
 		)
 		this.items.add(this.form);

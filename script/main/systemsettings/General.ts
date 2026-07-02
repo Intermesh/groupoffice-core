@@ -13,9 +13,7 @@ class General extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
 		super("general", t("General"), "core", "core", "description");
-	}
 
-	protected formItems(): Component[] {
 		this.loginMessageField = htmlfield({
 			name: "loginMessage",
 			label: t("Login message"),
@@ -24,7 +22,9 @@ class General extends AbstractModuleSystemSettingsPanel {
 			height: 200
 		});
 
-		return [
+
+		this.settingsForm.items.add(
+
 			fieldset({width: 400},
 				textfield({
 					name: "title",
@@ -78,18 +78,19 @@ class General extends AbstractModuleSystemSettingsPanel {
 					name: "loginMessageEnabled",
 					label: t("Enable login message"),
 					listeners: {
-						change: ({newValue}) => {
-							if (this.loginMessageField) {
-								this.loginMessageField.disabled = !newValue;
-							}
+						setvalue: ({newValue}) => {
+
+							this.loginMessageField!.disabled = !newValue;
 						}
 					}
 				}),
 
 				this.loginMessageField
 			)
-		];
+		)
 	}
+
+
 
 	// TODO: Implement language export functionality
 	// private async onExportLanguage() {

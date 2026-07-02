@@ -23,9 +23,7 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
 		super("notifications", t("Notifications"),  "core", "core","notifications");
-	}
 
-	protected formItems(): Component[] {
 		this.verifyCertField = checkbox({
 			name: "smtpEncryptionVerifyCertificate",
 			label: t("Verify SSL certificate"),
@@ -38,7 +36,7 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 			required: true
 		});
 
-		return [
+		this.settingsForm.items.add(
 			fieldset({
 					width: 400,
 					legend: t("Outgoing E-mail (SMTP)")
@@ -105,7 +103,7 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 					})
 				)
 			)
-		];
+		)
 	}
 
 	async load(): Promise<any> {
