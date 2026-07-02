@@ -6,14 +6,17 @@ import {
 	comp,
 	Component,
 	ComponentEventMap,
+	ComponentState,
 	h4,
+	hr,
 	Menu,
 	menu,
+	router,
+	sortable,
 	t,
 	tbar,
 	translate,
-	Window,
-	router, hr, ComponentState, p, Sortable, sortable, win
+	Window
 } from "@intermesh/goui";
 import {entities} from "../Entities.js";
 import {extjswrapper, ExtJSWrapper} from "../components/ExtJSWrapper.js";
