@@ -43,6 +43,8 @@ export class LoginWindow extends Window<LoginEventMap> {
 	public addSignInButton(btn: Button) {
 		this.signinButtonFieldSet.hidden = false;
 		this.signinButtonFieldSet.items.add(btn);
+
+		this.center();
 	}
 
 	protected createModalOverlayCls() {
@@ -98,6 +100,19 @@ export class LoginWindow extends Window<LoginEventMap> {
 
 			if(c.settings.allowRegistration) {
 				this.findChild("register")!.hidden = false;
+			}
+
+			if(c.settings.loginMessageEnabled) {
+				// Notifier.error(c.settings.loginMessage)
+
+				this.loginForm.items.insert(0,
+					fieldset({},comp({
+						cls: "card pad",
+						html: c.settings.loginMessage
+					}))
+				);
+
+				this.center();
 			}
 		})
 
