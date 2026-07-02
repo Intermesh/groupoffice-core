@@ -8,17 +8,18 @@ import {
 	Fieldset,
 	fieldset,
 	form,
-	Form, menu,
+	Form,
+	menu,
 	Notifier,
 	t,
 	tbar,
-	textfield, Toolbar,
+	textfield,
+	Toolbar,
 	Window,
 	WindowEventMap
 } from "@intermesh/goui";
 import {RegisterForm} from "./RegisterForm.js";
 import {client, ForgottenData} from "../jmap/index.js";
-import {LanguageField} from "../components/index.js";
 
 export interface LoginEventMap extends WindowEventMap {
 	cancel: {}
@@ -51,7 +52,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 	protected createHeader(): Toolbar {
 		const header = super.createHeader();
 
-		header.items.insert(-1,
+		header.items.insert(this.closable ? -1 : header.items.count(),
 			btn({
 				icon: "language",
 				menu: menu({
@@ -83,12 +84,13 @@ export class LoginWindow extends Window<LoginEventMap> {
 
 		this.width = 480;
 		this.height = "auto";
-		this.title = t("Login");
+		this.title = t("Login required");
 		this.cls = "login";
 		this.modal = true;
 		this.resizable = false;
 		this.draggable = false;
 		this.draggable = false;
+		this.closable = false;
 
 
 		this.on("show", async () => {
@@ -121,10 +123,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 					flex: "1",
 					cls:  "flow scroll"
 				},
-				comp({
-					tagName: "p",
-					html: t("Please enter your username and password")
-				}),
+
 				textfield({
 					label: t("Username"),
 					name: "username",
