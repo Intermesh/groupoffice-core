@@ -17,7 +17,7 @@ import {userDS} from "../../auth";
 import {modules} from "../../Modules";
 import {client} from "../../jmap";
 
-userSettingsPanels.add(class Account extends AbstractSettingsPanel {
+export class Account extends AbstractSettingsPanel {
 	constructor() {
 		super("account", t("Account"), "account_box");
 		const core = modules.get("core", "core")!;
@@ -79,22 +79,22 @@ userSettingsPanels.add(class Account extends AbstractSettingsPanel {
 			),
 			fieldset({legend: t("Authorized clients")},
 				mapfield({name:'clients', buildField: record =>
-					containerfield(({cls:'group'}),
-						hiddenfield({name:'lastSeen'}),
-						hiddenfield({name:'platform'}),
-						hiddenfield({name:'name'}),
-						displayfield({name:'ip', flex:1, htmlEncode:false, renderer: _ => [
-								record.ip || "?",
-								(record.platform || "?") + ' ' + (record.name || "?"),
-								record.lastSeen ? (new DateTime(record.lastSeen)).format(client.user.dateFormat + " " + client.user.timeFormat) : "?"
-							].join('<br>')
-						}),
-						selectfield({name:'status', width:140, options: [
-							{value:'new', text: t('New')},
-							{value:'allowed', text: t('Allowed')},
-							{value:'denied', text: t('Denied')}
-						]})
-					),
+						containerfield(({cls:'group'}),
+							hiddenfield({name:'lastSeen'}),
+							hiddenfield({name:'platform'}),
+							hiddenfield({name:'name'}),
+							displayfield({name:'ip', flex:1, htmlEncode:false, renderer: _ => [
+									record.ip || "?",
+									(record.platform || "?") + ' ' + (record.name || "?"),
+									record.lastSeen ? (new DateTime(record.lastSeen)).format(client.user.dateFormat + " " + client.user.timeFormat) : "?"
+								].join('<br>')
+							}),
+							selectfield({name:'status', width:140, options: [
+									{value:'new', text: t('New')},
+									{value:'allowed', text: t('Allowed')},
+									{value:'denied', text: t('Denied')}
+								]})
+						),
 
 				}),
 				btn({text: t('Logout all')}).on('click', ({target}) => {
@@ -104,4 +104,6 @@ userSettingsPanels.add(class Account extends AbstractSettingsPanel {
 			)
 		))
 	}
-});
+}
+
+userSettingsPanels.add(Account);

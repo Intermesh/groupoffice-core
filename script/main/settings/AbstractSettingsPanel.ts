@@ -4,7 +4,7 @@ import {User} from "../../auth/index.js";
 export abstract class AbstractSettingsPanel extends Component {
 	protected user?: User;
 
-	protected form?: DataSourceForm
+	public readonly form?: DataSourceForm
 	constructor(itemId: string, title: string, icon:MaterialIcon) {
 		super();
 		this.cls = 'scroll fit';
