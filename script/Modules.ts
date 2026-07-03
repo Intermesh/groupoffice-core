@@ -13,7 +13,7 @@ export interface EntityFilter {
 	type: EntityFilterType | string, // todo: custom components from modules?
 	typeConfig?: Record<string, any>,
 	title: string,
-	multiple: boolean,
+	multiple?: boolean,
 	wildcards?: boolean,
 	customfield?: Field,
 	options?: {
@@ -318,7 +318,7 @@ class Modules {
 		GO.checker = new GO.Checker();
 		GO.checker.init();
 
-		GO.mainLayout.fireReady();
+
 	}
 
 
@@ -536,6 +536,10 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 		await this.legacyInit();
 
 		this.initModules();
+
+
+		GO.mainLayout.fireEvent('authenticated', this, go.User);
+		GO.mainLayout.fireReady();
 	}
 
 	private initModules() {
