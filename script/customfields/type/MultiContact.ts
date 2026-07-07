@@ -1,21 +1,18 @@
 import {Type} from "./Type.js";
 import {FieldDialog} from "../FieldDialog.js";
 import {
+	autocompletechips,
+	AutocompleteChips,
 	btn,
 	column,
-	ComboBox,
-	combobox,
 	comp,
+	datasourcestore,
 	displayfield,
-	p,
-	t,
 	Field as FormField,
-	datasourcestore, autocompletechips, AutocompleteChips, table
+	t,
+	table
 } from "@intermesh/goui";
-import {NotesDialog} from "./NotesDialog.js";
 import {customFields, Field} from "../CustomFields.js";
-import {TemplateField} from "./TemplateField.js";
-import {Notes} from "./Notes.js";
 import {jmapds} from "../../jmap/index.js";
 import {TextDialog} from "./TextDialog.js";
 
