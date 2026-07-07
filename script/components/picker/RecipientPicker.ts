@@ -40,7 +40,7 @@ interface RecipientPickerEventMap extends WindowEventMap {
 	}
 }
 
-class AddressBookPicker extends ExtJSWrapper implements RecipientPickerComponent{
+export class AddressBookPicker extends ExtJSWrapper implements RecipientPickerComponent{
 	constructor() {
 		super( new go.modules.community.addressbook.SelectDialogPanel({title: undefined}));
 
@@ -85,7 +85,7 @@ class AddressBookPicker extends ExtJSWrapper implements RecipientPickerComponent
 export class RecipientPicker extends Window<RecipientPickerEventMap> {
 
 	private cards;
-	constructor() {
+	constructor(types = [UserPicker, AddressBookPicker]) {
 		super();
 
 		this.modal = true;
@@ -101,8 +101,7 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 			cardmenu(),
 
 			this.cards = cards({flex: 1},
-				new UserPicker(),
-				new AddressBookPicker()
+				...types.map(type => new type),
 				),
 
 			tbar({cls: "border-top"},
@@ -195,7 +194,7 @@ class UserTable extends Table<DataSourceStore<typeof principalDS>> {
 	}
 }
 
-class UserPicker extends Component implements RecipientPickerComponent {
+export class UserPicker extends Component implements RecipientPickerComponent {
 
 	private readonly table;
 	constructor() {
