@@ -255,6 +255,8 @@ class Main extends Component<MainPanelEventMap> {
 
 	private addPanelMenuItem(m: MainPanelCreator) {
 
+		const badge = this.launcher!.getBadge(m.id)
+
 		const menuItem = comp({
 				cls: "pinned-item sortable",
 				itemId: m.id,
@@ -323,7 +325,7 @@ class Main extends Component<MainPanelEventMap> {
 				)
 			}),
 
-			comp({cls: "goui-badge", hidden:true, itemId: "badge"})
+			comp({cls: "goui-badge", hidden:!badge, itemId: "badge", text: badge.toString()})
 
 		);
 		this.menu.items.add(menuItem);

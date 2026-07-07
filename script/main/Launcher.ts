@@ -98,9 +98,23 @@ export class Launcher extends Menu {
 			throw "Not found";
 		}
 
-		const badge =cmp.findChild("badge")!;
+		const badge = cmp.findChild("badge")!;
 
 		badge.hidden = !count;
 		badge.text = count ? count?.toString() : "";
+	}
+
+	public getBadge(panelId:string) {
+		const cmp = this.allButtons.find(b => {
+			return b.itemId == panelId;
+		})
+
+		if(!cmp) {
+			throw "Not found";
+		}
+
+		const badge = cmp.findChild("badge")!;
+
+		return parseInt(badge.text);
 	}
 }
