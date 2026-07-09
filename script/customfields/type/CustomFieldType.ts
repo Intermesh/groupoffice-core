@@ -88,7 +88,7 @@ export abstract class CustomFieldType {
 			return undefined;
 		}
 		return {
-			name: field.databaseName,
+			name: field.databaseName.toLowerCase(),
 			type: "string",
 			wildcards: true,
 			multiple: true,
