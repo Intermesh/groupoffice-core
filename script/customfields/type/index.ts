@@ -31,6 +31,3 @@ export * from "./CustomFieldType.js";
 export * from "./CustomFieldUserCustomField.js";
 export * from "./CustomFieldYesNo.js";
 export * from "./CustomFieldYesNoDialog.js";
-export * from "./CustomFieldMultiContact.js";
-export * from "./CustomFieldProject.js";
-export * from "./CustomFieldFile.js";
