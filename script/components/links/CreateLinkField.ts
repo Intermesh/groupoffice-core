@@ -2,13 +2,11 @@ import {
 	AutocompleteChips,
 	Config,
 	createComponent,
-	DataSourceForm,
 	DataSourceStore,
 	menu,
 	t,
 	Table
 } from "@intermesh/goui";
-import {linkDS} from "../../model/Link";
 import {SelectSearchPanel} from "./SelectSearchPanel";
 
 
@@ -49,26 +47,8 @@ export class CreateLinkField extends AutocompleteChips<Table<DataSourceStore>> {
 		this.on("autocomplete" , ({input}) => {
 			this.selectSearchPanel.resultTable.store.setFilter("autocomplete", {text: input});
 			void this.selectSearchPanel.resultTable.store.load();
-		})
+		});
 
-		this.on("render", () => {
-			const f = this.findAncestorByType(DataSourceForm);
-			if(!f) {
-				return;
-			}
-			f.on("save", () => {
-
-				this.value.forEach((v:any) => {
-					void linkDS.create({
-						fromId: f.currentId,
-						fromEntity: f.dataSource.id,
-						toId: v.entityId,
-						toEntity: v.entityName
-					})
-				});
-
-			}, {unshift: true});
-		})
 	}
 
 	protected createMenu() {

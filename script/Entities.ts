@@ -54,6 +54,19 @@ export interface Entity {
 	 * Module package name this entity belongs to
 	 */
 	package: string
+	/**
+	 * options if not provided the default is:
+	 * [
+	 * 	{value: "", name: ""},
+	 * 	{value: 10, name: t("Read")},
+	 * 	{value: 20, name: t("Create")},
+	 * 	{value: 30, name: t("Write")},
+	 * 	{value: 40, name: t("Delete")},
+	 * 	{value: 50, name: t("Manage")}
+	 * ]
+	 */
+
+	permissions?: any[]
 
 	/**
 	 * translated title for the entity
@@ -237,7 +250,7 @@ class Entities {
 	public getAll() : Entity[] {
 		return Object.values(this.entities);
 	}
-	
+
 	register(entityCfg:EntityConfig & {package:string, module:string}) {
 		this.registered[entityCfg.name.toLowerCase()] = entityCfg;
 	}

@@ -5,8 +5,9 @@
  */
 
 
-import {ButtonEventMap, Config, createComponent, OverlayToolbarButton, t, ToolbarItems} from "@intermesh/goui";
+import {ButtonEventMap, Config, createComponent, DataSourceForm, OverlayToolbarButton, t, ToolbarItems} from "@intermesh/goui";
 import {createlinkfield, CreateLinkField} from "./CreateLinkField";
+import {linkDS} from "../../model/Link";
 
 
 export class CreateLinkButton extends OverlayToolbarButton {
@@ -15,6 +16,7 @@ export class CreateLinkButton extends OverlayToolbarButton {
 	public get createLinkField() {
 		if(!this._createLinkField) {
 			this._createLinkField = createlinkfield({
+				style: {height: "100%"},
 				flex: 1,
 				listeners: {
 					setvalue: ({newValue}) => {
@@ -26,6 +28,22 @@ export class CreateLinkButton extends OverlayToolbarButton {
 			this.on("open", () => {
 				this._createLinkField!.focus();
 			})
+
+			const f = this.findAncestorByType(DataSourceForm);
+			if (f) {
+				f.on("save", () => {
+
+					this._createLinkField!.value.forEach((v: any) => {
+						void linkDS.create({
+							fromId: f.currentId,
+							fromEntity: f.dataSource.id,
+							toId: v.entityId,
+							toEntity: v.entityName
+						})
+					});
+
+				}, {unshift: true});
+			}
 		}
 
 		return this._createLinkField;

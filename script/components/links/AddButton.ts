@@ -65,8 +65,8 @@ export class AddButton extends Button {
 								})
 							}));
 						}catch(e) {
-							await Window.error(e);
-						}finally {
+							void Window.error(e);
+						} finally {
 							root.unmask();
 						}
 

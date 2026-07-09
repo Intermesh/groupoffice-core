@@ -201,21 +201,10 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 
 	/**
 	 * Add a share panel to set permissions
-	 *
-	 * @params options if not provided the default is:
-	 * [
-	 * 	{value: "", name: ""},
-	 * 	{value: 10, name: t("Read")},
-	 * 	{value: 20, name: t("Create")},
-	 * 	{value: 30, name: t("Write")},
-	 * 	{value: 40, name: t("Delete")},
-	 * 	{value: 50, name: t("Manage")}
-	 * ]
 	 */
-	protected addSharePanel(levels?:{ [key: string]: any }[]) {
+	protected addSharePanel() {
 		this.sharePanel = sharepanel({
 			cls: "fit",
-			levels,
 			listeners: {
 				show: () => {
 					this.sharePanel!.load();
@@ -225,6 +214,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 		this.cards.items.add(this.sharePanel);
 
 		this.on("ready", () => {
+			this.sharePanel!.levels = entities.get(this.entityName).permissions;
+			this.sharePanel!.levels!.unshift({value: "",name: ""});
 			this.sharePanel!.setEntity(this.entityName, this.form.currentId);
 		})
 
