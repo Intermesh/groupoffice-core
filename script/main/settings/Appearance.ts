@@ -1,13 +1,14 @@
 import {
 	btn,
 	checkbox,
-	comp, datasourceform,
+	comp,
+	datasourceform,
 	datasourcestore,
 	fieldset,
-	hiddenfield,
 	radio,
 	select,
-	t, textfield
+	t,
+	textfield
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
