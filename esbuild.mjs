@@ -19,7 +19,9 @@ import fs from 'node:fs';
 const watch = (process.argv.length > 2 && process.argv[2] == "watch");
 
 const opts = {
-	entryPoints: ['script/index.ts'],
+	entryPoints: [
+		'script/index.ts'
+	],
 	bundle: true,
 	sourcemap: true,
 	format: "esm",

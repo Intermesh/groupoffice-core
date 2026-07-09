@@ -5,7 +5,7 @@ import {User} from "./auth";
 import {DetailPanel} from "./components/DetailPanel.js";
 import {LanguageField} from "./components/form/LanguageField.js";
 import {AppSettingsPanel, moduleSystemSettings, main, moduleSettings,} from "./main/index.js";
-import {Field} from "./customfields/index.js";
+import {CustomField} from "./customfields/index.js";
 
 export type EntityFilterType = "string" | "number" | "date" | "select";
 export interface EntityFilter {
@@ -15,7 +15,7 @@ export interface EntityFilter {
 	title: string,
 	multiple?: boolean,
 	wildcards?: boolean,
-	customfield?: Field,
+	customfield?: CustomField,
 	options?: {
 		value: any,
 		title: string

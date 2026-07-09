@@ -10,7 +10,7 @@ import {
 	Form,
 	containerfield, ContainerField
 } from "@intermesh/goui";
-import {customFields, Field, FieldSet as CustomFieldSet} from "./CustomFields.js";
+import {customFields, CustomField, FieldSet as CustomFieldSet} from "./CustomFields.js";
 export class FormFieldset extends Fieldset {
 	private container: ContainerField;
 	constructor(public readonly fieldSet:CustomFieldSet) {
@@ -55,7 +55,7 @@ export class FormFieldset extends Fieldset {
 		}
 	}
 
-	private createFormField(f: Field) : Component|undefined {
+	private createFormField(f: CustomField) : Component|undefined {
 		const cmp = customFields.getType(f.type).createFormField(f);
 		if(!cmp) {
 			return undefined;
@@ -161,7 +161,7 @@ export class FormFieldset extends Fieldset {
 	 */
 	private checkRequiredCondition(formField: FormField): boolean {
 
-		const customField = formField.dataSet.customField as Field|undefined;
+		const customField = formField.dataSet.customField as CustomField|undefined;
 
 		if(!customField) {
 			return false; //some form fields have sub form fields

@@ -1,6 +1,6 @@
 import {EntityConfig, EntityFilter, EntityLink, modules} from "./Modules.js";
 import {EntityID, t} from "@intermesh/goui";
-import {customFields, Field} from "./customfields/index.js";
+import {customFields, CustomField} from "./customfields/index.js";
 
 export type EntityRelation = {store: string, fk: string};
 

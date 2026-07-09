@@ -1,5 +1,5 @@
 import {t, Window} from "@intermesh/goui";
-import {EntityPanel} from "./EntityPanel.js";
+import {CustomFieldEntityPanel} from "./CustomFieldEntityPanel.js";
 
 export class EntityDialog extends Window {
 	constructor() {
@@ -12,7 +12,7 @@ export class EntityDialog extends Window {
 	public async load(entityName: string) {
 		this.title = t("Custom fields") + ": " + t(entityName);
 
-		const entityPanel = new EntityPanel(entityName);
+		const entityPanel = new CustomFieldEntityPanel(entityName);
 
 		this.items.add(entityPanel);
 

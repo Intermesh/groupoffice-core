@@ -1,7 +1,7 @@
 import {EntityID, TableColumn} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index.js";
 import {AclItemEntity, AclOwnerEntity} from "../auth/index.js";
-import {Type} from "./type/index.js";
+import {CustomFieldType} from "./type/index.js";
 import {EntityFilter} from "../Modules.js";
 import {EntityRelation} from "../Entities.js";
 
@@ -28,7 +28,7 @@ export type SelectOption = {
 	parents?: SelectOption[]
 }
 
-export interface Field extends AclItemEntity {
+export interface CustomField extends AclItemEntity {
 	fieldSetId: string
 	name: string
 	default:any
@@ -54,12 +54,12 @@ export interface Field extends AclItemEntity {
 	}
 }
 export const fieldSetDS = new JmapDataSource<FieldSet>("FieldSet");
-export const fieldDS = new JmapDataSource<Field>("Field");
+export const fieldDS = new JmapDataSource<CustomField>("Field");
 
 
 class CustomFields {
 	private fieldSets: Record<string, FieldSet[]> = {};
-	private fields: Record<string, Field[]> = {};
+	private fields: Record<string, CustomField[]> = {};
 
 
 	public async init() {
@@ -85,7 +85,7 @@ class CustomFields {
 	}
 
 	getEntityFields(entity: string) {
-		const f: Field[] = [];
+		const f: CustomField[] = [];
 
 		if (!this.fieldSets[entity]) {
 			return f;
@@ -108,14 +108,14 @@ class CustomFields {
 		return this.fields[fieldSet.id] ?? [];
 	}
 
-	private types: Record<string, Type> = {}
+	private types: Record<string, CustomFieldType> = {}
 
 	/**
 	 * Register a custom field type
 	 *
 	 * @param cf
 	 */
-	public registerType(cf: Type) {
+	public registerType(cf: CustomFieldType) {
 		this.types[cf.name] = cf;
 	}
 
