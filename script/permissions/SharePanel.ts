@@ -223,6 +223,11 @@ export class SharePanel extends Field {
 
 	public setEntity(name: string, id?: EntityID) {
 		this.groupTable.setEntity(name, id);
+		const e =  entities.get(name);
+		if(e.permissions) {
+			this.levels = e.permissions;
+			this.levels!.unshift({value: "", name: ""});
+		}
 	}
 
 	public load() {
