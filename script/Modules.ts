@@ -1,4 +1,4 @@
-import {BaseEntity, Component, EntityID, MaterialIcon, router, t, translate} from "@intermesh/goui";
+import {BaseEntity, ClassTypeOf, Component, EntityID, Field, MaterialIcon, router, t, translate} from "@intermesh/goui";
 import {client, JmapDataSource} from "./jmap/index.js";
 import {entities, Entity, EntityRelation} from "./Entities.js";
 import {User} from "./auth";
@@ -7,10 +7,9 @@ import {LanguageField} from "./components/form/LanguageField.js";
 import {AppSettingsPanel, moduleSystemSettings, main, moduleSettings,} from "./main/index.js";
 import {CustomField} from "./customfields/index.js";
 
-export type EntityFilterType = "string" | "number" | "date" | "select";
+export type EntityFilterType = "string" | "number" | "date" | "select" | "link";
 export interface EntityFilter {
-	name: string,
-	type: EntityFilterType | string, // todo: custom components from modules?
+	type: EntityFilterType | ClassTypeOf<Field<any>>,
 	typeConfig?: Record<string, any>,
 	title: string,
 	multiple?: boolean,
@@ -78,7 +77,7 @@ export interface EntityConfig {
 	/**
 	 * Custom filters for the entity
 	 */
-	filters?: EntityFilter[]
+	filters?: Record<string, EntityFilter>
 
 	relations?: Record<string, EntityRelation>
 
@@ -408,63 +407,59 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 				{
 					name: 'User',
-					filters: [
-						{
+					filters: {
+						text: {
 							wildcards: false,
-							name: 'text',
 							type: "string",
 							multiple: false,
 							title: t("Query")
 						},
-						{
+						comment: {
 							title: t("Comment"),
-							name: 'comment',
 							multiple: true,
 							type: 'string'
 						},
-						{
+						commentedat: {
 							title: t("Commented at"),
-							name: 'commentedat',
 							multiple: false,
 							type: 'date'
-						}, {
+						},
+						modifiedat: {
 							title: t("Modified at"),
-							name: 'modifiedat',
 							multiple: false,
 							type: 'date'
-						}, {
+						},
+						modifiedBy: {
 							title: t("Modified by"),
-							name: 'modifiedBy',
 							multiple: true,
 							type: 'string'
-						}, {
+						},
+						createdat: {
 							title: t("Created at"),
-							name: 'createdat',
 							multiple: false,
 							type: 'date'
-						}, {
+						},
+						createdby: {
 							title: t("Created by"),
-							name: 'createdby',
 							multiple: true,
 							type: 'string'
 						},
-						{
+						username: {
 							title: t("Username"),
-							name: 'username',
-							multiple: true,
-							type: 'string'
-						},{
-							title: t("Display name"),
-							name: 'displayName',
-							multiple: true,
-							type: 'string'
-						},{
-							title: t("E-mail"),
-							name: 'email',
 							multiple: true,
 							type: 'string'
 						},
-					]
+						displayName: {
+							title: t("Display name"),
+							multiple: true,
+							type: 'string'
+						},
+						email: {
+							title: t("E-mail"),
+							multiple: true,
+							type: 'string'
+						},
+					}
 
 				},
 				'Principal',

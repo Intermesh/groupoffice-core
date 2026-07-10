@@ -76,7 +76,7 @@ export interface Entity {
 	/**
 	 * Available JMAP filters
 	 */
-	filters: Record<string, any>,
+	filters: Record<string, EntityFilter>,
 
 	/**
 	 * Relation definitions
@@ -88,6 +88,7 @@ export interface LinkConfig extends EntityLink {
 	title: string,
 	entity: string,
 }
+
 
 
 
@@ -136,18 +137,19 @@ class Entities {
 				delete this.entities[entity.name.toLowerCase()];
 			}
 
-			entity.filters = entity.filters ?? [{
-				name: 'text',
-				type: "string",
-				multiple: false,
-				title: t("Query")
-			}];
+			entity.filters = entity.filters ?? {
+				text: {
+					type: "string",
+					multiple: false,
+					title: t("Query")
+				}
+			};
 
 			if (entity.supportsCustomFields) {
 				this.applyCustomFieldFilters(entity);
 			}
 
-			entity.filters = this.normalizeFilters(entity.filters as EntityFilter[])
+			entity.filters = this.normalizeFilters(entity.filters)
 			entity.links = this.normalizeLinks(entity)
 			entity.relations = entity.relations || {};
 			entity.relations = {...entity.relations, ...customFields.getRelations(entity.name)};
@@ -175,31 +177,31 @@ class Entities {
 		});
 	}
 
-	private normalizeFilters(filters:EntityFilter[]) {
-		return Object.fromEntries(filters.map(item => {
+	private normalizeFilters(filters:Record<string, EntityFilter>) {
+		const normalized: Record<string, EntityFilter> = {};
+		for(const name in filters) {
+			const key = name.toLowerCase();
+			const item = filters[name];
 			if(item.wildcards === undefined) {
-				item.wildcards = item.type == "string" && item.name != 'text';
+				item.wildcards = item.type == "string" && key != 'text';
 			}
-			return [item.name.toLowerCase(), item]
-		}));
+			normalized[key] = item;
+		}
+		return normalized;
 	}
 
 
 	private applyCustomFieldFilters(entity:Entity) {
 
-		const existingNames = entity.filters.map((e:EntityFilter) => e.name);
+		const customFieldFilters = customFields.getFilters(entity.name)
 
-		let customFieldFilters = customFields.getFilters(entity.name)
-
-		customFieldFilters = customFieldFilters.filter((f)=> {
-			const exists = existingNames.indexOf(f.name) > -1;
-			if(exists) {
-				console.warn("Custom field name " + f.name+ " can't be filtered as the name conflicts with an existing filter for entity " + entity.name);
+		for(const name in customFieldFilters) {
+			if(name in entity.filters) {
+				console.warn("Custom field name " + name + " can't be filtered as the name conflicts with an existing filter for entity " + entity.name);
+				continue;
 			}
-			return !exists;
-
-		});
-		entity.filters = entity.filters.concat(customFieldFilters);
+			entity.filters[name] = customFieldFilters[name];
+		}
 
 	}
 
