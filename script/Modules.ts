@@ -8,8 +8,8 @@ import {AppSettingsPanel, moduleSystemSettings, main, moduleSettings,} from "./m
 import {CustomField} from "./customfields/index.js";
 
 export type EntityFilterType = "string" | "number" | "date" | "select" | "link";
-export interface EntityFilter {
-	type: EntityFilterType | ClassTypeOf<Field<any>>,
+export interface EntityFilterConfig {
+	type: EntityFilterType | ClassTypeOf<Field<any>> | string,
 	typeConfig?: Record<string, any>,
 	title: string,
 	multiple?: boolean,
@@ -19,6 +19,10 @@ export interface EntityFilter {
 		value: any,
 		title: string
 	}[]
+}
+
+export interface EntityFilter extends EntityFilterConfig {
+	name: string
 }
 
 export interface EntityLink {
@@ -77,7 +81,7 @@ export interface EntityConfig {
 	/**
 	 * Custom filters for the entity
 	 */
-	filters?: Record<string, EntityFilter>
+	filters?: Record<string, EntityFilterConfig>
 
 	relations?: Record<string, EntityRelation>
 

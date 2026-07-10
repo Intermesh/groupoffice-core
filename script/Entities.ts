@@ -182,6 +182,7 @@ class Entities {
 		for(const name in filters) {
 			const key = name.toLowerCase();
 			const item = filters[name];
+			item.name = name;
 			if(item.wildcards === undefined) {
 				item.wildcards = item.type == "string" && key != 'text';
 			}

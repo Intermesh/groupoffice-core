@@ -8,15 +8,16 @@ import {VariableDateFilter} from "./variabletypes/VariableDateFilter.js";
 import {VariableSelectFilter} from "./variabletypes/VariableSelectFilter.js";
 import {VariableLinkFilter} from "./variabletypes/VariableLinkFilter.js";
 import {VariableComponentFilter} from "./variabletypes/VariableComponentFilter.js";
+import {EntityFilter} from "../../Modules.js";
 
 
 export interface VariableFilterGridEventMap extends ListEventMap {
-	variablefiltersetvalue: { filter: Filter, value?: string | { entity: string } }
+	variablefiltersetvalue: { filter: EntityFilter, value?: string | { entity: string } }
 }
 
 export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap> {
 	private readonly entity: Entity;
-	public filterValues: { filter: Filter, value?: string | { entity: string } }[] = [];
+	public filterValues: { filter: EntityFilter, value?: string | { entity: string } }[] = [];
 
 
 	constructor(entityName: string) {
@@ -60,11 +61,7 @@ export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap>
 						default:
 
 							// type could be a Component class
-							if(typeof filter.type === "function") {
-								filterField = new VariableComponentFilter(filter);
-							} else {
-								console.error("No field!", filter.type)
-							}
+							filterField = new VariableComponentFilter(filter);
 
 					}
 

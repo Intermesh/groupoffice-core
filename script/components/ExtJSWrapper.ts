@@ -16,7 +16,9 @@ export class ExtJSWrapper extends Component {
 				if(this.extJSComp && !this.extJSComp.isDestroyed) {
 					this.extJSComp.setWidth(Component.remToPx(this.width));
 					this.extJSComp.setHeight(Component.remToPx(this.height));
-					this.extJSComp.doLayout();
+					if(this.extJSComp.doLayout) {
+						this.extJSComp.doLayout();
+					}
 				}
 			}));
 

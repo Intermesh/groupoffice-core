@@ -11,7 +11,7 @@ import {
 } from "@intermesh/goui";
 import {CustomFieldDialog} from "../CustomFieldDialog.js";
 import {CustomField} from "../CustomFields.js";
-import {EntityFilter} from "../../Modules.js";
+import {EntityFilter, EntityFilterConfig} from "../../Modules.js";
 import {EntityRelation} from "../../Entities.js";
 
 export abstract class CustomFieldType {
@@ -83,7 +83,7 @@ export abstract class CustomFieldType {
 		}
 	}
 
-	getFilter (field:CustomField) : EntityFilter | undefined {
+	getFilter (field:CustomField) : EntityFilterConfig | undefined {
 		if(!field.databaseName) {
 			return undefined;
 		}

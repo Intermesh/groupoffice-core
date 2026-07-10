@@ -12,7 +12,7 @@ export class CustomFieldEncryptedText extends CustomFieldText {
 		);
 	}
 
-	getFilter(field:CustomField): EntityFilter | undefined {
+	getFilter(field:CustomField) {
 		return undefined;
 	}
 }
