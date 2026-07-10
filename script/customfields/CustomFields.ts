@@ -144,14 +144,14 @@ class CustomFields {
 		}).filter(c => c !== undefined);
 	}
 
-	getFilters(entity: string) : EntityFilter[] {
-		const defs:EntityFilter[] = [];
+	getFilters(entity: string) : Record<string, EntityFilter> {
+		const defs:Record<string, EntityFilter> = {};
 
 		this.getEntityFields(entity).forEach((field) => {
 			const type = this.getType(field.type);
 			const def = type.getFilter(field);
-			if(def) {
-				defs.push(def);
+			if(def && field.databaseName) {
+				defs[field.databaseName.toLowerCase()] = def;
 			}
 
 		});

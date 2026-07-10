@@ -70,7 +70,6 @@ export class FilterFieldset extends Fieldset {
 
 						filters.subconditions = {
 							type: "subconditions",
-							name: "subconditions",
 							title: t("Sub conditions")
 						};
 
@@ -111,7 +110,7 @@ export class FilterFieldset extends Fieldset {
 									}
 								}
 							},
-							options: Object.values(filters)
+							options: Object.entries(filters).map(([name, f]) => ({...f, name}))
 						});
 
 						const filterField = comp();

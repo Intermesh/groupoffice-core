@@ -24,7 +24,7 @@ export class VariableFilterDialog extends FormWindow {
 					name: "name",
 					valueField: "name",
 					textRenderer: (f: any) => f.title,
-					options: Object.values(this.entity.filters)
+					options: Object.entries(this.entity.filters).map(([name, f]) => ({...f, name}))
 				})
 			)
 		);
