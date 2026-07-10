@@ -9,6 +9,7 @@ export * from './form/index.js';
 export * from './picker/index.js';
 export * from './emailtemplate/index';
 export * from './pdftemplate/index';
+export * from './GroupCombo.js';
 
 export * from './EntityTypeTable.js';
 export * from './links';

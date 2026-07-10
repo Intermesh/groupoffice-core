@@ -1,16 +1,15 @@
 import {
-	AutocompleteEventMap,
-	BaseEntity,
 	ComboBox,
 	ComboBoxConfig,
-	ComboBoxDefaultRenderer, ComboBoxStoreConfig, ComboRenderer,
+	ComboBoxDefaultRenderer,
+	ComboBoxStoreConfig,
+	ComboRenderer,
 	createComponent,
-	t, TableConfig
+	t,
+	TableConfig
 } from "@intermesh/goui";
-import {JmapDataSource, jmapds} from "../jmap/index.js";
-import {Group, groupDS, Principal, principalDS, User} from "../auth/index.js";
-import {PrincipalCombo, PrincipalComboConfig} from "./PrincipalCombo";
-
+import {JmapDataSource} from "../jmap/index.js";
+import {Group, groupDS} from "../auth/index.js";
 
 
 export class GroupCombo extends ComboBox<JmapDataSource<Group>> {

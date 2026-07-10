@@ -7,6 +7,7 @@ import {VariableNumberFilter} from "./variabletypes/VariableNumberFilter.js";
 import {VariableDateFilter} from "./variabletypes/VariableDateFilter.js";
 import {VariableSelectFilter} from "./variabletypes/VariableSelectFilter.js";
 import {VariableLinkFilter} from "./variabletypes/VariableLinkFilter.js";
+import {VariableComponentFilter} from "./variabletypes/VariableComponentFilter.js";
 
 
 export interface VariableFilterGridEventMap extends ListEventMap {
@@ -54,16 +55,24 @@ export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap>
 							filterField = new VariableSelectFilter(filter);
 							break;
 						case "link":
-						case "go.links.FilterLinkEntityCombo": // backwards compatibility
 							filterField = new VariableLinkFilter(filter);
 							break;
+						default:
+
+							// type could be a Component class
+							if(typeof filter.type === "function") {
+								filterField = new VariableComponentFilter(filter);
+							} else {
+								console.error("No field!", filter.type)
+							}
+
 					}
 
 					if (filterField) {
-						filterField.valueField.on("setvalue", ({newValue}) => {
+						filterField.valueField.on("setvalue", ({newValue}:{newValue:any}) => {
 							const existingIndex = this.filterValues.findIndex(fv => fv.filter === filter);
 
-							if (filter.type == "link" || filter.type == "go.links.FilterLinkEntityCombo") {
+							if (filter.type == "link") {
 								if (newValue.length) {
 									(newValue as string[]).forEach((v) => {
 										const filterValue = {entity: v ?? ""};
