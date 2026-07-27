@@ -214,7 +214,8 @@ export abstract class FormWindow<EntityType extends BaseEntity = DefaultEntity, 
 
 		this.on("ready", () => {
 			this.sharePanel!.levels = entities.get(this.entityName).permissions;
-			this.sharePanel!.levels!.unshift({value: "",name: ""});
+			if(this.sharePanel!.levels![0].value != '')
+				this.sharePanel!.levels!.unshift({value: "",name: ""});
 			this.sharePanel!.setEntity(this.entityName, this.form.currentId);
 		})
 
