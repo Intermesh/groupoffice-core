@@ -715,3 +715,9 @@ export class FileCustomField extends AbstractCustomField {
 		})
 	}
 }
+
+export class AttachmentsCustomField extends AbstractCustomField {
+	createFormField(): Component | undefined {
+		return textfield({readOnly: true, value: "TODO"})
+	}
+}

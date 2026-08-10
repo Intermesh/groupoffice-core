@@ -2,7 +2,7 @@ import {EntityID, TableColumn} from "@intermesh/goui";
 import {JmapDataSource} from "../jmap/index.js";
 import {AclItemEntity, AclOwnerEntity} from "../auth/index.js";
 import {
-	AbstractCustomField, CheckboxCustomField,
+	AbstractCustomField, AttachmentsCustomField, CheckboxCustomField,
 	ContactCustomField,
 	DateCustomField,
 	DateTimeCustomField, FileCustomField, FunctionCustomField,
@@ -136,6 +136,7 @@ class CustomFields {
 		Text: TextCustomField,
 		Notes: NotesCustomField,
 		Template: TemplateCustomField,
+		Attachments: AttachmentsCustomField,
 
 		// Todo, these should be added by the modules using registerTableColumnCreator
 		Project: ProjectCustomField,
