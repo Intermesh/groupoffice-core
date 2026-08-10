@@ -1,10 +1,10 @@
-import {jmapds} from "../jmap/index.js";
+import {client, jmapds} from "../jmap/index.js";
 import {groupDS, principalDS} from "../auth/index.js";
 import {Field, SelectOption} from "./CustomFields.js";
 import {
 	AutocompleteChips,
 	autocompletechips, AutocompleteField,
-	boolcolumn,
+	boolcolumn, browser,
 	btn,
 	checkbox,
 	column,
@@ -12,7 +12,7 @@ import {
 	ComboBox,
 	comp,
 	Component,
-	Config, datasourcestore,
+	Config, containerfield, datasourcestore,
 	datecolumn,
 	datefield,
 	datetimecolumn,
@@ -21,8 +21,8 @@ import {
 	displaydatefield,
 	displayfield,
 	Field as FormField,
-	Format,
-	htmlfield,
+	Format, h4,
+	htmlfield, MapField, mapfield, Notifier,
 	numbercolumn,
 	numberfield,
 	p,
@@ -717,7 +717,75 @@ export class FileCustomField extends AbstractCustomField {
 }
 
 export class AttachmentsCustomField extends AbstractCustomField {
-	createFormField(): Component | undefined {
-		return textfield({readOnly: true, value: "TODO"})
+
+	createDetailField(): Component | undefined {
+		return mapfield({...this.getDetailFieldConfig(),
+
+			buildField: (v: any) => {
+
+				return containerfield({flex:'1 0 100%',cls: 'flow'},
+					btn({
+						icon: "description",
+						text: v.name,
+						flex:'1',
+						style:{textAlign:'left'},
+						handler() {
+							client.downloadBlobId(v.blobId, v.title).catch((error) => {
+								Notifier.error(error);
+							})
+						}
+					})
+				);
+			}
+		});
+	}
+
+	createFormField() {
+		const config = this.getFormFieldConfig();
+		const attsFld  = mapfield({...config,
+
+				buildField: (v: any) => {
+
+					return containerfield({flex:'1 0 100%',cls: 'flow'},
+						textfield({hidden:true,name:'name'}),
+						textfield({hidden:true,name:'blobId'}),
+						btn({
+							icon: "description",
+							text: v.name,
+							flex:'1',
+							style:{textAlign:'left'},
+							handler() {
+								client.downloadBlobId(v.blobId, v.title).catch((error) => {
+									Notifier.error(error);
+								})
+							}
+						}),
+
+						btn({icon: "delete", width:50, handler(btn) {btn.parent!.remove();}})
+					);
+				}
+			});
+
+		return comp({},
+			h4(config.label),
+			attsFld,
+			btn({
+				icon:'attach_file',
+				text: t("Attach file"),
+				handler: _ => this.attachFile(attsFld) }
+			)
+		)
+	}
+
+	private attachFile(attsFld: MapField) {
+		browser.pickLocalFiles(true).then(files => {
+			attsFld.mask();
+			client.uploadMultiple(files).then(blobs => {
+				for(const r of blobs)
+					attsFld.add({blobId:r.id, name: r.name}, );
+			}).finally(() => {
+				attsFld.unmask();
+			});
+		});
 	}
 }
