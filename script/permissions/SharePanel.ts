@@ -1,5 +1,5 @@
 import {
-	avatar,
+	avatar, btn,
 	column,
 	comp,
 	Config,
@@ -13,14 +13,57 @@ import {
 	radio,
 	searchbtn,
 	select,
-	small,
-	t,
+	small, Store,
+	t, table,
 	Table,
-	tbar
+	tbar,
+	Window
 } from "@intermesh/goui";
 import {client, jmapds} from "../jmap/index.js";
 import {entities} from "../Entities.js";
 
+class GroupWindow extends Window {
+
+	private readonly tbl: Table;
+	constructor() {
+		super();
+		this.resizable = true;
+		this.collapsible = false;
+		this.closable = true;
+
+		this.tbl = table({
+			headers: false,
+			store: new Store(),
+			columns: [
+				column({
+					id: "id",
+					width: 60,
+					resizable: false,
+					renderer: (_v, record) => avatar({
+						displayName: record.name,
+						backgroundImage: record.avatarId ? client.downloadUrl(record.avatarId) : undefined
+					})
+				}),
+				column({
+					id: "name",
+					resizable: false,
+				})
+			]
+		});
+
+		this.items.add(comp({cls: "bg-lowest scroll"}, this.tbl));
+	}
+
+	async load(r: { name: string; users: string[]; }) {
+		this.title = r.name;
+		if (r.users!.length > 0) {
+			jmapds("Principal").get(r.users).then((data) => {
+				this.tbl.store.loadData(data.list, false);
+			});
+		}
+	}
+
+}
 
 class GroupTable extends Table<DataSourceStore> {
 	value: any = null;
@@ -106,6 +149,20 @@ class GroupTable extends Table<DataSourceStore> {
 									}
 									this.value[record.id] = newValue ? newValue : null;
 								}
+							}
+						});
+					}
+				}),
+
+				column({
+					width: 36,
+					id: "more",
+					renderer: (_v, record) => {
+						return btn({
+							icon: "group",
+							handler: () => {
+								const w = new GroupWindow();
+								w.load(record).then(() =>w.show());
 							}
 						});
 					}
