@@ -18,7 +18,7 @@ export class VariableComponentFilter extends VariableFilterType {
 		} else {
 			const cmp = new filter.type as Field;
 			cmp.on("change", ({newValue}) => {
-				this.valueField.value = newValue;
+				this.valueField.value = this.valueField.value = {[filter.name]: newValue};
 			})
 			this.items.add(cmp);
 		}

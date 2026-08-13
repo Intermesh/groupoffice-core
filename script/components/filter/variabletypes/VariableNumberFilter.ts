@@ -45,7 +45,7 @@ export class VariableNumberFilter extends VariableFilterType {
 				label: t(filter.title),
 				listeners: {
 					change: ({newValue}) => {
-						this.valueField.value = `${this.operatorSelect.value} ${newValue}`;
+						this.valueField.value = this.valueField.value = {[filter.name]: `${this.operatorSelect.value} ${newValue}`};
 					}
 				}
 			})

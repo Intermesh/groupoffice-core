@@ -12,7 +12,7 @@ export class VariableSelectFilter extends VariableFilterType {
 				textRenderer: (r: any) => r.title,
 				listeners: {
 					setvalue: ({newValue}) => {
-						this.valueField.value = newValue
+						this.valueField.value = {[filter.name]: newValue};
 					}
 				}
 			})

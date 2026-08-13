@@ -10,7 +10,7 @@ export class VariableDateFilter extends VariableFilterType {
 				label: t(filter.title),
 				listeners: {
 					change: ({newValue}) => {
-						this.valueField.value = newValue;
+						this.valueField.value = {[filter.name]: newValue};
 					}
 				}
 			})

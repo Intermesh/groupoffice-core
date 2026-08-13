@@ -101,23 +101,23 @@ export class FilterPanel extends Component<FilterPanelEventMap> {
 			}
 		};
 
-		this.variableFilterGrid.on("variablefiltersetvalue", ({filter, value}) => {
-			const newFilter: Filter = {
-				operator: "AND",
-				conditions: []
-			};
-
-			this.variableFilterGrid.filterValues.forEach((fv) => {
-				newFilter.conditions!.push({[fv.filter.name]: fv.value});
-			});
+		this.variableFilterGrid.on("variablefiltersetvalue", ({value}) => {
+			// const newFilter = value.map((v:any) => {
+			// 	return {
+			// 		operator: "AND",
+			// 		conditions: [v]
+			// 	}
+			// });
 
 			if (this.filterStore) {
-				this.filterStore.setFilter("customfilters", newFilter);
+				this.filterStore.setFilter("customfilters", {
+					operator: "AND", conditions: value
+				});
 
 				void this.filterStore.load();
 			}
 
-			this.fire("variablefilterchange", ({filter: filter}));
+			this.fire("variablefilterchange", ({filter: value}));
 		});
 	}
 }
