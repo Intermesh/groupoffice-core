@@ -1,14 +1,13 @@
 import {AbstractModuleSystemSettingsPanel} from "./AbstractModuleSystemSettingsPanel.js";
-import {btn, colorfield, Component, comp, fieldset, t, p} from "@intermesh/goui";
+import {colorfield, comp, Component, fieldset, t} from "@intermesh/goui";
 import {systemSettingsPanels} from "./SystemSettingsWindow.js";
-import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {imagefield} from "../../components/index.js";
 
 class Appearance extends AbstractModuleSystemSettingsPanel {
 
 	constructor() {
 		super("appearance", t("Appearance"),"core", "core", "palette");
-		this.cls = "hbox";
+		this.cls = "hbox fit scroll";
 
 		this.settingsForm.items.add(
 			// Light theme fieldset

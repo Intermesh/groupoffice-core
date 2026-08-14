@@ -7,7 +7,7 @@ class SystemSettingsTools extends AbstractModuleSystemSettingsPanel {
 	constructor() {
 		super("tools", t("Tools"), "core", "core", "tools_wrench");
 
-		this.cls = "fit vbox";
+		this.cls = "fit vbox scroll";
 
 		const buttons = [
 			this.buildButton("/install/gotest.php", t("System check")),
