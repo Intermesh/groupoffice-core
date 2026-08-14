@@ -1,6 +1,6 @@
 import {
 	avatar,
-	btn,
+	btn, Button,
 	cardmenu,
 	cards,
 	comp,
@@ -260,7 +260,15 @@ class Main extends Component<MainPanelEventMap> {
 		const menuItem = comp({
 				cls: "pinned-item sortable",
 				itemId: m.id,
-				draggable: true
+				draggable: true,
+				listeners: {
+					render: e => {
+						e.target.el.addEventListener("contextmenu", (ev) => {
+							ev.preventDefault();
+							(e.target.findChild("menu-button") as Button).menu!.showAt(ev)
+						})
+					}
+				}
 			},
 			btn({
 
@@ -271,7 +279,8 @@ class Main extends Component<MainPanelEventMap> {
 			}),
 
 			btn({
-				cls: "menu small",
+				itemId: "menu-button",
+				cls: "menu small for-medium-device",
 				icon: "more_vert",
 				menu: menu({
 						listeners: {

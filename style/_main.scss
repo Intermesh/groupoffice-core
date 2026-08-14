@@ -97,11 +97,14 @@ body#goui {
 				z-index: 1;
 			}
 
-			&:hover {
-				.menu {
-					display: block;
+			@media screen {
+				&.active {
+					.menu.for-medium-device {
+						display: block;
+					}
 				}
 			}
+
 		}
 
 		button.goui-button {
