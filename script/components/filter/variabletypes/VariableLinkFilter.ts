@@ -31,14 +31,17 @@ export class VariableLinkFilter extends VariableFilterType {
 						})
 					]
 				}),
-				pickerRecordToValue: (_field, record) => record.id,
+				pickerRecordToValue: (_field, record) => record,
 				chipRenderer: async (chip, value) => {
-					const option = options.find(o => o.id === value);
+					const option = options.find(o => o.id === value.id);
 					chip.text = option?.name ?? value;
 				},
 				listeners: {
 					setvalue: ({newValue}) => {
-						this.valueField.value = newValue;
+						this.valueField.value = {
+							conditions: newValue.map((v:any) => { return {link: {entity:v.entity, filter:v.filter}}; }),
+							operator: "OR"
+						};
 					}
 				}
 			})

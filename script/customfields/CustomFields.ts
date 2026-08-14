@@ -151,7 +151,7 @@ class CustomFields {
 			const type = this.getType(field.type);
 			const def = type.getFilter(field);
 			if(def && field.databaseName) {
-				defs[field.databaseName.toLowerCase()] = def;
+				defs[field.databaseName.toLowerCase()] = def as EntityFilter;
 			}
 
 		});

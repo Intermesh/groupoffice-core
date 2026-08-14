@@ -9,7 +9,8 @@ export class VariableComponentFilter extends VariableFilterType {
 
 		if (typeof filter.type === "string") {
 			// backwards compat for extjs filters
-			const cmp = extjswrapper({comp: new (eval(filter.type) as any)});
+			const cls = window.eval(filter.type) as any;
+			const cmp = extjswrapper({comp: new cls});
 			cmp.extJSComp.on("change", (c:any, newValue:any) => {
 				this.valueField.value = newValue;
 			})
@@ -17,7 +18,7 @@ export class VariableComponentFilter extends VariableFilterType {
 		} else {
 			const cmp = new filter.type as Field;
 			cmp.on("change", ({newValue}) => {
-				this.valueField.value = newValue;
+				this.valueField.value = this.valueField.value = {[filter.name]: newValue};
 			})
 			this.items.add(cmp);
 		}

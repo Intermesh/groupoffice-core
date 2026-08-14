@@ -1,4 +1,16 @@
-import {btn, column, datasourcestore, Filter, ListEventMap, menu, menucolumn, Store, t, Table} from "@intermesh/goui";
+import {
+	btn,
+	column,
+	datasourcestore, EntityID,
+	Filter,
+	ListEventMap,
+	menu,
+	menucolumn,
+	store,
+	Store,
+	t,
+	Table
+} from "@intermesh/goui";
 import {EntityFilterDS} from "./FilterGrid.js";
 import {VariableFilterDialog} from "./VariableFilterDialog.js";
 import {entities, Entity} from "../../Entities.js";
@@ -12,12 +24,12 @@ import {EntityFilter} from "../../Modules.js";
 
 
 export interface VariableFilterGridEventMap extends ListEventMap {
-	variablefiltersetvalue: { filter: EntityFilter, value?: string | { entity: string } }
+	variablefiltersetvalue: {value:any }
 }
 
 export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap> {
 	private readonly entity: Entity;
-	public filterValues: { filter: EntityFilter, value?: string | { entity: string } }[] = [];
+	public filterValues: Record<EntityID, any> = {};
 
 
 	constructor(entityName: string) {
@@ -67,39 +79,25 @@ export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap>
 
 					if (filterField) {
 						filterField.valueField.on("setvalue", ({newValue}:{newValue:any}) => {
-							const existingIndex = this.filterValues.findIndex(fv => fv.filter === filter);
+							// const existingIndex = this.filterValues.findIndex(fv => fv.filter === filter);
+							//
+							// if (filter.type == "link") {
+							// 	if (newValue.length) {
+							// 		newValue = {operator: "OR", conditions: newValue.map((v:any) => { return {link: v}; })}
+							// 	} else {
+							// 		newValue = undefined;
+							// 	}
+							// }
+							//
+							// if (existingIndex !== -1) {
+							// 	this.filterValues[existingIndex].value = newValue;
+							// } else {
+							// 	this.filterValues.push({filter: filter, value: newValue});
+							// }
 
-							if (filter.type == "link") {
-								if (newValue.length) {
-									(newValue as string[]).forEach((v) => {
-										const filterValue = {entity: v ?? ""};
+							this.filterValues[record.id] = newValue;
 
-										if (existingIndex !== -1) {
-											this.filterValues[existingIndex].value = filterValue;
-										} else {
-											this.filterValues.push({filter: filter, value: filterValue});
-										}
-
-										this.fire("variablefiltersetvalue", ({filter: filter, value: filterValue}));
-									});
-								} else {
-									if (existingIndex !== -1) {
-										this.filterValues[existingIndex].value = undefined;
-									} else {
-										this.filterValues.push({filter: filter, value: undefined});
-									}
-
-									this.fire("variablefiltersetvalue", ({filter: filter, value: undefined}));
-								}
-							} else {
-								if (existingIndex !== -1) {
-									this.filterValues[existingIndex].value = newValue;
-								} else {
-									this.filterValues.push({filter: filter, value: newValue});
-								}
-
-								this.fire("variablefiltersetvalue", ({filter: filter, value: newValue}));
-							}
+							this.fire("variablefiltersetvalue", ({value: Object.values(this.filterValues)}));
 
 						});
 					}
