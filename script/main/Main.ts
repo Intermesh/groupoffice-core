@@ -319,6 +319,10 @@ class Main extends Component<MainPanelEventMap> {
 							this.pinned = this.pinned.filter(p => p !== m.id)
 							this.saveState();
 							menuItem.remove();
+							const pnl = this.container.findChild(m.id);
+							if(pnl) {
+								pnl.remove();
+							}
 						})
 					})
 
