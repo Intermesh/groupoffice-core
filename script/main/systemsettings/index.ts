@@ -9,6 +9,7 @@ export * from './Authentication.js';
 export * from './AuthAllowGroupGrid.js';
 export * from './DefaultPermissionsPanel.js';
 export * from './CustomFields.js';
+export * from './Tools.js';
 
 export * from './users';
 export * from './groups';
