@@ -34,7 +34,7 @@ export abstract class CustomFieldType {
 	protected getDetailFieldConfig(field: CustomField) : Config<FormField> {
 		return {
 			name: field.databaseName,
-			hidden:true,
+			hidden: true,
 			label: field.name
 		};
 
