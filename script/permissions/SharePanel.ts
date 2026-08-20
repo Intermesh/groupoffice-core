@@ -30,6 +30,7 @@ class GroupWindow extends Window {
 		this.resizable = true;
 		this.collapsible = false;
 		this.closable = true;
+		this.minHeight = 640;
 
 		this.tbl = table({
 			headers: false,
