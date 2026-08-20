@@ -43,7 +43,7 @@ export class GroupModuleTable extends Table<DataSourceStore> {
 				header: t("Name")
 			}),
 			column({
-				id: "package",
+				id: "localizedPackage",
 				header: t("Package")
 			}),
 			column({
