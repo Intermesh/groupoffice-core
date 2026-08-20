@@ -1,4 +1,5 @@
 import {
+	ArrayUtil,
 	autocompletechips,
 	checkbox,
 	CheckboxColumn,
@@ -7,7 +8,6 @@ import {
 	column,
 	DataSourceStore,
 	datasourcestore,
-	EntityID,
 	store,
 	t,
 	table,
@@ -21,7 +21,20 @@ export class GroupModuleTable extends Table<DataSourceStore> {
 	constructor() {
 		const moduleStore = datasourcestore({
 			dataSource: moduleDS,
-			sort: [{property: "enabled"}]
+			onBeforeLoad: records => {
+
+				records = ArrayUtil.multiSort(records, [{
+					property: "title"
+				}])
+
+				records = records.sort((a, b) => {
+					const groupKey = this.groupId ?? "null";
+					const checkedA = (a.permissions && a.permissions[groupKey]) ? 1 : 0, checkedB = (b.permissions && b.permissions[groupKey]) ? 1 : 0;
+
+					return checkedB - checkedA;
+				})
+				return records;
+			}
 		});
 
 		const columns = [
@@ -61,7 +74,7 @@ export class GroupModuleTable extends Table<DataSourceStore> {
 							store: store({
 								data: rightKeys.map(name => ({
 									id: name,
-									name: t(name)
+									name: t(name, record.package, record.name)
 								}))
 							}),
 							columns: [
@@ -71,9 +84,9 @@ export class GroupModuleTable extends Table<DataSourceStore> {
 							rowSelectionConfig: {multiSelect: true}
 						}),
 						value: rightKeys.filter(name => !!entry.rights[name]),
-						chipRenderer: async (chip, value) => {
+						chipRenderer: (chip, value) => {
 							chip.text = t(value, record.package, record.name);
-						}
+						},
 					});
 
 					field.on("change", async ({newValue}) => {
