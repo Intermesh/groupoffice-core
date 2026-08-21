@@ -34,9 +34,6 @@ userSettingsPanels.add(class VisibleTo extends AbstractSettingsPanel {
 
 	async load(user: User): Promise<any> {
 		this.sharePanel.setEntity("Group", user.personalGroup.id);
-		if(!this.hidden) {
-			this.sharePanel.load();
-		}
 
 		return super.load(user);
 	}

@@ -1,5 +1,5 @@
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel";
-import {btn, checkbox, datasourceform, fieldset, Notifier, t} from "@intermesh/goui";
+import {checkbox, datasourceform, fieldset, t} from "@intermesh/goui";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {userDS} from "../../auth";
 

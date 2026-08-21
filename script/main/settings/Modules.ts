@@ -13,7 +13,11 @@ class Modules extends AbstractSettingsPanel {
 	}
 
 	async load(user: User): Promise<any> {
-		return Promise.all(this.findChildrenByType(AppSettingsPanel).map(p => p.load(user)));
+		return Promise.all(this.findChildrenByType(AppSettingsPanel).map(p => {
+			return p.load(user).catch(e => {
+				console.error("Load error in module panel: ", p, e);
+			});
+		}));
 	}
 
 	async save(): Promise<any> {

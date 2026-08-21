@@ -1,17 +1,5 @@
-import {
-	avatar, browserStoreConnection, btn,
-	column,
-	datasourcestore,
-	DataSourceStore,
-	datetimecolumn, menu, menucolumn,
-	numbercolumn, store,
-	t,
-	Table, Window
-} from "@intermesh/goui";
-import {Group, groupDS, Principal, principalDS, User, userDS} from "../../../auth/index.js";
-import {client, img} from "../../../jmap/index.js";
-import {UserSettingsWindow} from "../../settings/index.js";
-import {customFields} from "../../../customfields/index.js";
+import {btn, column, datasourcestore, DataSourceStore, menu, menucolumn, t, Table} from "@intermesh/goui";
+import {Group, groupDS, Principal, principalDS} from "../../../auth/index.js";
 import {GroupDialog} from "./GroupDialog.js";
 
 export class GroupTable extends Table<DataSourceStore> {
@@ -51,7 +39,7 @@ export class GroupTable extends Table<DataSourceStore> {
 							memberStr += t(" and {count} more").replace('{count}', more);
 						}
 
-						return `<h3>${name.htmlEncode()}</h3> <h4>${memberStr}</h4>`
+						return `<h3>${name.htmlEncode()}</h3> <h4>${memberStr.htmlEncode()}</h4>`
 					},
 					width: 200
 				}),

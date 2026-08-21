@@ -1,4 +1,4 @@
-import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window,router} from "@intermesh/goui";
+import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window, router, i} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
@@ -38,7 +38,7 @@ export class UserSettingsWindow extends Window {
 					width: 300
 				}),
 				comp({flex:1, cls: "vbox"},
-					this.cards = cards({flex:1},
+					this.cards = cards({flex:1, activeItem: -1},
 						...pnls
 					),
 					tbar({cls : "border-top"},
@@ -59,15 +59,19 @@ export class UserSettingsWindow extends Window {
 			)
 		)
 
-		if(selectedItemId) {
-			const active = this.cards.findItem(selectedItemId)
-			if(active) {
-				this.cards.activeItem = active;
-			}
-		}
 
-		this.on("render", () => {
-			void this.load(user);
+
+		this.on("render", async () => {
+
+			await this.load(user);
+console.warn(selectedItemId);
+			if(selectedItemId) {
+
+				const active = this.cards.findItem(selectedItemId)
+				if(active) {
+					this.cards.activeItem = active;
+				}
+			}
 		})
 	}
 
@@ -87,8 +91,16 @@ export class UserSettingsWindow extends Window {
 
 	public async load(user:User) {
 		try {
+
 			this.mask();
-			return Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.load(user)))
+			return Promise.all(
+				this.findChildrenByType(AbstractSettingsPanel).map((panel) => {
+					return panel.load(user).catch(e=> {
+						console.error("Load error in ", panel, e);
+					})
+				}))
+		} catch(e) {
+			Window.error(e);
 		} finally {
 			this.unmask();
 		}
