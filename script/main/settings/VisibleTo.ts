@@ -11,12 +11,15 @@ userSettingsPanels.add(class VisibleTo extends AbstractSettingsPanel {
 		super("visibleto", t("Visible to"), "visibility");
 		const rights = modules.get("core", "core")!.userRights;
 
+		this.cls = "fit";
 		this.items.add(
-			this.form = datasourceform({dataSource: userDS},
+			this.form = datasourceform({dataSource: userDS, cls: "fit"},
 				containerfield({
+					cls: "fit",
 					name: "personalGroup"
 				},
 					this.sharePanel = sharepanel({
+						cls: "fit",
 						name:'acl',
 						levels:[{value: "",name: ""},	{value: 10,name: t("Yes")}],
 						disabled: !rights.mayChangeUsers
