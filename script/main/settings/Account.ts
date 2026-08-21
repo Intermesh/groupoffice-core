@@ -31,7 +31,7 @@ export class Account extends AbstractSettingsPanel {
 		const rights = core.userRights,
 			settings = core.settings;
 
-		this.items.add(this.form = datasourceform({dataSource: userDS},
+		this.items.add(this.form = datasourceform({dataSource: userDS, width: 700},
 			fieldset({},
 				comp({ width: 200},
 					imagefield({name: "avatarId"}),
@@ -47,28 +47,19 @@ export class Account extends AbstractSettingsPanel {
 					}),
 				)
 			),
-			comp({cls:'flow'},
-				fieldset({width: 320,legend: t('Disk space'), hidden: !rights.mayChangeUsers},
-					numberfield({
-						name:'disk_quota', label: t('Disk quota'),
-						suffix:'MB',
-						decimals:0,
-						hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
-					numberfield({name:'disk_usage',decimals:0, label: t('Space used'),suffix:'b', readOnly:true})
-				),
-				fieldset({flex:1,legend: t('Password')},
+
+				fieldset({legend: t('Password')},
 					passwordfield({
 						autocomplete: "new-password",
 						minLength: settings.minPasswordLength,
-						required: true,
-
+						required: false
 					})
 						.on("generatepassword", ({target, password}) => {
 							(target.nextSibling() as TextField).value = password;
 						}),
 					textfield({
 						label: t("Confirm password"),
-						required: true,
+						required: false,
 						type: "password",
 						autocomplete: "new-password",
 						listeners: {
@@ -82,8 +73,20 @@ export class Account extends AbstractSettingsPanel {
 						}
 					}),
 					checkbox({name: "forcePasswordChange", label: t("Force password change"),hidden: !rights.mayChangeUsers}),
-				)
+				),
+
+			fieldset({
+					legend: t('Disk space'),
+					hidden: !rights.mayChangeUsers
+				},
+				numberfield({
+					name:'disk_quota', label: t('Disk quota'),
+					suffix:'MB',
+					decimals:0,
+					hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
+				numberfield({name:'disk_usage',decimals:0, label: t('Space used'),suffix:'b', readOnly:true})
 			),
+
 			fieldset({legend: t("Authorized clients")},
 				mapfield({name:'clients', buildField: record =>
 						containerfield(({cls:'group'}),
