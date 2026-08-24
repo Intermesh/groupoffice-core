@@ -21,20 +21,23 @@ import {
 } from "@intermesh/goui";
 import {client, jmapds} from "../jmap/index.js";
 import {entities} from "../Entities.js";
+import {Group, principalDS} from "../auth/index.js";
 
 class GroupWindow extends Window {
 
-	private readonly tbl: Table;
+	private readonly tbl;
 	constructor() {
 		super();
 		this.resizable = true;
 		this.collapsible = false;
 		this.closable = true;
-		this.minHeight = 640;
+		this.height = 640;
 
 		this.tbl = table({
+			fitParent: true,
 			headers: false,
-			store: new Store(),
+			store: datasourcestore({dataSource: principalDS}),
+			scrollLoad: true,
 			columns: [
 				column({
 					id: "id",
@@ -52,16 +55,14 @@ class GroupWindow extends Window {
 			]
 		});
 
-		this.items.add(comp({cls: "bg-lowest scroll"}, this.tbl));
+		this.items.add(comp({cls: "bg-lowest fit scroll"}, this.tbl));
 	}
 
-	async load(r: { name: string; users: string[]; }) {
-		this.title = r.name;
-		if (r.users!.length > 0) {
-			jmapds("Principal").get(r.users).then((data) => {
-				this.tbl.store.loadData(data.list, false);
-			});
-		}
+	async load(r: Group) {
+		this.title = t("Members") + ": " + r.name;
+
+		this.tbl.store.setFilter("group", {groupid: r.id})
+		return this.tbl.store.load();
 	}
 
 }
@@ -163,7 +164,8 @@ class GroupTable extends Table<DataSourceStore> {
 							icon: "group",
 							handler: () => {
 								const w = new GroupWindow();
-								w.load(record).then(() =>w.show());
+								void w.load(record);
+								w.show();
 							}
 						});
 					}
