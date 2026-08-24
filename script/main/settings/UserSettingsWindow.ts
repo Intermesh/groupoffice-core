@@ -1,4 +1,17 @@
-import {btn, CardContainer, cardmenu, cards, comp, Component, t, tbar, Window, router, i} from "@intermesh/goui";
+import {
+	btn,
+	CardContainer,
+	cardmenu,
+	cards,
+	comp,
+	Component,
+	t,
+	tbar,
+	Window,
+	router,
+	i,
+	ArrayUtil
+} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
@@ -27,7 +40,6 @@ export class UserSettingsWindow extends Window {
 			})
 			pnls.push(panel);
 		}
-
 
 		this.items.add(
 
@@ -59,14 +71,11 @@ export class UserSettingsWindow extends Window {
 			)
 		)
 
-
-
 		this.on("render", async () => {
 
 			await this.load(user);
-console.warn(selectedItemId);
-			if(selectedItemId) {
 
+			if(selectedItemId) {
 				const active = this.cards.findItem(selectedItemId)
 				if(active) {
 					this.cards.activeItem = active;
@@ -99,10 +108,14 @@ console.warn(selectedItemId);
 						console.error("Load error in ", panel, e);
 					})
 				}))
+
 		} catch(e) {
 			Window.error(e);
 		} finally {
 			this.unmask();
+			if(this.cards.activeItem === -1) {
+				this.cards.activeItem = 0;
+			}
 		}
 	}
 

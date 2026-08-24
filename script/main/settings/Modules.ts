@@ -1,4 +1,4 @@
-import {Panel, t} from "@intermesh/goui";
+import {ArrayUtil, Panel, t} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {User} from "../../auth/index.js";
@@ -9,7 +9,7 @@ class Modules extends AbstractSettingsPanel {
 
 		this.cls = "fit scroll";
 
-		this.items.add(...moduleSettings.getPanels().map(p => new p))
+		this.items.add(...ArrayUtil.multiSort(moduleSettings.getPanels().map(p => new p), [{property: "title"}]))
 	}
 
 	async load(user: User): Promise<any> {
