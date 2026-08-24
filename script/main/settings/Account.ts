@@ -18,7 +18,7 @@ import {
 	textfield
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
-import {userSettingsPanels} from "./UserSettingsWindow.js";
+import {userSettingsPanels, UserSettingsWindow} from "./UserSettingsWindow.js";
 import {imagefield} from "../../components";
 import {User, userDS} from "../../auth";
 import {modules} from "../../Modules";
@@ -51,6 +51,9 @@ export class Account extends AbstractSettingsPanel {
 			),
 
 			this.passwordFieldSet = fieldset({legend: t('Password')},
+				hiddenfield({
+					name: "currentPassword"
+				}),
 				passwordfield({
 					autocomplete: "new-password",
 					minLength: settings.minPasswordLength,
@@ -132,6 +135,16 @@ export class Account extends AbstractSettingsPanel {
 				})
 			)
 		))
+	}
+
+	async save(): Promise<boolean> {
+
+		if (!modules.get("core", "core")!.userRights.mayChangeUsers) {
+			if (this.form!.findField('password')!.isModified()) {
+				this.form!.findField("currentPassword")!.value = await this.findAncestorByType(UserSettingsWindow)!.currentPasswordPrompt();
+			}
+		}
+		return super.save();
 	}
 
 	async load(user: User): Promise<any> {

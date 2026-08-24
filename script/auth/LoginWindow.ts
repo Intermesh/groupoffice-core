@@ -205,8 +205,6 @@ export class LoginWindow extends Window<LoginEventMap> {
 							otpauthenticator: <{ code: string }>form.value
 						}
 					}).then(response => {
-						console.log(response);
-
 						switch (response.status) {
 							case 201:
 								return this.onLoginSuccess(response);

@@ -19,6 +19,28 @@ import {client} from "../../jmap/index.js";
 export class UserSettingsWindow extends Window {
 
 	private cards: CardContainer;
+
+	private _currentPasswordPrompt : Promise<string> | undefined;
+
+	public currentPasswordPrompt() : Promise<string> {
+		if(this._currentPasswordPrompt) {
+			return this._currentPasswordPrompt;
+		}
+		this._currentPasswordPrompt = Window.prompt({
+			fieldType: "password",
+			inputLabel: t("Current passwprd"),
+			title: t("Enter password"),
+			text: t("Your current password is required to save these changes")
+		}).then(v => {
+			if(v) {
+				return v;
+			} else {
+				return this.currentPasswordPrompt();
+			}
+		})
+
+		return this._currentPasswordPrompt;
+	}
 	constructor(selectedItemId:string|undefined, user:User = client.user) {
 		super();
 		this.title = t("My Account");
@@ -92,6 +114,7 @@ export class UserSettingsWindow extends Window {
 		try {
 			this.mask();
 			const p = await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
+			this._currentPasswordPrompt = undefined;
 			return p.filter(i => !i).length === 0;
 		} finally {
 			this.unmask();

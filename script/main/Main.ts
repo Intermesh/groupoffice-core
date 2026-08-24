@@ -229,7 +229,7 @@ class Main extends Component<MainPanelEventMap> {
 			if(this.panelConfigs[panelId]) {
 				this.addPanelMenuItem(this.panelConfigs[panelId]);
 				if(first) {
-					router.goto(panelId);
+					this.openPanel(panelId);
 					first = false;
 				}
 			}
