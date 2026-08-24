@@ -5,12 +5,12 @@ import {
 	containerfield,
 	datasourceform,
 	DateTime,
-	displayfield,
+	displayfield, Fieldset,
 	fieldset,
 	hiddenfield,
 	MapField,
 	mapfield,
-	numberfield,
+	numberfield, p,
 	passwordfield,
 	selectfield,
 	t,
@@ -20,11 +20,13 @@ import {
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {imagefield} from "../../components";
-import {userDS} from "../../auth";
+import {User, userDS} from "../../auth";
 import {modules} from "../../Modules";
 import {client} from "../../jmap";
 
 export class Account extends AbstractSettingsPanel {
+	private passwordFieldSet;
+	private convertToLocalFieldset;
 	constructor() {
 		super("account", t("Account"), "account_box");
 		const core = modules.get("core", "core")!;
@@ -48,31 +50,48 @@ export class Account extends AbstractSettingsPanel {
 				)
 			),
 
-				fieldset({legend: t('Password')},
-					passwordfield({
-						autocomplete: "new-password",
-						minLength: settings.minPasswordLength,
-						required: false
-					})
-						.on("generatepassword", ({target, password}) => {
-							(target.nextSibling() as TextField).value = password;
-						}),
-					textfield({
-						label: t("Confirm password"),
-						required: false,
-						type: "password",
-						autocomplete: "new-password",
-						listeners: {
-							validate: ({target}) => {
-								const passwordFld = target.previousSibling() as TextField;
+			this.passwordFieldSet = fieldset({legend: t('Password')},
+				passwordfield({
+					autocomplete: "new-password",
+					minLength: settings.minPasswordLength,
+					required: false,
+					name: "password"
+				})
+					.on("generatepassword", ({target, password}) => {
+						(target.nextSibling() as TextField).value = password;
+					}),
+				textfield({
+					itemId: "confirmPassword",
+					label: t("Confirm password"),
+					required: false,
+					type: "password",
+					autocomplete: "new-password",
+					listeners: {
+						validate: ({target}) => {
+							const passwordFld = target.previousSibling() as TextField;
 
-								if(target.value != passwordFld.value) {
-									target.setInvalid("The passwords don't match");
-								}
+							if(target.value != passwordFld.value) {
+								target.setInvalid("The passwords don't match");
 							}
 						}
-					}),
-					checkbox({name: "forcePasswordChange", label: t("Force password change"),hidden: !rights.mayChangeUsers}),
+					}
+				}),
+				checkbox({name: "forcePasswordChange", label: t("Force password change"),hidden: !rights.mayChangeUsers}),
+			),
+
+			this.convertToLocalFieldset = fieldset({legend: t('Password')},
+					p(t("This user doesn't have a local password because it's authenticated using an external provider. Click the button below to set a password and convert it to a local user. The domain will be stripped off the username")),
+					btn({
+						text: t("Convert to local user"),
+						handler: button => {
+							this.togglePassword(true);
+
+							const usernameField = this.form!.findField("username") as TextField;
+							usernameField.value = usernameField.value.split("@")[0];
+							usernameField.focus();
+						}
+
+					})
 				),
 
 			fieldset({
@@ -113,6 +132,34 @@ export class Account extends AbstractSettingsPanel {
 				})
 			)
 		))
+	}
+
+	async load(user: User): Promise<any> {
+		const ret = super.load(user);
+
+		// Disable password fieldset if there's no password authentication method.
+		// User logged in via imap or ldap authenticator for example.
+		// If there are 0 authenticators we enable it too, so it's possible to set a password.
+		this.togglePassword(user.authenticators.length === 0 || user.authenticators.indexOf("password") > -1);
+
+		return ret;
+	}
+
+	private togglePassword(hasPassword: boolean) {
+
+		const fields = ['username', 'password', 'confirmPassword', 'email', 'recoveryEmail'];
+
+		fields.forEach(f => {
+			const field = this.form!.findField(f) as TextField
+			field.disabled = !hasPassword;
+		})
+
+		this.passwordFieldSet.hidden = !hasPassword;
+
+		if (modules.get("core", "core")!.userRights.mayChangeUsers) {
+			this.convertToLocalFieldset.hidden = hasPassword;
+
+		}
 	}
 }
 
