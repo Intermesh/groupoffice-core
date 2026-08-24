@@ -224,15 +224,18 @@ class Main extends Component<MainPanelEventMap> {
 			this.container
 		);
 
-
-		this.pinned.forEach(panelId => {
-		if(this.panelConfigs[panelId]) {
+		let first = true;
+		this.pinned.forEach((panelId, index) => {
+			if(this.panelConfigs[panelId]) {
 				this.addPanelMenuItem(this.panelConfigs[panelId]);
+				if(first) {
+					router.goto(panelId);
+					first = false;
+				}
 			}
 		})
 
 		this.menu.items.add(hr({itemId: "pinned-splitter", cls: "sortable"}));
-
 
 		this.setupRoutes();
 

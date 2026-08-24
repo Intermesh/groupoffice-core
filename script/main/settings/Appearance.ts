@@ -73,7 +73,7 @@ userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 				),
 
 				fieldset({legend: t('Global'), minWidth: 300, flex: 1},
-					select({name: 'start_module', label: t("Start in module"), listeners: {render: e => e.target.store!.load()}, store: datasourcestore({dataSource:moduleDS}), valueField: "name", textRenderer: record => record.title}),
+					// select({name: 'start_module', label: t("Start in module"), listeners: {render: e => e.target.store!.load()}, store: datasourcestore({dataSource:moduleDS}), valueField: "name", textRenderer: record => record.title}),
 					select({name: 'max_rows_list', label:t("Maximum items in list"), options: [
 							{text: '10', value: 10},
 							{text: '20', value: 20},
