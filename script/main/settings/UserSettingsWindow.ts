@@ -102,6 +102,11 @@ export class UserSettingsWindow extends Window {
 		try {
 
 			this.mask();
+
+			if(user.id != client.user.id) {
+				this.title = t("User") + ": " + user.displayName;
+			}
+
 			return Promise.all(
 				this.findChildrenByType(AbstractSettingsPanel).map((panel) => {
 					return panel.load(user).catch(e=> {
