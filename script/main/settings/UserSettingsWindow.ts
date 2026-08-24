@@ -28,7 +28,7 @@ export class UserSettingsWindow extends Window {
 		}
 		this._currentPasswordPrompt = Window.prompt({
 			fieldType: "password",
-			inputLabel: t("Current passwprd"),
+			inputLabel: t("Current password"),
 			title: t("Enter password"),
 			text: t("Your current password is required to save these changes")
 		}).then(v => {

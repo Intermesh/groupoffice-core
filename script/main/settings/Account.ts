@@ -62,6 +62,10 @@ export class Account extends AbstractSettingsPanel {
 				})
 					.on("generatepassword", ({target, password}) => {
 						(target.nextSibling() as TextField).value = password;
+						this.currentPasswordRequired = !modules.get("core", "core")!.userRights.mayChangeUsers || this.form?.currentId == client.user.id;
+					})
+					.on("change", () => {
+						this.currentPasswordRequired = !modules.get("core", "core")!.userRights.mayChangeUsers || this.form?.currentId == client.user.id;
 					}),
 				textfield({
 					itemId: "confirmPassword",
@@ -137,13 +141,14 @@ export class Account extends AbstractSettingsPanel {
 		))
 	}
 
+	public currentPasswordRequired = false;
+
 	async save(): Promise<boolean> {
 
-		if (!modules.get("core", "core")!.userRights.mayChangeUsers) {
-			if (this.form!.findField('password')!.isModified()) {
-				this.form!.findField("currentPassword")!.value = await this.findAncestorByType(UserSettingsWindow)!.currentPasswordPrompt();
-			}
+		if (this.currentPasswordRequired) {
+			this.form!.findField("currentPassword")!.value = await this.findAncestorByType(UserSettingsWindow)!.currentPasswordPrompt();
 		}
+
 		return super.save();
 	}
 
