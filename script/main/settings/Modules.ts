@@ -1,4 +1,4 @@
-import {ArrayUtil, Panel, t} from "@intermesh/goui";
+import {ArrayUtil, comp, Panel, t} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {User} from "../../auth/index.js";
@@ -9,7 +9,10 @@ class Modules extends AbstractSettingsPanel {
 
 		this.cls = "fit scroll";
 
-		this.items.add(...ArrayUtil.multiSort(moduleSettings.getPanels().map(p => new p), [{property: "title"}]))
+		this.items.add(
+			comp({cls: "user-settings-modules"},
+			...ArrayUtil.multiSort(moduleSettings.getPanels().map(p => new p), [{property: "title"}]))
+		)
 	}
 
 	async load(user: User): Promise<any> {
@@ -31,6 +34,7 @@ export class AppSettingsPanel extends Panel {
 		super();
 		this.baseCls = 'panel app-settings-panel';
 		this.collapsed = true;
+		// this.collapsible = false;
 	}
 
 	public async save() : Promise<any> {
