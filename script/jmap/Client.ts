@@ -502,7 +502,7 @@ export class Client extends Observable<ClientEventMap> {
 	 */
 	public upload(file: File): Promise<UploadResponse> {
 		return new Promise((resolve, reject) => {
-			const maxFileSize = this.session?.capabilities['maxSizeUpload'];
+			const maxFileSize = this.session?.capabilities['urn:ietf:params:jmap:core'].maxSizeUpload;
 			if(maxFileSize && file.size > maxFileSize) {
 				reject(new Error("Max size is too large"));
 				Notifier.notify({category:"status",variant:'error', title:file.name, text: t('File size exceeds the maximum of {max}.').replace('{max}', Format.fileSize(maxFileSize))})
