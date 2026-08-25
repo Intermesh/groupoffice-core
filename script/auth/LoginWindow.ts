@@ -396,7 +396,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 		if(!success) {
 			Notifier.error("Sorry, an unexpected error occurred");
 		} else {
-			Notifier.success(t("Welcome back, {name}!").replace('{name}', client.user.displayName));
+			//Notifier.success(t("Welcome back, {name}!").replace('{name}', client.user.displayName));
 			this.hide();
 			this.fire("login", {});
 		}

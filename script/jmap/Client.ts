@@ -20,6 +20,8 @@ import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
 import {entities} from "../Entities.js";
 import {LanguageField} from "../components/index.js";
+import {modules} from "../Modules.js";
+import {customFields} from "../customfields/index.js";
 
 
 export interface LoginData {
@@ -255,6 +257,11 @@ export class Client extends Observable<ClientEventMap> {
 			}
 		})
 
+		// Load custom fields and server modules
+		await Promise.all([
+			customFields.init(),
+			modules.init()
+		])
 
 		this.fire("authenticated", {session: this._session});
 
@@ -272,16 +279,6 @@ export class Client extends Observable<ClientEventMap> {
 		Format.currency = this._user.currency;
 		Format.thousandsSeparator = this._user.thousandsSeparator;
 		Format.decimalSeparator = this._user.decimalSeparator;
-	}
-
-	/**
-	 * This function is only used up to 6.8. In 6.9 authenticate() is called in mainlayout.js
-	 */
-	public fireAuth() {
-		// this.session = go.User.session;
-		// this._user = go.User;
-
-		this.fire("authenticated", {session: this._session});
 	}
 
 	/**

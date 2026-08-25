@@ -176,12 +176,6 @@ class Main extends Component<MainPanelEventMap> {
 		// Authenticate
 		await authManager.requireLogin();
 
-		// Load custom fields and server modules
-		await Promise.all([
-			customFields.init(),
-			modules.init()
-		])
-
 		main.initState();
 
 		this.notifier.load();
