@@ -4,7 +4,7 @@ import {
 	btn,
 	checkbox,
 	checkboxselectcolumn,
-	column, comp,
+	column, combobox, comp,
 	containerfield,
 	datasourceform,
 	fieldset,
@@ -19,6 +19,7 @@ import {moduleDS, modules} from "../../../Modules.js";
 import {dateformatfield, firstweekdayfield, timeformatfield, timezonefield} from "../../settings/index.js";
 import {groupchips} from "../../../components/GroupChips.js";
 import {main} from "../../Main.js";
+import {jmapds} from "../../../jmap/index.js";
 
 
 
@@ -136,7 +137,13 @@ export class UserDefaultsWindow extends Window {
 					groupchips({
 						name: "defaultGroups",
 						hint: t("Users will automatically be added to these groups", "users", "core"),
-					})
+					}),
+
+					...(modules.get("community","addressbook") ? [combobox({
+						label: t("User addressbook", "community", "addressbook"),
+						name: "userAddressBookId",
+						dataSource: jmapds("AddressBook")
+					})] : [])
 				),
 
 			),
