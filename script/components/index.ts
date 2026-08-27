@@ -15,3 +15,4 @@ export * from './EntityTypeTable.js';
 export * from './links';
 export * from './ExtJSWrapper.js';
 export * from './table/TableTitle.js';
+export * from './GroupChips.js';

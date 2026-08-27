@@ -1,18 +1,17 @@
 import {
 	browser,
 	btn,
-	checkbox, comp,
-	datasourceform,
-	datasourcestore,
+	checkbox, Config,
+	datasourceform, FieldConfig,
 	fieldset,
 	radio,
 	select,
+	SelectField,
 	t,
 	textfield
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
-import {moduleDS} from "../../Modules";
 import {userDS} from "../../auth";
 import {languagefield} from "../../components/index.js";
 
@@ -64,7 +63,7 @@ userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 						}
 					})
 				),
-				fieldset({legend: t('Formatting'), minWidth: 300, flex: 1},
+				fieldset({legend: t('Formatting'), width: 200},
 					textfield({name:'listSeparator', label: t('List separator')}),
 					textfield({name:'textSeparator', label: t('Text separator')}),
 					textfield({name:'thousandsSeparator', label: t('Thousand separator')}),
@@ -90,31 +89,43 @@ userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 						hint: t("When this is on and items are moved by dragging, confirmation is requested")}),
 				),
 				fieldset({legend: t("Regional"), minWidth: 300, flex: 1},
+					timezonefield(),
 					languagefield(),
-					select({name: 'timezone', label: t("Timezone"), options: Intl.supportedValuesOf('timeZone').map(tz => {return {value: tz, text: tz};})}),
-					select({name: 'dateFormat', label: t("Date format"), options: [
-							{value: 'd-m-Y', text: t("Day-Month-Year",'users','core')},
-							{value: 'm/d/Y', text: t("Month/Day/Year",'users','core')},
-							{value: 'd/m/Y', text: t("Day/Month/Year",'users','core')},
-							{value: 'd.m.Y', text: t("Day.Month.Year",'users','core')},
-							{value: 'Y-m-d', text: t("Year-Month-Day",'users','core')},
-							{value: 'Y.m.d', text: t("Year.Month.Day",'users','core')}
-						]}),
-
-					select({name: 'timeFormat', label: t("Time format"), options:[
-							{value: 'G:i', text: t('24 hour format','users','core')},
-							{value: 'g:i a', text: t('12 hour format','users','core')}
-						]}),
-
+					timeformatfield(),
 					checkbox({name: 'shortDateInList',label: t("Use short format for date and time in lists")}),
-
-					select({name: 'firstWeekday', label: t("First weekday"), options:[
-						{value: '0', text:  t('Sunday','users','core')},
-						{value: '1', text: t('Monday','users','core')}
-					] }),
+					firstweekdayfield(),
 					// select({name: 'holidayset',label: t("Holidays"), options:[]}), // GO.lang.holidaySets ? Deprecate in favour of new calendar holidays?
 				)
 			))
 
 	}
 });
+
+export function timezonefield(config?: FieldConfig<SelectField>) {
+	return select({name: 'timezone', label: t("Timezone"), options: Intl.supportedValuesOf('timeZone').map(tz => {return {value: tz, text: tz};}), ...config});
+}
+
+export function dateformatfield(config?: FieldConfig<SelectField>) {
+	return 	select({name: 'dateFormat', label: t("Date format"), options: [
+			{value: 'd-m-Y', text: t("Day-Month-Year",'users','core')},
+			{value: 'm/d/Y', text: t("Month/Day/Year",'users','core')},
+			{value: 'd/m/Y', text: t("Day/Month/Year",'users','core')},
+			{value: 'd.m.Y', text: t("Day.Month.Year",'users','core')},
+			{value: 'Y-m-d', text: t("Year-Month-Day",'users','core')},
+			{value: 'Y.m.d', text: t("Year.Month.Day",'users','core')}
+		], ...config});
+}
+
+export function timeformatfield(config?: FieldConfig<SelectField>) {
+	return 	select({name: 'timeFormat', label: t("Time format"), options:[
+			{value: 'G:i', text: t('24 hour format','users','core')},
+			{value: 'g:i a', text: t('12 hour format','users','core')}
+		], ...config});
+}
+
+export function firstweekdayfield(config?: FieldConfig<SelectField>) {
+	return 	select({name: 'firstWeekday', label: t("First weekday"), options:[
+			{value: '0', text:  t('Sunday','users','core')},
+			{value: '1', text: t('Monday','users','core')}
+		], ...config});
+}

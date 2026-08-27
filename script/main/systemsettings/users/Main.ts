@@ -1,8 +1,11 @@
-import {btn, checkbox, comp, mstbar, searchbtn, t, tbar} from "@intermesh/goui";
+import {btn, checkbox, comp, hr, menu, mstbar, searchbtn, t, tbar} from "@intermesh/goui";
 import {systemSettingsPanels} from "../SystemSettingsWindow.js";
 import {AbstractSystemSettingsPanel} from "../AbstractSystemSettingsPanel.js";
 import {UserTable} from "./UserTable.js";
 import {CreateUserDialog} from "./CreateUserDialog.js";
+import {Import} from "../../../util/importexport/Import.js";
+import {Export} from "../../../util/importexport/Export.js";
+import {UserDefaultsWindow} from "./UserDefaultsWindow.js";
 
 class Main extends AbstractSystemSettingsPanel {
 	private userTbl: UserTable;
@@ -52,6 +55,7 @@ class Main extends AbstractSystemSettingsPanel {
 					}
 				}),
 				btn({
+					icon: "add",
 					text: t("Add"),
 					cls: "primary filled",
 					handler: (button, ev) => {
@@ -59,6 +63,81 @@ class Main extends AbstractSystemSettingsPanel {
 						d.show();
 					}
 				}),
+
+				btn({
+					icon: "more_vert",
+					menu: menu({},
+						this.userTbl.getVisibleColumnButton(),
+						'-',
+						btn({
+							icon: "user_attributes",
+							text: t("User defaults"),
+							handler: () => {
+								const win = new UserDefaultsWindow();
+								win.show();
+							}
+						}),
+						'-',
+						btn({
+							icon: "cloud_upload",
+							text: t("Import"),
+							handler: () => {
+								Import.fromFile(
+									'User',
+									'.csv, .xlsx, .json',
+									{},
+									{}
+								);
+							}
+						}),
+						btn({
+							icon: "cloud_download",
+							text: t("Export"),
+							menu: menu({},
+								btn({
+									icon: "unknown_document",
+									text: t("Microsoft Excel"),
+									handler: () => {
+										Export.toFile(
+											'User',
+											this.userTbl.store.queryParams,
+											"xlsx");
+									}
+								}),
+								btn({
+									icon: "csv",
+									text: "Comma Seperated Values",
+									handler: () => {
+										Export.toFile(
+											'User',
+											this.userTbl.store.queryParams,
+											"csv");
+									}
+								}),
+								btn({
+									icon: "html",
+									text: t("Web page") + " (HTML)",
+									handler: () => {
+										Export.toFile(
+											'User',
+											this.userTbl.store.queryParams,
+											"html");
+									}
+								}),
+								btn({
+									icon: "text_snippet",
+									text: "JSON",
+									handler: () => {
+										Export.toFile(
+											'User',
+											this.userTbl.store.queryParams,
+											"json");
+									}
+								})
+							)
+						})
+						)
+				})
 
 				),
 			comp({
