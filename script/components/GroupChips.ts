@@ -28,9 +28,7 @@ export function groupchips(config?: Partial<AutoCompleteChipsConfig<Table<DataSo
 				multiSelect: true
 			},
 			columns: [
-				checkboxselectcolumn({
-					id: "id"
-				}),
+				checkboxselectcolumn(),
 				column({
 					header: t("Name"),
 					id: "name",
