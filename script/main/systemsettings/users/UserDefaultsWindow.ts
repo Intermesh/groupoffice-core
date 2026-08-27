@@ -90,6 +90,7 @@ export class UserDefaultsWindow extends Window {
 					}),
 
 					autocompletechips({
+						sortable: true,
 						name: "defaultPinnedTabs",
 						label: t("Pinned tabs"),
 						list: table({
