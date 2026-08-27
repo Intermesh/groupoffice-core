@@ -127,6 +127,12 @@ class Main extends Component<MainPanelEventMap> {
 
 		if(state.pinned) {
 			this.pinned = state.pinned;
+		} else {
+			const coreMod = modules.get("core", "core");
+
+			if(coreMod?.settings.defaultPinnedTabs) {
+				this.pinned = coreMod?.settings.defaultPinnedTabs;
+			}
 		}
 
 		console.log(this.pinned);
@@ -217,6 +223,9 @@ class Main extends Component<MainPanelEventMap> {
 			),
 			this.container
 		);
+
+
+
 
 		let first = true;
 		this.pinned.forEach((panelId, index) => {
