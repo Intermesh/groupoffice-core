@@ -1,18 +1,4 @@
-import {
-	ArrayUtil,
-	btn,
-	column,
-	comp,
-	containerfield,
-	p,
-	store,
-	Store,
-	t,
-	Table,
-	tbar,
-	win,
-	Window
-} from "@intermesh/goui";
+import {ArrayUtil, btn, column, comp, p, store, Store, t, Table, tbar, Window} from "@intermesh/goui";
 import {moduleDS, modules} from "../../Modules.js";
 import {SharePanel} from "../../permissions/index.js";
 import {entities, Entity} from "../../Entities.js";

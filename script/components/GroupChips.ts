@@ -1,17 +1,17 @@
 import {
-	autocompletechips, AutoCompleteChipsConfig,
-	AutoCompleteConfig,
+	autocompletechips,
+	AutoCompleteChipsConfig,
 	checkboxselectcolumn,
 	column,
 	DataSourceStore,
-	datasourcestore, sortable,
+	datasourcestore,
 	t,
 	Table,
 	table
 } from "@intermesh/goui";
 import {groupDS} from "../auth/index.js";
 
-export function groupchips(config?: Partial<AutoCompleteChipsConfig<Table<DataSourceStore>>>) {
+export function groupchips(config?: Partial<AutoCompleteChipsConfig<Table<DataSourceStore>> & {groupFilter: Record<string, any>}>) {
 	return autocompletechips({
 		name: "groups",
 		label: t("Groups"),
@@ -21,7 +21,7 @@ export function groupchips(config?: Partial<AutoCompleteChipsConfig<Table<DataSo
 			store: datasourcestore({
 				dataSource: groupDS,
 				filters:{
-					default: {hideUsers: true, excludeEveryone: true}
+					default: config?.groupFilter ?? {hideUsers: true, excludeEveryone: true}
 				}
 			}),
 			rowSelectionConfig: {

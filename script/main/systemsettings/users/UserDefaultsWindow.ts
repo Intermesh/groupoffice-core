@@ -1,12 +1,12 @@
 import {
-	ArrayUtil,
+	ArrayUtil, AutocompleteChips,
 	autocompletechips,
 	btn,
 	checkbox,
 	checkboxselectcolumn,
 	column, combobox, comp,
 	containerfield,
-	datasourceform,
+	datasourceform, EntityID,
 	fieldset,
 	store,
 	t,
@@ -20,19 +20,22 @@ import {dateformatfield, firstweekdayfield, timeformatfield, timezonefield} from
 import {groupchips} from "../../../components/GroupChips.js";
 import {main} from "../../Main.js";
 import {jmapds} from "../../../jmap/index.js";
+import {entities} from "../../../Entities.js";
+import {AclLevel} from "../../../auth/index.js";
 
 
 
 export class UserDefaultsWindow extends Window {
 	private form;
+	private visileToField!: AutocompleteChips;
 	constructor() {
 		super();
 
 		this.title = t("User defaults");
 		this.modal = true;
 
-		this.width = 800;
-		this.width = 700;
+		this.width = 1000;
+		this.height = 700;
 
 		this.resizable = true;
 
@@ -56,7 +59,20 @@ export class UserDefaultsWindow extends Window {
 			patchMode: true,
 			cls: "fit vbox",
 			listeners:{
-				save: () => {
+				save: async () => {
+
+					const groupEntity = entities.get("Group")!, oldGroups:Record<EntityID,number> = groupEntity.defaultAcl!, newGroups: Record<EntityID,number> = {};
+
+					(this.visileToField.value as EntityID[]).forEach((groupId:EntityID) => {
+							newGroups[groupId] = oldGroups[groupId] ?? AclLevel.READ;
+					})
+
+					const coreMod = modules.get("core", "core");
+					await moduleDS.update(coreMod!.id, {["entities/Group/defaultAcl"]: newGroups});
+
+					//Hackish but the defaultAcl does not update automatically unfortunately
+					groupEntity.defaultAcl = newGroups;
+
 					this.close()
 				}
 			}
@@ -78,7 +94,7 @@ export class UserDefaultsWindow extends Window {
 						firstweekdayfield({name: "defaultFirstWeekday"})
 					),
 
-					fieldset({legend: t('Formatting'), width: 200},
+					fieldset({legend: t('Formatting'), flex:1,minWidth:200},
 						textfield({name:'defaultListSeparator', label: t('List separator')}),
 						textfield({name:'defaultTextSeparator', label: t('Text separator')}),
 						textfield({name:'defaultThousandSeparator', label: t('Thousand separator')}),
@@ -88,64 +104,79 @@ export class UserDefaultsWindow extends Window {
 				),
 
 
-				fieldset({legend: t("Other")},
+				comp({cls: "flow"},
 
-					checkbox({
-						name: 'defaultConfirmOnMove',
-						label: t("Show confirmation dialog on move"),
-						hint: t("When this is on and items are moved by dragging, confirmation is requested")
-					}),
+					fieldset({legend: t("User interface"), minWidth: 400, flex: 1},
 
-					autocompletechips({
-						sortable: true,
-						name: "defaultPinnedTabs",
-						label: t("Pinned tabs"),
-						list: table({
-							fitParent: true,
-							headers: false,
-							store: store(),
-							rowSelectionConfig: {
-								multiSelect: true
-							},
-							columns: [
-								checkboxselectcolumn(),
-								column({
-									header: t("Title"),
-									id: "title"
-								})
-							]
+						checkbox({
+							name: 'defaultConfirmOnMove',
+							label: t("Show confirmation dialog on move"),
+							hint: t("When this is on and items are moved by dragging, confirmation is requested")
 						}),
-						chipRenderer: (chip, value) => {
-							const record = panels.find(p => p.id == value);
-							chip.text = record?.title ?? value;
-						},
-						pickerRecordToValue(field, record): any {
-							return record.id;
-						},
-						listeners: {
-							autocomplete: ({target, input}) => {
-								if(input) {
-									const filtered = panels.filter(r => r.title.toLowerCase().startsWith(input.toLowerCase()));
-									target.list.store.loadData(filtered, false);
-								} else {
-									target.list.store.loadData(panels, false);
+
+						autocompletechips({
+							sortable: true,
+							name: "defaultPinnedTabs",
+							label: t("Pinned tabs"),
+							list: table({
+								fitParent: true,
+								headers: false,
+								store: store(),
+								rowSelectionConfig: {
+									multiSelect: true
+								},
+								columns: [
+									checkboxselectcolumn(),
+									column({
+										header: t("Title"),
+										id: "title"
+									})
+								]
+							}),
+							chipRenderer: (chip, value) => {
+								const record = panels.find(p => p.id == value);
+								chip.text = record?.title ?? value;
+							},
+							pickerRecordToValue(field, record): any {
+								return record.id;
+							},
+							listeners: {
+								autocomplete: ({target, input}) => {
+									if(input) {
+										const filtered = panels.filter(r => r.title.toLowerCase().startsWith(input.toLowerCase()));
+										target.list.store.loadData(filtered, false);
+									} else {
+										target.list.store.loadData(panels, false);
+									}
 								}
-							}
-						},
-					}),
+							},
+						}),
+					),
 
-					groupchips({
-						name: "defaultGroups",
-						hint: t("Users will automatically be added to these groups", "users", "core"),
-					}),
+					fieldset({legend: t("Permissions"), minWidth: 400, flex: 1},
 
-					...(modules.get("community","addressbook") ? [combobox({
-						label: t("User addressbook", "community", "addressbook"),
-						name: "userAddressBookId",
-						dataSource: jmapds("AddressBook")
-					})] : [])
-				),
+						groupchips({
+							name: "defaultGroups",
+							hint: t("Users will automatically be added to these groups", "users", "core"),
+						}),
 
+						...(modules.get("community","addressbook") ? [combobox({
+							label: t("User addressbook", "community", "addressbook"),
+							name: "userAddressBookId",
+							dataSource: jmapds("AddressBook")
+						})] : []),
+
+
+						this.visileToField = groupchips({
+							groupFilter: {hideUsers: true},
+							name: undefined,
+							label: t("Visible to"),
+							value: Object.keys(entities.get("Group")!.defaultAcl!),
+							hint: t("New users will be visible to these groups")
+						}),
+					),
+
+				)
 			),
 
 			tbar({},
