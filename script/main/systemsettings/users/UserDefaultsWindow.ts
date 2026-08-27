@@ -4,7 +4,7 @@ import {
 	btn,
 	checkbox,
 	checkboxselectcolumn,
-	column,
+	column, comp,
 	containerfield,
 	datasourceform,
 	fieldset,
@@ -48,40 +48,46 @@ export class UserDefaultsWindow extends Window {
 
 	private createForm() {
 
-		const panels = ArrayUtil.multiSort(main.getPanels(), [{property:"title"}])
-
+		const panels = ArrayUtil.multiSort(main.getPanels(), [{property:"title"}]);
 
 		return datasourceform({
-				dataSource: moduleDS,
-				patchMode: true,
-				cls: "fit vbox"
+			dataSource: moduleDS,
+			patchMode: true,
+			cls: "fit vbox",
+			listeners:{
+				save: () => {
+					this.close()
+				}
+			}
 		},
 
 			containerfield({
-					keepUnknownValues: false,
-					name: "settings",
-					cls: "autofit scroll",
-					flex: 1
+				keepUnknownValues: false,
+				name: "settings",
+				cls: "scroll flow",
+				flex: 1
 			},
 
-				fieldset({legend: t("Regional"), flex: 1},
-					timezonefield({name: "defaultTimezone"}),
-					dateformatfield({name: "defaultDateFormat"}),
-					timeformatfield({name: "defaultTimeFormat"}),
-					checkbox({name: 'defaultShortDateInList',label: t("Use short format for date and time in lists")}),
-					firstweekdayfield({name: "defaultFirstWeekday"})
+				comp({cls: "flow"},
+					fieldset({legend: t("Regional"), flex: 1, minWidth:300},
+						timezonefield({name: "defaultTimezone"}),
+						dateformatfield({name: "defaultDateFormat"}),
+						timeformatfield({name: "defaultTimeFormat"}),
+						checkbox({name: 'defaultShortDateInList',label: t("Use short format for date and time in lists")}),
+						firstweekdayfield({name: "defaultFirstWeekday"})
+					),
+
+					fieldset({legend: t('Formatting'), width: 200},
+						textfield({name:'defaultListSeparator', label: t('List separator')}),
+						textfield({name:'defaultTextSeparator', label: t('Text separator')}),
+						textfield({name:'defaultThousandSeparator', label: t('Thousand separator')}),
+						textfield({name:'defaultDecimalSeparator', label: t('Decimal separator')}),
+						textfield({name:'defaultCurrency', label: t('Currency')}),
+					)
 				),
 
-				fieldset({legend: t('Formatting'), width: 200},
-					textfield({name:'defaultListSeparator', label: t('List separator')}),
-					textfield({name:'defaultTextSeparator', label: t('Text separator')}),
-					textfield({name:'defaultThousandSeparator', label: t('Thousand separator')}),
-					textfield({name:'defaultDecimalSeparator', label: t('Decimal separator')}),
-					textfield({name:'defaultCurrency', label: t('Currency')}),
-				),
 
-
-				fieldset({legend: t("Other"), flex: 1},
+				fieldset({legend: t("Other")},
 
 					checkbox({
 						name: 'defaultConfirmOnMove',
@@ -96,16 +102,12 @@ export class UserDefaultsWindow extends Window {
 						list: table({
 							fitParent: true,
 							headers: false,
-							store: store({
-								data: panels
-							}),
+							store: store(),
 							rowSelectionConfig: {
 								multiSelect: true
 							},
 							columns: [
-								checkboxselectcolumn({
-									id: "id"
-								}),
+								checkboxselectcolumn(),
 								column({
 									header: t("Title"),
 									id: "title"
@@ -121,9 +123,8 @@ export class UserDefaultsWindow extends Window {
 						},
 						listeners: {
 							autocomplete: ({target, input}) => {
-
 								if(input) {
-									const filtered = panels.filter(r => r.title.startsWith(input));
+									const filtered = panels.filter(r => r.title.toLowerCase().startsWith(input.toLowerCase()));
 									target.list.store.loadData(filtered, false);
 								} else {
 									target.list.store.loadData(panels, false);
@@ -137,8 +138,6 @@ export class UserDefaultsWindow extends Window {
 						hint: t("Users will automatically be added to these groups", "users", "core"),
 					})
 				),
-
-
 
 			),
 

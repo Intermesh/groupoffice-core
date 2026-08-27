@@ -125,7 +125,7 @@ export function timeformatfield(config?: FieldConfig<SelectField>) {
 
 export function firstweekdayfield(config?: FieldConfig<SelectField>) {
 	return 	select({name: 'firstWeekday', label: t("First weekday"), options:[
-			{value: '0', text:  t('Sunday','users','core')},
-			{value: '1', text: t('Monday','users','core')}
+			{value: 0, text:  t('Sunday','users','core')},
+			{value: 1, text: t('Monday','users','core')}
 		], ...config});
 }
