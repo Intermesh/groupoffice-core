@@ -13,4 +13,6 @@ export * from './Tools.js';
 
 export * from './users';
 export * from './groups';
+export * from './cron/ScheduledJobs';
+
 export * from './SystemSettingsModules.js';

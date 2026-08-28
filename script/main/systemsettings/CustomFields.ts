@@ -16,8 +16,6 @@ class CustomFields extends AbstractSystemSettingsPanel {
 	constructor() {
 		super("customfields", t("Custom fields"), "storage");
 
-		this.cls = "fit scroll";
-
 		this.store = store<EntityWithCustomfields>({});
 
 		this.title = t("Custom fields");
