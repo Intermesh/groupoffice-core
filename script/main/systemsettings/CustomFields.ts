@@ -73,7 +73,9 @@ class CustomFields extends AbstractSystemSettingsPanel {
 			})
 		);
 
-		void this.load();
+		this.on("show", () => {
+			void this.load();
+		})
 	}
 
 	public async load() {
@@ -84,7 +86,7 @@ class CustomFields extends AbstractSystemSettingsPanel {
 		for (const mod of mods) {
 			for (const entityName in mod.entities) {
 				if(!entities.exists(entityName.toString())) {
-					console.warn(`${entityName.toString()} not found`)
+					// console.warn(`${entityName.toString()} not found`)
 					continue;
 				}
 				const entity = entities.get(entityName.toString());
