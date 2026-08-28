@@ -39,7 +39,7 @@ export function groupchips(config?: Partial<AutoCompleteChipsConfig<Table<DataSo
 		}),
 		hint: t("Users will automatically be added to these groups"),
 		chipRenderer: async (chip, value) => {
-			const record = await groupDS.single(value.groupId ? value.groupId : value);
+			const record = await groupDS.single(value);
 			chip.text = record.name;
 		},
 		pickerRecordToValue(field, record): any {
