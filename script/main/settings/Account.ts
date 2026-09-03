@@ -1,4 +1,6 @@
 import {
+	ArrayField,
+	arrayfield,
 	btn,
 	checkbox,
 	comp,
@@ -114,28 +116,53 @@ export class Account extends AbstractSettingsPanel {
 			),
 
 			fieldset({legend: t("Authorized clients")},
-				mapfield({name:'clients', buildField: record =>
-						containerfield(({cls:'group'}),
-							hiddenfield({name:'lastSeen'}),
-							hiddenfield({name:'platform'}),
-							hiddenfield({name:'name'}),
-							displayfield({name:'ip', flex:1, htmlEncode:false, renderer: _ => [
-									record.ip || "?",
-									(record.platform || "?") + ' ' + (record.name || "?"),
-									record.lastSeen ? (new DateTime(record.lastSeen)).format(client.user.dateFormat + " " + client.user.timeFormat) : "?"
-								].join('<br>')
-							}),
-							selectfield({name:'status', width:140, options: [
-									{value:'new', text: t('New')},
-									{value:'allowed', text: t('Allowed')},
-									{value:'denied', text: t('Denied')}
-								]})
-						),
+				comp({cls: "scroll", style: {maxHeight: "30rem"}},
 
-				}),
+					arrayfield({
+						name:'clients',
+						listeners: {
+							setvalue: ev => {
+								const fs = ev.target.findAncestorByType(Fieldset)!;
+
+								fs.legend = t("Authorized clients") + `&nbsp;<span class="badge">${ev.newValue.length}</span>`
+							}
+						},
+						buildField: record => {
+							const	field = containerfield(({cls: 'group'}),
+
+								displayfield({
+									name: 'ip', flex: 1, htmlEncode: false, renderer: _ => [
+										record.ip || "?",
+										(record.platform || "?") + ' ' + (record.name || "?"),
+										record.lastSeen ? (new DateTime(record.lastSeen)).format(client.user.dateFormat + " " + client.user.timeFormat) : "?"
+									].join('<br>')
+								}),
+								selectfield({
+									name: 'status', width: 140, options: [
+										{value: 'new', text: t('New')},
+										{value: 'allowed', text: t('Allowed')},
+										{value: 'denied', text: t('Denied')}
+									]
+								}),
+								btn({
+									icon: "delete",
+									title: "Delete",
+									handler: (btn) => {
+										field.remove();
+									}
+								})
+							)
+
+							return field;
+						},
+
+					})
+				),
+
 				btn({text: t('Logout all')}).on('click', ({target}) => {
-					const clientFld = target.previousSibling() as MapField;
-					clientFld.value = {};
+					const clientFld = target.previousSibling()!.items.first() as ArrayField;
+
+					clientFld.value = [];
 				})
 			)
 		))
