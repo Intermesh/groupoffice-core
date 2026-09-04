@@ -324,7 +324,6 @@ export class MultiSelectCustomField extends SelectCustomField {
 			},
 
 			list: table({
-				fitParent: true,
 				headers: false,
 				store: store({
 					data: this.field.dataType.options
@@ -614,7 +613,6 @@ export class MultiContactCustomField extends AbstractCustomField {
 			})],
 
 			list: table({
-				fitParent: true,
 				headers: false,
 				store: store,
 				columns: [

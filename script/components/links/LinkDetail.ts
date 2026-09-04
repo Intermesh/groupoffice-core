@@ -71,7 +71,6 @@ export class LinkDetail extends Component {
 
 		return table({
 			headers: false,
-			fitParent: true,
 			store: datasourcestore({
 				dataSource: linkDS,
 				relations: {

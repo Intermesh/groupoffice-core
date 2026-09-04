@@ -157,7 +157,6 @@ class GroupTable extends Table<DataSourceStore<typeof groupDS>> {
 			]
 		);
 		this.scrollLoad = true;
-		this.fitParent = true;
 		this.rowSelectionConfig = {multiSelect: true};
 
 		this.on("render", () => {
@@ -183,7 +182,6 @@ class UserTable extends Table<DataSourceStore<typeof principalDS>> {
 			]
 		);
 
-		this.fitParent = true;
 
 		this.rowSelectionConfig = {multiSelect: true};
 		this.scrollLoad = true;
