@@ -18,7 +18,7 @@ import {
 import {fetchEventSource} from "@fortaine/fetch-event-source";
 import {jmapds} from "./JmapDataSource.js";
 import {User, userDS} from "../auth/index.js";
-import {entities} from "../Entities.js";
+import {entities as e} from "../Entities.js";
 import {LanguageField} from "../components/index.js";
 import {modules} from "../Modules.js";
 import {customFields} from "../customfields/index.js";
@@ -711,8 +711,15 @@ export class Client extends Observable<ClientEventMap> {
 	 *
 	 * @returns {Boolean}
 	 */
-	public async startSSE (entities:string[]) {
+	public async startSSE (entities?:string[]) {
 		try {
+
+			if(!entities) {
+				 entities = e.getAvailable().filter(function(e) {
+					// Search and user get lots of updates. We only update them when needed,
+					return e.package != "legacy"  && e.name != "Search" && e.name != "User";
+				}).map(entity => entity.name);
+			}
 
 			this.SSELastEntities = entities;
 
@@ -748,7 +755,7 @@ export class Client extends Observable<ClientEventMap> {
 			// updates
 			document.addEventListener('visibilitychange', () => {
 				if (!document.hidden) {
-					this.updateAllDataSources(entities);
+					this.updateAllDataSources(entities!);
 				}
 			});
 

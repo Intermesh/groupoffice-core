@@ -29,6 +29,7 @@ import {customFields} from "../customfields/index.js";
 import {authManager} from "../auth/index.js";
 import {SystemSettingsWindow} from "./systemsettings/index.js";
 import {UserSettingsWindow} from "./settings/index.js";
+import {AboutWindow} from "./AboutWindow.js";
 
 
 type MainPanelCreator = {
@@ -153,7 +154,8 @@ class Main extends Component<MainPanelEventMap> {
 			}),
 			"-",
 			btn({icon: "info", text: t("About")}).on('click',() => {
-				void Window.alert(t("About"), "TODO")
+				const aboutWin = new AboutWindow();
+				aboutWin.show();
 			}),
 			btn({icon: "help", text: t("Documentation")}).on('click',() => {
 				window.open("https://www.group-office.com/documentation.html", "_blank");
@@ -185,6 +187,8 @@ class Main extends Component<MainPanelEventMap> {
 		main.initState();
 
 		this.notifier.load();
+
+		void client.startSSE();
 
 		this.items.add(
 			comp({cls: "header hbox"},
