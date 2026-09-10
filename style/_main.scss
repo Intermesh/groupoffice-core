@@ -78,7 +78,6 @@ body#goui {
 
 
 		.pinned-item {
-			min-width: 10rem;
 			display: flex;
 			position: relative;
 
@@ -109,12 +108,18 @@ body#goui {
 
 		button.goui-button {
 			flex: 1;
+			padding: 1.1rem 1.1rem;
 			color: white;
-			font-weight: normal;
-			font-size: .9em;
-			opacity: .7;
+			font-weight: bold;
+			font-size: sp(15);
+			opacity: .6;
 			letter-spacing: .022em;
-			&.active {
+
+
+		}
+
+		.active {
+			button.goui-button {
 				opacity: 1;
 			}
 		}
