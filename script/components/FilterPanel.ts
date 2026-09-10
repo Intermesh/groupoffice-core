@@ -8,6 +8,7 @@ import {
 	FunctionUtil, Listener, ObservableListenerOpts,
 	Store
 } from "@intermesh/goui";
+import {extjswrapper} from "./ExtJSWrapper.js";
 
 
 /**
@@ -23,19 +24,18 @@ export class FilterPanel extends Component<FilterPanelEventMap> {
 	constructor(public readonly entityName:string, public readonly store?:Store) {
 		super();
 
+		this.goFilterPanel = new go.filter.FilterPanel({
+			entity: entityName,
+			store: store
+		})
 		this.items.add(
-			comp({},//somehow an extra comp is needed for the ext toolbar to resize properly
-					this.goFilterPanel = new go.filter.FilterPanel({
-					entity: entityName,
-					store: store
-				})
+			extjswrapper({comp: this.goFilterPanel},//somehow an extra comp is needed for the ext toolbar to resize properly
+
 			)
 			);
 
 		this.on("render", () => {
-			const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
-				this.goFilterPanel.setWidth(this.el.offsetWidth);
-			}));
+
 
 			this.goFilterPanel.on("filterchange", (_p:any, filter:any) => {
 				this.fire("filterchange", {filter});
@@ -45,7 +45,6 @@ export class FilterPanel extends Component<FilterPanelEventMap> {
 				this.fire("variablefilterchange", {filter});
 			})
 
-			ro.observe(this.el);
 		});
 	}
 }
