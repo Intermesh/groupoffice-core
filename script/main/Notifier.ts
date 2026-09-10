@@ -159,7 +159,7 @@ export class Notifier extends Observable {
 		 });
 
 		this.panel = sidePanel;
-
+		this.load()
 		void this.initNotifications();
 	}
 
