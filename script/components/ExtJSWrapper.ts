@@ -10,8 +10,10 @@ export class ExtJSWrapper extends Component {
 			// @ts-ignore
 			this[p] = extJSComp[p].bind(extJSComp);
 		})
-		this.on("render", () => {
-			const ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
+
+		let ro : ResizeObserver | undefined;
+		this.on("attach", () => {
+			ro = new ResizeObserver(FunctionUtil.onRepaint( () => {
 
 				if(this.extJSComp && !this.extJSComp.isDestroyed) {
 					this.extJSComp.setWidth(Component.remToPx(this.width));
@@ -23,7 +25,16 @@ export class ExtJSWrapper extends Component {
 			}));
 
 			ro.observe(this.el);
+		}).on("detach", () => {
+			if(ro) {
+				ro.disconnect();
+				ro = undefined;
+			}
 		})
+	}
+
+	cascade(fn: (comp: Component) => (boolean | void)) {
+		//super.cascade(fn);
 	}
 }
 
