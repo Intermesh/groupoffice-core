@@ -330,3 +330,22 @@ button[data-count]::before {
 .user-settings-modules {
 	max-width: 90rem;
 }
+
+.about-groupoffice-logo {
+	// 210 x 43
+	background-image: url("../resources/groupoffice-logo-blue.svg");
+	background-size: contain;
+	background-repeat: no-repeat;
+	height: 4rem;
+	width: 21rem;
+	margin: .8rem 0;
+	display:block;
+}
+
+.about {
+	.item-container {
+		padding: dp(16);
+
+
+	}
+}
