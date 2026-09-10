@@ -68,7 +68,6 @@ export class Launcher extends Menu {
 				.on("input", ({value}) => {
 					if(value) {
 						this.modulesContainer.items.replace(...this.allButtons.filter((b) => {
-							console.log(b)
 							return b.text.toLowerCase().startsWith(value.toLowerCase());
 						}));
 					} else {
