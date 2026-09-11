@@ -1,13 +1,4 @@
-import {
-	checkboxselectcolumn,
-	column,
-	Config,
-	createComponent,
-	ListEventMap,
-	store,
-	Store,
-	Table
-} from "@intermesh/goui";
+import {column, Config, createComponent, store, Store, Table} from "@intermesh/goui";
 import {entities, LinkConfig} from "../Entities";
 
 export class EntityTypeTable extends Table<Store<LinkConfig>> {
@@ -34,15 +25,8 @@ export class EntityTypeTable extends Table<Store<LinkConfig>> {
 
 		);
 
-		this.style.width = "100%";
-
 		this.headers = false;
 		this.rowSelectionConfig = {multiSelect: true, clickToAdd: true};
-
-		// this.on("rowclick", ({storeIndex}) => {
-		// 	this.rowSelection!.clear();
-		// 	this.rowSelection!.selectIndex(storeIndex);
-		// })
 	}
 }
 

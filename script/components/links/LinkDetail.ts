@@ -7,12 +7,14 @@ import {
 	DataSourceStore,
 	DefaultEntity,
 	Format,
-	h3, menu,
-	menucolumn, t,
+	h3,
+	menu,
+	menucolumn,
+	t,
 	Table,
 	table,
 	TableColumn,
-	tbar, Window
+	tbar
 } from "@intermesh/goui";
 import {entities, LinkConfig} from "../../Entities";
 import {Link, linkDS, Search, searchDS} from "../../model/Link";
