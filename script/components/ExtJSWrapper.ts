@@ -7,7 +7,7 @@ export class ExtJSWrapper extends Component {
 	 * @param extJSComp
 	 * @param proxies An array of methods that needs to be proxied onto the extjs component
 	 */
-	constructor(protected extJSComp:any, proxies : string[] = []) {
+	constructor(public readonly extJSComp:any, proxies : string[] = []) {
 		super();
 
 		this.items.add(extJSComp);
