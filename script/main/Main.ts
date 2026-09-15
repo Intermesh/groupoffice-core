@@ -29,7 +29,7 @@ import {customFields} from "../customfields/index.js";
 import {authManager} from "../auth/index.js";
 import {SystemSettingsWindow} from "./systemsettings/index.js";
 import {UserSettingsWindow} from "./settings/index.js";
-// import {AboutWindow} from "./AboutWindow.js";
+import {AboutWindow} from "./AboutWindow.js";
 
 
 type MainPanelCreator = {
@@ -153,10 +153,10 @@ class Main extends Component<MainPanelEventMap> {
 				void router.goto("systemsettings");
 			}),
 			"-",
-			// btn({icon: "info", text: t("About")}).on('click',() => {
-			// 	const aboutWin = new AboutWindow();
-			// 	aboutWin.show();
-			// }),
+			btn({icon: "info", text: t("About")}).on('click',() => {
+				const aboutWin = new AboutWindow();
+				aboutWin.show();
+			}),
 			btn({icon: "help", text: t("Documentation")}).on('click',() => {
 				window.open("https://www.group-office.com/documentation.html", "_blank");
 			}),

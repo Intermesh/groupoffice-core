@@ -13,7 +13,7 @@ export class AboutWindow extends Window {
 			comp({cls: "about-groupoffice-logo"}),
 
 			p({
-					html: t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved.")
+					html: t("Version: {version}<br/>Copyright &copy; 2003-{current_year}, {company_name}<br/>All rights reserved.")
 						.replace("{version}", client.session!.version)
 						.replace("{current_year}", (new Date).getFullYear())
 						.replace("{company_name}", "Intermesh")
