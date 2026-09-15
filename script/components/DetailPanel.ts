@@ -95,7 +95,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 				this.detailView.doLayout();
 			})
 
-			this.scroller.items.add(extjswrapper({comp:this.detailView}));
+			this.scroller.items.add(extjswrapper({comp:this.detailView, syncHeight:false}));
 		}
 
 		return this.detailView;
