@@ -34,7 +34,6 @@ class GroupWindow extends Window {
 		this.height = 640;
 
 		this.tbl = table({
-			fitParent: true,
 			headers: false,
 			store: datasourcestore({dataSource: principalDS}),
 			scrollLoad: true,
@@ -173,12 +172,8 @@ class GroupTable extends Table<DataSourceStore> {
 
 			]);
 
-		this.fitParent = true;
-
 		this.scrollLoad = true;
-
 		this.style.width = "100%";
-
 		this.cls = 'goui-share-panel';
 	}
 

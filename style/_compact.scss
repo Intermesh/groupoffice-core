@@ -28,7 +28,7 @@ html.compact {
 	.goui-form-field.check div.control {
 		padding: util.dp(8) 0 !important;
 	}
-	.vbox > .goui-toolbar:not(.header) .goui-button:not(.filled):not([type="submit"]) {
+	.vbox > .goui-toolbar:not(.header) .goui-button:not(.filled):not(.active):not([type="submit"]) {
 		background-color:var(--bg-bright);
 	}
 	menu.goui-dropdown>li hr {

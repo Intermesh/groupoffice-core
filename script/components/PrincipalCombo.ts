@@ -19,7 +19,7 @@ export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 		 * If provided, it will only show entities of this type. For example "User"
 		 */
 		entity?:string,
-		renderer:ComboRenderer = ComboBoxDefaultRenderer,
+
 		storeConfig:ComboBoxStoreConfig<JmapDataSource<Principal>> = {
 			queryParams: {
 				limit: 50
@@ -33,7 +33,9 @@ export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 			principalDS,
 			"name",
 			"id",
-			renderer,
+			(field, record) => {
+				return `<h3>${record.name?.htmlEncode()}</h3><h4>${record.description?.htmlEncode()}</h4>`;
+			},
 			storeConfig,
 			tableConfig,
 			selectFirst
@@ -44,8 +46,9 @@ export class PrincipalCombo extends ComboBox<JmapDataSource<Principal>> {
 
 		if(entity === 'User') {
 			this.label = t("User");
-			this.filter = {entity: 'User'};
 		}
+
+		this.filter = {entity: entity};
 	}
 }
 
@@ -59,7 +62,6 @@ export type PrincipalComboConfig = Omit<ComboBoxConfig<PrincipalCombo>, "dataSou
 export const principalcombo = (config?:PrincipalComboConfig) =>
 	createComponent(new PrincipalCombo(
 			config?.entity,
-			config?.renderer ?? ComboBoxDefaultRenderer,
 			config?.storeConfig ?? {	queryParams: {limit: 50}},
 			config?.tableConfig ?? {},
 			config?.selectFirst ?? false

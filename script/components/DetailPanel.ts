@@ -12,6 +12,9 @@ import {
 	router
 } from "@intermesh/goui";
 import {jmapds} from "../jmap/index.js";
+import {customFields} from "../customfields/CustomFields";
+import {DetailFieldset} from "../customfields/DetailFieldset";
+import {extjswrapper} from "./ExtJSWrapper.js";
 
 export interface DetailPanelEventMap<EntityType extends BaseEntity = DefaultEntity> extends ComponentEventMap {
 	/**
@@ -80,11 +83,6 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 
 	private get legacyDetailView() {
 		if (!this.detailView) {
-			const ro = new ResizeObserver(FunctionUtil.onRepaint(() => {
-				this.detailView.doLayout();
-			}));
-
-			ro.observe(this.el);
 
 			this.detailView = new go.detail.Panel({
 				width: undefined,
@@ -97,7 +95,7 @@ export abstract class DetailPanel<EntityType extends BaseEntity = DefaultEntity>
 				this.detailView.doLayout();
 			})
 
-			this.scroller.items.add(this.detailView);
+			this.scroller.items.add(extjswrapper({comp:this.detailView, syncHeight:false}));
 		}
 
 		return this.detailView;

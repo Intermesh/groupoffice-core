@@ -23,7 +23,7 @@ import {entityttypeable} from "../EntityTypeTable";
 import {Link, linkDS, Search, searchDS} from "../../model/Link";
 import {entities} from "../../Entities";
 import {LinkDetailWindow} from "./LinkDetailWindow";
-import {extjswrapper} from "../ExtJSWrapper";
+import {ExtJSWrapper, extjswrapper} from "../ExtJSWrapper";
 import {DetailPanel} from "../DetailPanel";
 import {SelectSearchWindow} from "./SelectSearchWindow";
 
