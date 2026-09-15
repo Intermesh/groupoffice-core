@@ -29,7 +29,6 @@ class ScheduledJobs extends AbstractModuleSystemSettingsPanel {
 		});
 
 		this.tbl = table({
-			fitParent: true,
 			store: cronStore,
 			columns: [
 				column({
