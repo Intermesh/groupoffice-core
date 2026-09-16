@@ -11,7 +11,7 @@ export class LegacyApi {
 	private baseUrl: string;
 
 	constructor(module: string, model: string) {
-		this.baseUrl = "legacy.php?r=" + module + "/" + model + "/";
+		this.baseUrl = "legacy.php?r=" + module + "/" + model;
 	}
 
 
@@ -53,7 +53,7 @@ export class LegacyApi {
 	public async read(id: EntityID, params: any = {}): Promise<any> {
 		params['id'] = id;
 
-		const response = await fetch(this.baseUrl + "load", {
+		const response = await fetch(this.baseUrl + "/load", {
 			method: "POST",
 			mode: "cors",
 			credentials: "include",
@@ -76,13 +76,24 @@ export class LegacyApi {
 	 * @see EmailTemplateSettingsPanel
 	 */
 	public delete(ids: EntityID[]): Promise<any> {
-		let url = this.baseUrl + "store&delete_keys="+encodeURIComponent('['+ids.join(",")+']');
+		let url = this.baseUrl + "/store&delete_keys="+encodeURIComponent('['+ids.join(",")+']');
 		return fetch(url, {
 			method: "POST",
 			mode: "cors",
 			credentials: "include",
 			headers: this.getHeaders(true)
 		});
+	}
+
+	public async call(route :string = "") {
+		let url = this.baseUrl + (route.length > 0 ? "/" : "") + route
+		const response = await fetch(url, {
+			method: "GET",
+			mode: "cors",
+			credentials: "include",
+			headers: this.getHeaders(false),
+		});
+		return response.json();
 	}
 
 
