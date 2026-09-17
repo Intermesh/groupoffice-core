@@ -47,12 +47,12 @@ export class AboutWindow extends Window {
 					textfield({
 						label: t("Files"),
 						readOnly: true,
-						value: `${Format.fileSize(resp.data.file_storage_usage)} / ${Format.fileSize(resp.data.quota)}`
+						value: `${Format.fileSize(resp.data.file_storage_usage)} / ${resp.data.quota ? Format.fileSize(resp.data.quota): "-"}`
 					}),
 					textfield({
 						label: t("E-mail"),
 						readOnly: true,
-						value: Format.fileSize(resp.data.mailbox_usage)
+						value: resp.data.mailbox_usage ? Format.fileSize(resp.data.mailbox_usage) : '-'
 					}),
 					textfield({
 						label: t("Total"),
@@ -62,7 +62,7 @@ export class AboutWindow extends Window {
 					textfield({
 						label: t("Date"),
 						readOnly: true,
-						value: Format.fileSize(resp.data.date)
+						value: resp.data.date ? Format.smartDateTime(resp.data.date) : t("Never")
 					})
 				));
 			}

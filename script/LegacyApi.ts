@@ -23,7 +23,7 @@ export class LegacyApi {
 	 */
 	public async store(permissionLevel: number = AclLevel.READ, params: any = {}): Promise<any> {
 		// TODO: Validate whether permission level exists?
-		let url = this.baseUrl + "store";
+		let url = this.baseUrl + "/store";
 		params['permissionLevel'] = permissionLevel;
 		(Object.keys(params) as Array<keyof typeof params>).forEach(key => {
 			url += `&${String(key)}=${encodeURIComponent(params[key])}`;
