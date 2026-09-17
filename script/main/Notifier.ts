@@ -10,7 +10,7 @@ import {
 	INotification,
 	h3,
 	Notifier as GOUINotifier,
-	list, store, Store, List, datasourcestore, Format, DefaultEntity, progress, Component
+	list, store, Store, List, datasourcestore, Format, DefaultEntity, Component
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
 import {entities} from "../Entities";
@@ -150,7 +150,7 @@ export class Notifier extends Observable {
 					sidePanel.show(); // severe, open panel
 				case 'message':
 				case 'progress':
-					this.notify(msg); // flyout and desktop
+					this.add(msg);
 			}
 
 			this.add(msg);
@@ -164,7 +164,7 @@ export class Notifier extends Observable {
 	}
 
 	load() {
-		this.alertStore.load();
+		//this.alertStore.load();
 	}
 
 	regRenderer(entityType:string, renderer: (alert: AlertEntity, closeFn: ()=>void) => INotification | undefined) {
@@ -186,6 +186,11 @@ export class Notifier extends Observable {
 	}
 
 	private add(msg: INotification) {
+		if(msg.tag) {
+			const oldMsg = this.store.find(v => v.tag == msg.tag);
+			console.log(oldMsg);
+			if(oldMsg) this.remove(oldMsg);
+		}
 		this.store.add(msg);
 		this.msgList.onStoreLoad();
 		this.count++;
@@ -214,41 +219,42 @@ export class Notifier extends Observable {
 		this.canNotify = (p === 'granted');
 	}
 
-	notify(msg: INotification) {
-
-		console.log(msg);
-		return;
-		if(['alarm','message'].includes(msg.category!)) {
-			this.playSound(msg.category==='alarm' ? 'reminders' : 'email');
-		}
-
-		// Hard fallback conditions
-		if (!this.canNotify) {
-			return this.flyout(msg);
-		}
-
-		try {
-			const n = new Notification(msg.title || defaultTitle, {body:msg.text, icon: msg.icon?.link || defaultIcon});
-			if (msg.actions?.click) {
-				n.onclick = (e) => {
-					e.preventDefault();
-					msg.actions!.click.run();
-					n.close();
-				};
-				delete msg.actions?.click;
-			}
-			n.onclose = () => {
-				// TODO: some OSes and Browsers auto close in a few seconds. re-open to keep persistent?
-			};
-			n.onerror = () => {
-				this.flyout(msg);
-			};
-
-			return n;
-		} catch {
-			return this.flyout(msg);
-		}
-	}
+	// notify(msg: INotification) {
+	//
+	// 	console.log(msg);
+	// 	return;
+	//
+	// 	if(['alarm','message'].includes(msg.category!)) {
+	// 		this.playSound(msg.category==='alarm' ? 'reminders' : 'email');
+	// 	}
+	//
+	// 	// Hard fallback conditions
+	// 	if (!this.canNotify) {
+	// 		return this.flyout(msg);
+	// 	}
+	//
+	// 	try {
+	// 		const n = new Notification(msg.title || defaultTitle, {body:msg.text, icon: msg.icon?.link || defaultIcon});
+	// 		if (msg.actions?.click) {
+	// 			n.onclick = (e) => {
+	// 				e.preventDefault();
+	// 				msg.actions!.click.run();
+	// 				n.close();
+	// 			};
+	// 			delete msg.actions?.click;
+	// 		}
+	// 		n.onclose = () => {
+	// 			// TODO: some OSes and Browsers auto close in a few seconds. re-open to keep persistent?
+	// 		};
+	// 		n.onerror = () => {
+	// 			this.flyout(msg);
+	// 		};
+	//
+	// 		return n;
+	// 	} catch {
+	// 		return this.flyout(msg);
+	// 	}
+	// }
 
 	private defaultNotificationRenderer(alert:any, closeFn: () => void): INotification {
 
@@ -307,7 +313,7 @@ export class Notifier extends Observable {
 		const card = comp({cls:msg.variant||''},
 			h3({text:msg.title},
 				comp({tagName:'i',cls:'icon',text: msg.icon?.name, style:{color:msg.icon?.color}}),
-				btn({icon:'close', title:t('Close'), hidden: msg.category==='alarm'}).on('click', rm)
+				btn({icon:'close', title:t('Close'), hidden: msg.category==='system'}).on('click', rm)
 			),
 			...items,
 			...(actions.length ? [tbar({},...Object.values(actions).map(a =>
@@ -328,19 +334,22 @@ export class Notifier extends Observable {
 		})
 	}
 
-	flyout(msg: INotification) {
-
-		const c = this.card(msg);
-
-		if(msg.category==='status' || msg.category === 'message') {
-			setTimeout(() => {
-				c.remove();
-			}, 5000);
-		}
-
-		this.panel.items.add(c);
-
-	}
+	// flyout(msg: INotification) {
+	//
+	// 	const c = this.card(msg);
+	//
+	// 	if(msg.category==='status' || msg.category === 'message') {
+	// 		setTimeout(() => {
+	// 			c.remove();
+	// 		}, 5000);
+	// 	}
+	// 	if(['alarm','message'].includes(msg.category!)) {
+	// 		this.playSound(msg.category==='alarm' ? 'reminders' : 'email');
+	// 	}
+	//
+	// 	this.panel.items.add(c);
+	//
+	// }
 
 	playSound(filename: SoundName = 'question') {
 		if(!GO.util.empty(go.User.mute_sound) ||
