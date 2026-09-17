@@ -93,7 +93,6 @@ export class AuthAllowGroupGrid extends Table<DataSourceStore<JmapDataSource<Aut
 
 		super(store, columns);
 
-		this.fitParent = true;
 		this.rowSelectionConfig = {
 			multiSelect: false
 		};

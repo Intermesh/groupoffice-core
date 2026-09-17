@@ -78,7 +78,6 @@ export class PdfTemplateTable extends Table<DataSourceStore<JmapDataSource<PdfTe
 			})
 		];
 		super(store, columns);
-		this.fitParent = true;
 
 		this.on('rowdblclick', async ({storeIndex}) => {
 			const dlg = new PdfTemplateDialog();

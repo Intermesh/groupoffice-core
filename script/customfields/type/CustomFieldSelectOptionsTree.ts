@@ -30,7 +30,6 @@ export class CustomFieldSelectOptionsTree extends Component {
 				text: t("Warning: removing select options also removes the data from the records. You can disable select options by unchecking them.")
 			}),
 			this.treeComponent = tree({
-				fitParent: true,
 				columns: [
 					treecolumn({
 						id: "text",

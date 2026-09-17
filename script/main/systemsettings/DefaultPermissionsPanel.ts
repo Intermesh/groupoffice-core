@@ -64,12 +64,9 @@ export class DefaultPermissionsTable extends Table<Store<Record>> {
 
 		super(entityStore, columns);
 
-		this.fitParent = true;
-
 		this.on("rowdblclick", ({storeIndex}) => {
 			this.edit(this.store.get(storeIndex) as Record);
 		});
-
 
 	}
 

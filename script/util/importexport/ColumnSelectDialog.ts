@@ -124,7 +124,6 @@ export class ColumnSelectDialog extends Window {
 							}
 						},
 						headers: false,
-						fitParent: true,
 						store: new Store(),
 						columns: [
 							checkboxselectcolumn(),

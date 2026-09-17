@@ -72,6 +72,5 @@ export class EmailTemplateTable extends Table<DataSourceStore<JmapDataSource<Ema
 			})
 		];
 		super(store, columns);
-		this.fitParent = true;
 	}
 }

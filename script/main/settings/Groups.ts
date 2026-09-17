@@ -89,7 +89,6 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 				})
 			])
 
-		this.groupTbl.fitParent = true;
 
 		this.items.add(this.groupTbl, this.form = datasourceform({dataSource: userDS}, this.hiddenFld));
 

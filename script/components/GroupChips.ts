@@ -16,7 +16,6 @@ export function groupchips(config?: Partial<AutoCompleteChipsConfig<Table<DataSo
 		name: "groups",
 		label: t("Groups"),
 		list: table({
-			fitParent: true,
 			headers: false,
 			store: datasourcestore({
 				dataSource: groupDS,

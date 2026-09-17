@@ -62,7 +62,7 @@ export class UserTable extends Table<DataSourceStore> {
 						// 2 line rendering
 						return `<h3>${record.displayName.htmlEncode()}</h3> <h4>${record.username.htmlEncode()}</h4>`
 					},
-					width: 200
+					minWidth: 200
 				}),
 
 				column({
@@ -160,8 +160,6 @@ export class UserTable extends Table<DataSourceStore> {
 
 			await userDS.confirmDestroy(ids);
 		});
-
-		this.fitParent = true;
 	}
 
 	private edit(rowIndex: number) {

@@ -52,7 +52,6 @@ export class CustomFieldMultiSelect extends CustomFieldSelect {
 			},
 
 			list: table({
-				fitParent: true,
 				headers: false,
 				store: store({
 					data: field.dataType.options

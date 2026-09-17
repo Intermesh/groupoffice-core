@@ -41,7 +41,7 @@ export class GroupTable extends Table<DataSourceStore> {
 
 						return `<h3>${name.htmlEncode()}</h3> <h4>${memberStr.htmlEncode()}</h4>`
 					},
-					width: 200
+					minWidth: 200
 				}),
 
 				menucolumn({
@@ -80,7 +80,6 @@ export class GroupTable extends Table<DataSourceStore> {
 			await groupDS.confirmDestroy(ids);
 		});
 
-		this.fitParent = true;
 	}
 
 	private edit(rowIndex: number) {

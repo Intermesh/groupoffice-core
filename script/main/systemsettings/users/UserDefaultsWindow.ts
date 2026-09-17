@@ -119,7 +119,6 @@ export class UserDefaultsWindow extends Window {
 							name: "defaultPinnedTabs",
 							label: t("Pinned tabs"),
 							list: table({
-								fitParent: true,
 								headers: false,
 								store: store(),
 								rowSelectionConfig: {

@@ -135,7 +135,6 @@ export class VariableFilterGrid extends Table<Store, VariableFilterGridEventMap>
 		super(store, columns);
 
 		this.headers = false;
-		this.fitParent = true;
 		this.emptyStateHtml = "";
 		this.cls = "no-row-lines";
 

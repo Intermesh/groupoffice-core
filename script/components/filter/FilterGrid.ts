@@ -66,7 +66,6 @@ export class FilterGrid extends Table {
 
 
 		this.headers = false;
-		this.fitParent = true;
 		this.emptyStateHtml = "";
 		this.cls = "no-row-lines";
 	}

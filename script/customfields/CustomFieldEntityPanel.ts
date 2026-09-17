@@ -47,7 +47,6 @@ export class CustomFieldEntityPanel extends Component {
 		this.store = store<StoreEntity>();
 
 		this.table = table({
-			fitParent: true,
 			store: this.store,
 			cls: "bg-lowest",
 			columns: [

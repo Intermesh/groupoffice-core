@@ -22,7 +22,6 @@ export class VariableLinkFilter extends VariableFilterType {
 			autocompletechips({
 				label: t(filter.title),
 				list: table({
-					fitParent: true,
 					headers: false,
 					store: store({data: options}),
 					columns: [

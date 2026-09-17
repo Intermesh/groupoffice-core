@@ -54,7 +54,6 @@ export class ExportDialog extends Window {
 				})
 			),
 			table({
-				fitParent: true,
 				store: this.store,
 				columns: [
 					checkboxcolumn({

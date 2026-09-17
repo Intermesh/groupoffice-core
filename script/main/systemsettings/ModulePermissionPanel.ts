@@ -147,8 +147,6 @@ class GroupTable extends Table<DataSourceStore> {
 
 			);
 
-		this.fitParent = true;
-
 		this.scrollLoad = true;
 
 		this.style.width = "100%";

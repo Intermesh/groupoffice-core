@@ -104,7 +104,6 @@ export class CreateUserDialog extends FormWindow {
 
 				autocompletechips({
 					list: table({
-						fitParent: true,
 						headers: false,
 						store: datasourcestore({
 							dataSource: groupDS,

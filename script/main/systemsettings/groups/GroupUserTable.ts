@@ -92,6 +92,5 @@ export class GroupUserTable extends Table<DataSourceStore> {
 
 		this.headers = false;
 
-		this.fitParent = true;
 	}
 }

@@ -25,7 +25,6 @@ class CustomFields extends AbstractSystemSettingsPanel {
 
 		this.items.add(
 			table({
-				fitParent: true,
 				store: this.store,
 				cls: "bg-lowest",
 				rowSelectionConfig: {
