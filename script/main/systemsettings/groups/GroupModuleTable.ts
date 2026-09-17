@@ -69,7 +69,7 @@ export class GroupModuleTable extends Table<DataSourceStore> {
 
 					const field = autocompletechips({
 						list: table({
-							fitParent: true,
+							fit: true,
 							headers: false,
 							store: store({
 								data: rightKeys.map(name => ({
@@ -163,7 +163,7 @@ export class GroupModuleTable extends Table<DataSourceStore> {
 
 		super(moduleStore, columns);
 
-		this.fitParent = true;
+		this.fit = true;
 	}
 
 	public load(groupId: string) {
