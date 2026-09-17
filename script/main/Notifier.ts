@@ -157,7 +157,10 @@ export class Notifier extends Observable {
 		 });
 
 		this.panel = sidePanel;
-		this.load()
+		setTimeout(() => {
+			this.load(); // yak
+		}, 6000)
+
 		//void this.initNotifications();
 	}
 
@@ -314,7 +317,7 @@ export class Notifier extends Observable {
 				btn({icon:'close', title:t('Close'), hidden: msg.category==='system'}).on('click', rm)
 			),
 			...items,
-			...(actions.length ? [tbar({},...Object.values(actions).map(a =>
+			...(actions.length ? [comp({},...Object.values(actions).map(a =>
 				btn({text:a!.text, icon:a!.icon}).on('click', ()=>{a!.run(); })))] : [])
 		);
 
