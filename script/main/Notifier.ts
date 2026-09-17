@@ -153,18 +153,16 @@ export class Notifier extends Observable {
 					this.add(msg);
 			}
 
-			this.add(msg);
-
 			return false; // prevent goui toast
 		 });
 
 		this.panel = sidePanel;
-		// this.load()
-		void this.initNotifications();
+		this.load()
+		//void this.initNotifications();
 	}
 
 	load() {
-		//this.alertStore.load();
+		this.alertStore.load();
 	}
 
 	regRenderer(entityType:string, renderer: (alert: AlertEntity, closeFn: ()=>void) => INotification | undefined) {
@@ -319,6 +317,7 @@ export class Notifier extends Observable {
 			...(actions.length ? [tbar({},...Object.values(actions).map(a =>
 				btn({text:a!.text, icon:a!.icon}).on('click', ()=>{a!.run(); })))] : [])
 		);
+
 		const seconds = (when: Date) => Math.floor((when.getTime() - (new Date()).getTime()) / 1000);
 
 		if (msg.time) {
@@ -327,6 +326,7 @@ export class Notifier extends Observable {
 		if(msg.stale) {
 			setTimeout(() => {card.remove()}, seconds(msg.stale));
 		}
+		msg.card = card; // possible ref for changes
 
 		return card.on('render', e => {
 			if(msg.onClick)
