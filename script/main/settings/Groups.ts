@@ -28,7 +28,8 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 		this.cls = "fit scroll bg-lowest";
 
 
-		this.groupTbl = new Table(datasourcestore({
+		this.groupTbl = new Table(
+			datasourcestore({
 				queryParams: {limit: 20},
 				dataSource: groupDS,
 				sort: [{
@@ -68,8 +69,7 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 						}
 
 						return `<h3>${name.htmlEncode()}</h3> <h4>${memberStr.htmlEncode()}</h4>`
-					},
-					width: 200
+					}
 				}),
 
 				checkboxcolumn({
@@ -89,6 +89,7 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 				})
 			])
 
+		this.groupTbl.fit = true;
 
 		this.items.add(this.groupTbl, this.form = datasourceform({dataSource: userDS}, this.hiddenFld));
 
