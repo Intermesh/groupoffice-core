@@ -10,7 +10,7 @@ import {
 	INotification,
 	h3,
 	Notifier as GOUINotifier,
-	list, store, Store, List, datasourcestore, Format, DefaultEntity, Component
+	list, store, Store, List, datasourcestore, Format, DefaultEntity, Component, Config
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
 import {entities} from "../Entities";
@@ -83,8 +83,10 @@ export class Notifier extends Observable {
 				const now = new Date();
 				for(const alert of records) {
 					const triggerDate = new Date(alert.triggerAt);
-					const staleDate = new Date(alert.staleAt);
-					if(triggerDate > now || now > staleDate) continue; // delete me;
+					if(triggerDate > now || (alert.staleAt && now > new Date(alert.staleAt))) {
+						console.warn("Stale or future alert: ", alert);
+						continue;
+					} // delete me;
 					const ds = jmapds(alert.entity);
 					if(!ds) continue; // no dataSource for entity type found
 					alerts.push(alert);
@@ -157,15 +159,10 @@ export class Notifier extends Observable {
 		 });
 
 		this.panel = sidePanel;
-		setTimeout(() => {
-			this.load(); // yak
-		}, 6000)
-
-		//void this.initNotifications();
 	}
 
-	load() {
-		this.alertStore.load();
+	async load() {
+		return this.alertStore.load();
 	}
 
 	regRenderer(entityType:string, renderer: (alert: AlertEntity, closeFn: ()=>void) => INotification | undefined) {
@@ -261,16 +258,21 @@ export class Notifier extends Observable {
 
 		const entity = alert.entityData;
 
-		// oldcode: remove this when the old code for link configs is updated
-		const oldIconClass = entities.getLinkConfig(alert.entity)?.iconCls || '';
-		let parts = oldIconClass.split(' ');
-		const icon = {
-			name:parts[1].replace('ic-',''),
-		} as any;
-		if(parts[2]) icon.color = parts[2];
-		// end of oldcode
+		let icon = alert.data.icon;
+		if(!icon) {
+			// oldcode: remove this when the old code for link configs is updated
+			const oldIconClass = entities.getLinkConfig(alert.entity)?.iconCls;
+			if (oldIconClass) {
+				let parts = oldIconClass.split(' ');
+				icon = {
+					name: parts[1].replace('ic-', ''),
+				} as any;
+				if (parts[2]) icon.color = parts[2];
+				// end of oldcode
+			}
+		}
 
-		let text = Format.dateTime(alert.triggerAt);
+		let text = alert.data.body ?? Format.dateTime(alert.triggerAt);
 
 		if(alert.data) {
 			if("progress" in alert.data) {
@@ -283,7 +285,7 @@ export class Notifier extends Observable {
 		return {
 			title: alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity,
 			text,
-			icon,
+			icon: icon ?? undefined,
 			category: ("progress" in alert.data) ? 'progress' : 'event',
 			onClick: () => { entities.get(alert.entity).goto(alert.entityId); closeFn(); }
 		}

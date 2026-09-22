@@ -186,7 +186,7 @@ class Main extends Component<MainPanelEventMap> {
 
 		main.initState();
 
-		this.notifier.load();
+		void this.notifier.load();
 
 		void client.startSSE();
 
