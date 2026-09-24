@@ -50,6 +50,8 @@ const soundPath = 'views/goui/groupoffice-core/style/resources/sounds/';
 const queue: (() => void)[] = [];
 const defaultIcon = iconPath+'reminder.png'
 const defaultTitle = t("Reminders");
+const seconds = (when: Date) => Math.ceil((when.getTime() - (new Date()).getTime()) / 1000);
+
 
 let audioUnlocked = false;
 window.addEventListener('pointerdown', () => {
@@ -68,7 +70,7 @@ export class Notifier extends Observable {
 	private alertStore;
 	private msgList: List
 	private notificationRenderers: {[entityType:string]: (alert:any, closeFn: ()=>void) => INotification | undefined} = {};
-
+	private nextTriggerIntervalId?: number
 	constructor() {
 		super();
 
@@ -81,12 +83,18 @@ export class Notifier extends Observable {
 				const promises:Promise<any>[] = [];
 				const alerts: any[] = [];
 				const now = new Date();
+				let nextTrigger = null;
 				for(const alert of records) {
 					const triggerDate = new Date(alert.triggerAt);
-					if(triggerDate > now || (alert.staleAt && now > new Date(alert.staleAt))) {
-						console.warn("Stale or future alert: ", alert);
+					if(triggerDate > now) {
+						if(!nextTrigger || triggerDate < nextTrigger)
+							nextTrigger = triggerDate;
 						continue;
-					} // delete me;
+					}
+					if(alert.staleAt && now > new Date(alert.staleAt)) {
+						//jmapds("Alert").destroy(alert.id);
+						console.warn("Removing stale alert: ", alert);
+					}
 					const ds = jmapds(alert.entity);
 					if(!ds) continue; // no dataSource for entity type found
 					alerts.push(alert);
@@ -94,7 +102,16 @@ export class Notifier extends Observable {
 						alert.entityData = entity;
 					}).catch(e =>{console.warn("Failed to fetch relation", e)}));
 				}
-				this.alertCount = promises.length;
+				if(nextTrigger) {
+					// set timer to show future alerts
+					console.log('next trigger:'+ seconds(nextTrigger));
+					if(this.nextTriggerIntervalId)
+						clearTimeout(this.nextTriggerIntervalId);
+					this.nextTriggerIntervalId = setTimeout(()=>{
+						this.load();
+					}, seconds(nextTrigger)*1000)
+				}
+				this.alertCount = alerts.length;
 				this.updateCount();
 				return Promise.all(promises).then(() => alerts);
 			}
@@ -116,23 +133,38 @@ export class Notifier extends Observable {
 				})
 			),
 			comp({flex: 1, cls: "scroll"},
-				this.msgList = list({
-					emptyStateHtml: '<div style="position:absolute;z-index:-1" class="goui-empty-state"><b>'+t('No notifications')+'</b></div>',
-					store: this.store,
-					renderer: (msg:any) => [this.card(msg)]
-				}),
-				list({
-					emptyStateHtml: '',
-					store: this.alertStore,
-					renderer: (alert:any) => {
-						const closeFn = ()=>{jmapds("Alert").destroy(alert.id);};
-						let note = this.notificationRenderers?.[alert.entity]?.(alert, closeFn);
-						note ??= this.defaultNotificationRenderer(alert, closeFn);
-						note.onClose ??= closeFn;
+			this.msgList = list({
+				emptyStateHtml: '<div style="position:absolute;z-index:-1" class="goui-empty-state"><b>'+t('No notifications')+'</b></div>',
+				store: this.store,
+				renderer: (msg:any) => [this.card(msg)]
+			}),
+			list({
+				emptyStateHtml: '',
+				store: this.alertStore,
+				renderer: (alert:any) => {
+					const closeFn = ()=>{jmapds("Alert").destroy(alert.id);};
+					const clickFn = () => {
+						const e = entities.get(alert.entity);
+						debugger;
+						e.goto(alert.entityId);
+						//closeFn();
+					};
 
-						return [this.card(note)];
+					if(!alert.entityData && alert.entityId) {
+						console.log(alert.entity+' with id '+alert.entityId+' not longer exists, removing...');
+						closeFn();
+						return [];
 					}
-				})
+
+					let notification = this.notificationRenderers?.[alert.entity]?.(alert, closeFn);
+					notification ??= this.defaultNotificationRenderer(alert, closeFn);
+
+					notification.onClose ??= closeFn;
+					notification.onClick ??= clickFn;
+
+					return [this.card(notification)];
+				}
+			})
 			)
 		);
 
@@ -224,43 +256,6 @@ export class Notifier extends Observable {
 		this.canNotify = (p === 'granted');
 	}
 
-	// notify(msg: INotification) {
-	//
-	// 	console.log(msg);
-	// 	return;
-	//
-	// 	if(['alarm','message'].includes(msg.category!)) {
-	// 		this.playSound(msg.category==='alarm' ? 'reminders' : 'email');
-	// 	}
-	//
-	// 	// Hard fallback conditions
-	// 	if (!this.canNotify) {
-	// 		return this.flyout(msg);
-	// 	}
-	//
-	// 	try {
-	// 		const n = new Notification(msg.title || defaultTitle, {body:msg.text, icon: msg.icon?.link || defaultIcon});
-	// 		if (msg.actions?.click) {
-	// 			n.onclick = (e) => {
-	// 				e.preventDefault();
-	// 				msg.actions!.click.run();
-	// 				n.close();
-	// 			};
-	// 			delete msg.actions?.click;
-	// 		}
-	// 		n.onclose = () => {
-	// 			// TODO: some OSes and Browsers auto close in a few seconds. re-open to keep persistent?
-	// 		};
-	// 		n.onerror = () => {
-	// 			this.flyout(msg);
-	// 		};
-	//
-	// 		return n;
-	// 	} catch {
-	// 		return this.flyout(msg);
-	// 	}
-	// }
-
 	private defaultNotificationRenderer(alert:any, closeFn: () => void): INotification {
 
 		const entity = alert.entityData;
@@ -292,11 +287,11 @@ export class Notifier extends Observable {
 		return {
 			title: alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity,
 			text,
-			icon: icon ?? undefined,
+			icon: icon ?? {name: 'notifications'},
 			category: ("progress" in alert.data) ? 'progress' : 'event',
-			onClick: () => { entities.get(alert.entity).goto(alert.entityId); closeFn(); }
-		}
-
+			...(alert.triggerAt && { time: new Date(alert.triggerAt) }),
+			...(alert.staleAt && { stale: new Date(alert.staleAt) })
+		} as INotification
 	}
 
 	private card(msg: INotification)
@@ -323,20 +318,19 @@ export class Notifier extends Observable {
 		const card = comp({cls:msg.variant||''},
 			h3({text:msg.title},
 				comp({tagName:'i',cls:'icon',text: msg.icon?.name, style:{color:msg.icon?.color}}),
-				btn({icon:'close', title:t('Close'), hidden: msg.category==='system'}).on('click', rm)
+				btn({icon:'close', title:t('Close'), hidden: msg.category==='system'})
+					.on('click',(ctx) => { rm(); ctx.ev.stopPropagation(); })
 			),
 			...items,
 			...(actions.length ? [comp({},...Object.values(actions).map(a =>
 				btn({text:a!.text, icon:a!.icon}).on('click', ()=>{a!.run(); })))] : [])
 		);
 
-		const seconds = (when: Date) => Math.floor((when.getTime() - (new Date()).getTime()) / 1000);
-
-		if (msg.time) {
-			setTimeout(() => {card.show()}, seconds(msg.time));
-		}
+		// if (msg.time && msg.time > now) {
+		// 	setTimeout(() => {card.show()}, seconds(msg.time)*1000);
+		// }
 		if(msg.stale) {
-			setTimeout(() => {card.remove()}, seconds(msg.stale));
+			setTimeout(() => {card.remove()}, seconds(msg.stale)*1000);
 		}
 		msg.card = card; // possible ref for changes
 
@@ -345,23 +339,6 @@ export class Notifier extends Observable {
 				e.target.el.on('click', msg.onClick)
 		})
 	}
-
-	// flyout(msg: INotification) {
-	//
-	// 	const c = this.card(msg);
-	//
-	// 	if(msg.category==='status' || msg.category === 'message') {
-	// 		setTimeout(() => {
-	// 			c.remove();
-	// 		}, 5000);
-	// 	}
-	// 	if(['alarm','message'].includes(msg.category!)) {
-	// 		this.playSound(msg.category==='alarm' ? 'reminders' : 'email');
-	// 	}
-	//
-	// 	this.panel.items.add(c);
-	//
-	// }
 
 	playSound(filename: SoundName = 'question') {
 		if(!GO.util.empty(go.User.mute_sound) ||
