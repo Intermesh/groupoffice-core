@@ -101,7 +101,7 @@ export class Notifier extends Observable {
 		});
 
 		// has child with cls "notifications"
-		const sidePanel = comp({cls:'notifications vbox', hidden:true},
+		const sidePanel = comp({cls:'notifications', hidden:true},
 			tbar({style:{paddingLeft:'0'}},
 				btn({icon: "chevron_right", title: t("Close")}).on('click',() => {
 					sidePanel.hide()
@@ -279,11 +279,7 @@ export class Notifier extends Observable {
 			}
 		}
 
-		if(!icon) {
-			icon = {name: "notifications"};
-		}
-
-		let text = Format.dateTime(alert.triggerAt);
+		let text = alert.data.body ?? Format.dateTime(alert.triggerAt);
 
 		if(alert.data) {
 			if("progress" in alert.data) {
@@ -296,7 +292,7 @@ export class Notifier extends Observable {
 		return {
 			title: alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity,
 			text,
-			icon: icon,
+			icon: icon ?? undefined,
 			category: ("progress" in alert.data) ? 'progress' : 'event',
 			onClick: () => { entities.get(alert.entity).goto(alert.entityId); closeFn(); }
 		}
