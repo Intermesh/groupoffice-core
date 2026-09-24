@@ -101,7 +101,7 @@ export class Notifier extends Observable {
 		});
 
 		// has child with cls "notifications"
-		const sidePanel = comp({cls:'notifications', hidden:true},
+		const sidePanel = comp({cls:'notifications vbox', hidden:true},
 			tbar({style:{paddingLeft:'0'}},
 				btn({icon: "chevron_right", title: t("Close")}).on('click',() => {
 					sidePanel.hide()
@@ -115,23 +115,25 @@ export class Notifier extends Observable {
 					});
 				})
 			),
-			this.msgList = list({
-				emptyStateHtml: '<div style="position:absolute;z-index:-1" class="goui-empty-state"><b>'+t('No notifications')+'</b></div>',
-				store: this.store,
-				renderer: (msg:any) => [this.card(msg)]
-			}),
-			list({
-				emptyStateHtml: '',
-				store: this.alertStore,
-				renderer: (alert:any) => {
-					const closeFn = ()=>{jmapds("Alert").destroy(alert.id);};
-					let note = this.notificationRenderers?.[alert.entity]?.(alert, closeFn);
-					note ??= this.defaultNotificationRenderer(alert, closeFn);
-					note.onClose ??= closeFn;
+			comp({flex: 1, cls: "scroll"},
+				this.msgList = list({
+					emptyStateHtml: '<div style="position:absolute;z-index:-1" class="goui-empty-state"><b>'+t('No notifications')+'</b></div>',
+					store: this.store,
+					renderer: (msg:any) => [this.card(msg)]
+				}),
+				list({
+					emptyStateHtml: '',
+					store: this.alertStore,
+					renderer: (alert:any) => {
+						const closeFn = ()=>{jmapds("Alert").destroy(alert.id);};
+						let note = this.notificationRenderers?.[alert.entity]?.(alert, closeFn);
+						note ??= this.defaultNotificationRenderer(alert, closeFn);
+						note.onClose ??= closeFn;
 
-					return [this.card(note)];
-				}
-			})
+						return [this.card(note)];
+					}
+				})
+			)
 		);
 
 		root.items.add(sidePanel);
@@ -165,6 +167,11 @@ export class Notifier extends Observable {
 		return this.alertStore.load();
 	}
 
+	/**
+	 * Register a renderer for a specific entity type
+	 * @param entityType
+	 * @param renderer
+	 */
 	regRenderer(entityType:string, renderer: (alert: AlertEntity, closeFn: ()=>void) => INotification | undefined) {
 		this.notificationRenderers[entityType] = renderer;
 	}
@@ -272,7 +279,11 @@ export class Notifier extends Observable {
 			}
 		}
 
-		let text = alert.data.body ?? Format.dateTime(alert.triggerAt);
+		if(!icon) {
+			icon = {name: "notifications"};
+		}
+
+		let text = Format.dateTime(alert.triggerAt);
 
 		if(alert.data) {
 			if("progress" in alert.data) {
@@ -285,7 +296,7 @@ export class Notifier extends Observable {
 		return {
 			title: alert.data && alert.data.title ? alert.data.title : entity.name || entity.title || entity.description || alert.entity,
 			text,
-			icon: icon ?? undefined,
+			icon: icon,
 			category: ("progress" in alert.data) ? 'progress' : 'event',
 			onClick: () => { entities.get(alert.entity).goto(alert.entityId); closeFn(); }
 		}

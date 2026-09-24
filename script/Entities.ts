@@ -1,5 +1,5 @@
 import {EntityConfig, EntityFilter, EntityLink, modules} from "./Modules.js";
-import {EntityID, t} from "@intermesh/goui";
+import {EntityID, router, t} from "@intermesh/goui";
 import {customFields, CustomField} from "./customfields/index.js";
 
 export type EntityRelation = {store: string, fk: string};
@@ -153,6 +153,10 @@ class Entities {
 			entity.links = this.normalizeLinks(entity)
 			entity.relations = entity.relations || {};
 			entity.relations = {...entity.relations, ...customFields.getRelations(entity.name)};
+
+			if(!entity.goto) {
+				entity.goto = (entityId:EntityID) =>  router.goto(entity.name.toLowerCase() + "/" + entityId)
+			}
 
 			this.entities[entity.name.toLowerCase()] = entity;
 		}

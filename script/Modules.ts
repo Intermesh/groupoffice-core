@@ -96,6 +96,11 @@ export interface EntityConfig {
 		fieldSetDialog: string
 	}
 
+	/**
+	 * Method to route to the entity
+	 */
+	goto?: (id:EntityID)=>void,
+
 }
 
 export type MainPanelConfig<T extends typeof Component<any> = typeof Component<any>> = {
