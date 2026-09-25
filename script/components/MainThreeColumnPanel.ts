@@ -31,6 +31,7 @@ export abstract class MainThreeColumnPanel extends Component {
 		this.center = this.createCenter();
 		this.center.el.classList.add("center");
 		this.center.itemId = "center";
+		this.center.stateId = this.stateId + "-center";
 		if (!this.center.minWidth) {
 			this.center.minWidth = 300;
 		}
@@ -43,7 +44,7 @@ export abstract class MainThreeColumnPanel extends Component {
 		this.center.el.classList.add("active");
 
 		this.west = this.createWest();
-		this.west.stateId = "west";
+		this.west.stateId = this.stateId + "-west";
 		this.west.el.classList.add("west");
 
 		if (!this.west.minWidth) {
@@ -55,6 +56,7 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		this.east = this.createEast();
 		this.east.itemId = "east";
+		this.east.stateId = this.stateId + "-east";
 		this.east.flex = 1;
 		if (!this.east.minWidth) {
 			this.east.minWidth = 140;
@@ -170,6 +172,72 @@ export abstract class MainThreeColumnPanel extends Component {
 			handler: (button, ev) => {
 				this.activatePanel(this.center);
 				router.setPath(this.id);
+			}
+		})
+	}
+
+
+	protected openEastButton(cfg: Config<Button> = {}) {
+		return btn({
+			...cfg,
+			cls: "small",
+			title: t("Show details"),
+			icon: "right_panel_open",
+			listeners: {
+				render: ({target}) => {
+					this.east.on('show', () => {
+						target.hide();
+					});
+
+					this.east.on('hide', () => {
+						target.show();
+					});
+
+					target.hidden = !this.east.hidden;
+
+				}
+			},
+			handler: (button, ev) => {
+				this.east.hidden = false;
+				this.east.saveState();
+			}
+		})
+	}
+
+
+	/**
+	 * Button to show the center panel. Use in overrides.
+	 * @protected
+	 */
+	protected closeEastButton() {
+		return btn({
+			cls: "small",
+			title: t("Close details"),
+			icon: "right_panel_close",
+			listeners: {
+				render: ({target}) => {
+
+					this.east.on('show', () => {
+						target.show();
+						this.center.flex = "";
+					})
+
+					this.east.on('hide', () => {
+						target.hide();
+						this.center.flex = 1;
+					})
+
+					if(this.east.hidden) {
+						this.center.flex = 1;
+					}
+
+				}
+			},
+			handler: (button, ev) => {
+
+				this.east.hidden = true;
+				this.east.saveState();
+
 			}
 		})
 	}
