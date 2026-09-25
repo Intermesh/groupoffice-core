@@ -211,7 +211,7 @@ export abstract class MainThreeColumnPanel extends Component {
 	 */
 	protected closeEastButton() {
 		return btn({
-			cls: "small",
+			cls: "small not-small-device",
 			title: t("Close details"),
 			icon: "right_panel_close",
 			listeners: {
