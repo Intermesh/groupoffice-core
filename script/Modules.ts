@@ -541,6 +541,20 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		this.initModules();
 
+		main.notifier.regRenderer('Module', (alert, closeFn) => {
+			if(!alert.data.link) return; // is downloadable export
+
+			return {
+				title: alert.data.title,
+				text: alert.data.body, // file name
+				icon: {name:'import_export', color: 'green'},
+				category: 'event',
+				actions:{
+					primary:{text:t('Download'), icon:'download_2', run: ()=>{window.open(alert.data.link)}}
+				}
+			}
+		});
+
 
 		GO.mainLayout.fireEvent('authenticated', this, go.User);
 		GO.mainLayout.fireReady();
