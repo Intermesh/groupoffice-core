@@ -1,4 +1,4 @@
-import {browser, btn, Button, Component, Config, router, splitter, t} from "@intermesh/goui";
+import {browser, btn, Button, comp, Component, Config, router, splitter, t} from "@intermesh/goui";
 
 /**
  * MainThreeColumnPanel class
@@ -26,9 +26,8 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 		this.id = idAndRoute;
 		this.stateId = "main-3-col-" + idAndRoute
 
-		this.cls = "hbox fit mobile-cards";
+		this.cls = "hbox fit main-3-col";
 	}
-
 
 	/**
 	 * Child classes can call this method top setup the component after the child is fully constructed
@@ -41,6 +40,7 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 	protected setup(center: Center, west: West, east: East) {
 		this.center = center;
 		this.center.itemId = "center";
+		this.center.stateId = this.stateId + "-center";
 		if (!this.center.minWidth) {
 			this.center.minWidth = 300;
 		}
@@ -53,6 +53,8 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 		this.center.el.classList.add("active");
 
 		this.west = west;
+		this.west.el.classList.add("west");
+		this.west.stateId = this.stateId + "-west";
 		this.west.stateId = "west";
 
 		if (!this.west.minWidth) {
@@ -64,10 +66,13 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 
 		this.east = east;
 		this.east.itemId = "east";
+		this.east.stateId = this.stateId + "-east";
 		this.east.flex = 1;
 		if (!this.east.minWidth) {
 			this.east.minWidth = 140;
 		}
+
+		this.east.el.classList.add("east");
 
 		this.items.add(
 			this.west,
@@ -88,18 +93,12 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 		);
 	}
 
-
-	/**
-	 * Button to show the west panel. Use in overrides.
-	 *
-	 * @protected
-	 */
-	protected showWestButton(cfg: Config<Button> = {}) {
+	protected openWestButton(cfg: Config<Button> = {}) {
 		return btn({
 			...cfg,
-			cls: "small",
+			cls: "small not-medium-device",
 			title: t("Show sidebar"),
-			icon: browser.isMobile() ? "menu" : "left_panel_open",
+			icon: "left_panel_open",
 			listeners: {
 				render: ({target}) => {
 					this.west.on('show', () => {
@@ -110,19 +109,63 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 						target.show();
 					});
 
+					target.hidden = !this.west.hidden;
 
-					if (!browser.isMobile()) {
-						target.hidden = !this.west.hidden;
-					}
 				}
 			},
 			handler: (button, ev) => {
-				this.activatePanel(this.west);
+				this.west.hidden = false;
+				this.west.saveState();
+			}
+		})
+	}
 
-				if (button.icon == "left_panel_open") {
-					this.west.hidden = false;
-					this.west.saveState();
+	/**
+	 * Button to show the west panel. Use in overrides.
+	 *
+	 * @protected
+	 */
+	protected showWestButton(cfg: Config<Button> = {}) {
+		return btn({
+			...cfg,
+			cls: "small for-medium-device",
+			title: t("Show sidebar"),
+			icon: "menu",
+			handler: (button, ev) => {
+				this.activatePanel(this.west);
+			}
+		})
+	}
+
+
+	/**
+	 * Button to show the center panel. Use in overrides.
+	 * @protected
+	 */
+	protected closeWestButton() {
+		return btn({
+			cls: "small not-medium-device",
+			title: t("Close sidebar"),
+			icon: "left_panel_close",
+			listeners: {
+				render: ({target}) => {
+
+
+					this.west.on('show', () => {
+						target.show();
+					})
+
+					this.west.on('hide', () => {
+						target.hide();
+					})
+
 				}
+			},
+			handler: (button, ev) => {
+
+				this.west.hidden = true;
+				this.west.saveState();
+
 			}
 		})
 	}
@@ -131,38 +174,92 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 	 * Button to show the center panel. Use in overrides.
 	 * @protected
 	 */
-	protected showCenterButton() {
+	protected hideWestButton() {
 		return btn({
-			cls: "small",
+			cls: "small for-medium-device",
 			title: t("Close sidebar"),
-			icon: browser.isMobile() ? "close" : "left_panel_close",
-			listeners: {
-				render: ({target}) => {
-
-					if (this.west.findChild(target)) {
-						this.west.on('show', () => {
-							target.show();
-						})
-
-						this.west.on('hide', () => {
-							target.hide();
-						})
-					} else {
-						target.icon = "close";
-						target.cls = target.cls + " for-small-device";
-					}
-
-					// target.hidden = !this.west.hidden;
-				}
-			},
+			icon: "close",
 			handler: (button, ev) => {
 				this.activatePanel(this.center);
 				router.setPath(this.id);
+			}
+		})
+	}
 
-				if (button.icon == "left_panel_close") {
-					this.west.hidden = true;
-					this.west.saveState();
+
+	protected openEastButton(cfg: Config<Button> = {}) {
+		return btn({
+			...cfg,
+			cls: "small",
+			title: t("Show details"),
+			icon: "right_panel_open",
+			listeners: {
+				render: ({target}) => {
+					this.east.on('show', () => {
+						target.hide();
+					});
+
+					this.east.on('hide', () => {
+						target.show();
+					});
+
+					target.hidden = !this.east.hidden;
+
 				}
+			},
+			handler: (button, ev) => {
+				this.east.hidden = false;
+				this.east.saveState();
+			}
+		})
+	}
+
+
+	/**
+	 * Button to show the center panel. Use in overrides.
+	 * @protected
+	 */
+	protected closeEastButton() {
+		return btn({
+			cls: "small not-small-device",
+			title: t("Close details"),
+			icon: "right_panel_close",
+			listeners: {
+				render: ({target}) => {
+
+					this.east.on('show', () => {
+						target.show();
+						this.center.flex = "";
+					})
+
+					this.east.on('hide', () => {
+						target.hide();
+						this.center.flex = 1;
+					})
+
+					if(this.east.hidden) {
+						this.center.flex = 1;
+					}
+
+				}
+			},
+			handler: (button, ev) => {
+
+				this.east.hidden = true;
+				this.east.saveState();
+
+			}
+		})
+	}
+
+	protected hideEastButton() {
+		return btn({
+			cls: "small for-small-device",
+			title: t("Back"),
+			icon: "chevron_left",
+			handler: (button, ev) => {
+				this.activatePanel(this.center);
+				router.setPath(this.id);
 			}
 		})
 	}
@@ -174,9 +271,10 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 	 * @param active
 	 */
 	public activatePanel(active: Component) {
-		this.center.el.classList.remove("active");
-		this.east.el.classList.remove("active");
-		this.west.el.classList.remove("active");
+
+		active.parent?.items.forEach(c => c.el.classList.remove("active"))
+
+		active.hidden = false;
 		active.el.classList.add("active");
 
 	}
