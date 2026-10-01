@@ -145,7 +145,6 @@ export class Notifier extends Observable {
 					const closeFn = ()=>{jmapds("Alert").destroy(alert.id);};
 					const clickFn = () => {
 						const e = entities.get(alert.entity);
-						debugger;
 						e.goto(alert.entityId);
 						//closeFn();
 					};
