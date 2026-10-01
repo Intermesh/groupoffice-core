@@ -372,6 +372,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 						//this.loginForm.hide();
 						this.otpForm.show();
 						this.otpForm.focus();
+						this.center();
 					});
 					break;
 
