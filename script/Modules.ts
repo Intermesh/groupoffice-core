@@ -238,10 +238,11 @@ class Modules {
 
 		this.mods[id] = config;
 
-
-
 		go.Translate.package = config.package;
 		go.Translate.module = config.name;
+
+		translate.load(GO.lang[config.package]?.[config.name], config.package, config.name);
+
 
 		if (config.init) {
 			config.init();
