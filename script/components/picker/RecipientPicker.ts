@@ -125,7 +125,7 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 				}),
 
 				btn({
-					text: t("Add selected"),
+					text: t("Add selection"),
 					cls: "filled primary",
 					handler: ()=>{
 						const recipients = (this.cards.activeItemComponent as RecipientPickerComponent).getSelected()
