@@ -285,7 +285,10 @@ export abstract class MainThreeColumnPanel extends Component {
 
 		active.parent?.items.forEach(c => c.el.classList.remove("active"))
 
-		active.hidden = false;
+		if(active.hidden) {
+			active.hidden = false;
+			active.saveState();
+		}
 		active.el.classList.add("active");
 
 	}
