@@ -1,4 +1,4 @@
-import {browser, btn, Button, comp, Component, Config, router, splitter, t} from "@intermesh/goui";
+import {btn, Button, Component, Config, router, splitter, t} from "@intermesh/goui";
 
 /**
  * MainThreeColumnPanel class
