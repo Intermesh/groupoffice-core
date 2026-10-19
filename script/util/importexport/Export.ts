@@ -23,6 +23,7 @@ export abstract class Export {
 	private static export(entity: string, queryParams: Record<string, any>, extension: string, columns?:string[]) {
 		client.jmap(entity + "/query", queryParams).then((result) => {
 			client.jmap(entity + "/export", {
+				background: true,
 				extension: extension,
 				ids: result.ids,
 				columns: columns
