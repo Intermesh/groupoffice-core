@@ -1,4 +1,4 @@
-import {browser, btn, Button, comp, Component, Config, router, splitter, t} from "@intermesh/goui";
+import {btn, Button, Component, Config, router, splitter, t} from "@intermesh/goui";
 
 /**
  * MainThreeColumnPanel class
@@ -274,7 +274,10 @@ export abstract class MainThreeColumnPanel<West extends Component = Component, C
 
 		active.parent?.items.forEach(c => c.el.classList.remove("active"))
 
-		active.hidden = false;
+		if(active.hidden) {
+			active.hidden = false;
+			active.saveState();
+		}
 		active.el.classList.add("active");
 
 	}
