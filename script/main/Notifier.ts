@@ -70,7 +70,7 @@ export class Notifier extends Observable {
 	private alertStore;
 	private msgList: List
 	private notificationRenderers: {[entityType:string]: (alert:any, closeFn: ()=>void) => INotification | undefined} = {};
-	private nextTriggerIntervalId?: number
+	private nextTriggerIntervalId?: any
 	constructor() {
 		super();
 
