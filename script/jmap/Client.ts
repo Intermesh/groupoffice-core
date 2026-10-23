@@ -671,7 +671,8 @@ export class Client extends Observable<ClientEventMap> {
 				signal: this.SSEABortController.signal,
 				onmessage: (msg) => {
 
-					if(msg.event == "ping") {
+					// Ignore pings and empty messages. A parse error below would close the connection.
+					if(msg.event == "ping" || !msg.data) {
 						return;
 					}
 
