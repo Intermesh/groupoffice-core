@@ -47,6 +47,10 @@ export class ExtJSWrapper extends Component {
 				ro = undefined;
 			}
 		})
+
+		this.on("beforerender", e => {
+			e.target.el.classList.add("extjswrapper");
+		})
 	}
 
 	/**
