@@ -13,8 +13,14 @@ export class ExtJSWrapper extends Component {
 		this.items.add(extJSComp);
 
 		proxies.forEach(p => {
-			// @ts-ignore
-			this[p] = extJSComp[p].bind(extJSComp);
+
+			if(typeof extJSComp[p] === 'function'){
+				// @ts-ignore
+				this[p] = extJSComp[p].bind(extJSComp);
+			} else {
+				// @ts-ignore
+				this[p] = extJSComp[p];
+			}
 		})
 
 		let ro : ResizeObserver | undefined;
