@@ -44,10 +44,14 @@ export class MarkdownField extends Field {
 			uploadImage: true,
 			imagePathAbsolute: true,
 			imageUploadFunction: (file, onSuccess, onError) => {
-				client.upload(file).then(r => {
+				Promise.all([client.upload(file), MarkdownField.getImageSize(file)]).then(([r, size]) => {
+					let url = client.downloadUrl(r.id);
+					if (size) {
+						url = Markdown.addImageSize(url, size.width, size.height);
+					}
 					// Don't call onSuccess(). EasyMDE checks the URL for an image file extension and inserts a link
 					// instead of an image because the blob download URL has none.
-					this.insertImage(file.name, client.downloadUrl(r.id));
+					this.insertImage(file.name, url);
 				}).catch(err => {
 					console.error(err);
 					Notifier.error(t("Failed to upload {name}").replace("{name}", file.name));
@@ -77,6 +81,23 @@ export class MarkdownField extends Field {
 		});
 
 		return el;
+	}
+
+	/**
+	 * Get the image dimensions so the aspect ratio can be set before the image is loaded
+	 *
+	 * @param file
+	 */
+	private static async getImageSize(file: File): Promise<{ width: number, height: number } | undefined> {
+		try {
+			const bitmap = await createImageBitmap(file);
+			const size = {width: bitmap.width, height: bitmap.height};
+			bitmap.close();
+			return size;
+		} catch (e) {
+			// Not supported for this image type. For example SVG.
+			return undefined;
+		}
 	}
 
 	/**

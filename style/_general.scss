@@ -51,3 +51,8 @@
 .goui.table-title {
 	min-width: 0;
 }
+
+// See Image.enableZoom()
+.image-zoom img {
+	cursor: zoom-in;
+}
