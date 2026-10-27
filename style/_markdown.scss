@@ -1,0 +1,98 @@
+@use '../../goui/style/util';
+@use '../../goui/style/config';
+
+// EasyMDE and CodeMirror base styles
+@use '../../../../node_modules/easymde/dist/easymde.min';
+
+.goui-markdown-field {
+	display: flex;
+	flex-direction: column;
+	min-height: util.dp(160);
+
+	> .wrap, > .wrap > .input {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+
+	.EasyMDEContainer {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+
+		.CodeMirror {
+			flex: 1;
+			min-height: 0;
+			color: var(--fg-text);
+			background-color: var(--bg-input);
+			border-color: var(--fg-border);
+			border-bottom-left-radius: config.$borderRadius;
+			border-bottom-right-radius: config.$borderRadius;
+			font-family: monospace;
+		}
+
+		.CodeMirror-cursor {
+			border-left-color: var(--fg-text);
+		}
+
+		.CodeMirror-selected, .CodeMirror-focused .CodeMirror-selected {
+			background: var(--bg-selection);
+		}
+	}
+
+	.editor-toolbar {
+		flex: none;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		padding: util.dp(4);
+		opacity: 1;
+		border-color: var(--fg-border);
+		border-top-left-radius: config.$borderRadius;
+		border-top-right-radius: config.$borderRadius;
+		background-color: var(--bg-low);
+
+		button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: util.dp(32);
+			height: util.dp(32);
+			color: var(--fg-icon);
+			border-radius: config.$borderRadius;
+
+			&:hover, &.active {
+				background-color: var(--bg-hover);
+				border-color: transparent;
+			}
+
+			i.icon {
+				font-size: util.dp(20);
+			}
+		}
+
+		i.separator {
+			height: util.dp(20);
+			border-left-color: var(--fg-divider);
+			border-right: none;
+		}
+
+		&.disabled-for-preview button:not(.no-disable) {
+			opacity: .4;
+		}
+	}
+
+	.editor-preview, .editor-preview-side {
+		background-color: var(--bg-input);
+		color: var(--fg-text);
+	}
+
+	.editor-statusbar {
+		color: var(--fg-secondary-text);
+		&:empty {
+			display: none;
+		}
+	}
+}
