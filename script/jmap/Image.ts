@@ -4,7 +4,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-import {comp, Component, Config, createComponent} from "@intermesh/goui";
+import {comp, Component, Config, createComponent, t, win} from "@intermesh/goui";
 import {client} from "./Client.js";
 
 /**
@@ -53,6 +53,59 @@ export class Image extends Component {
 		Image.replaceImages(c.el);
 
 		return c;
+	}
+
+	/**
+	 * Open a window with the large image when an image inside the element is clicked
+	 *
+	 * @param el
+	 */
+	public static enableZoom(el: HTMLElement) {
+		el.classList.add("image-zoom");
+		el.addEventListener("click", (e) => {
+			if (e.target && (e.target as HTMLElement).tagName == "IMG") {
+				Image.showWindow(e.target as HTMLImageElement);
+			}
+		});
+	}
+
+	/**
+	 * Show the image in a window
+	 *
+	 * @param img
+	 */
+	public static showWindow(img: HTMLImageElement) {
+		const imageWin = win({
+				width: window.innerWidth - 50,
+				height: window.innerHeight - 50,
+				maximized: false,
+				maximizable: true,
+				resizable: true,
+				modal: true,
+				title: img.alt || t("Image"),
+			},
+			comp({
+				flex: 1,
+				itemId: "img-cont",
+
+				style: {
+					alignItems: "center",
+					justifyContent: "center"
+				},
+				listeners: {
+					beforerender: ({target}) => {
+						const i = img.cloneNode() as HTMLImageElement;
+						i.removeAttribute("style");
+						i.style.height = "100%";
+						i.style.width = "100%";
+						i.style.objectFit = "contain";
+						target.el.appendChild(i);
+					}
+				}
+			})
+		);
+
+		imageWin.show();
 	}
 
 	/**

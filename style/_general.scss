@@ -56,6 +56,12 @@
 .goui.table-title {
 	min-width: 0;
 }
+
+// See Image.enableZoom()
+.image-zoom img {
+	cursor: zoom-in;
+}
+
 //@media (orientation: landscape) and (max-device-width: config.$breakpointMedium) {
 	//.goui-module-panel {
 	//	top : 0;

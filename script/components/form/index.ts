@@ -4,3 +4,4 @@ export * from './RecurrenceField.js';
 export * from './ImageField.js';
 export * from './LanguageField.js';
 export * from './FileButtonField.js';
+export * from './MarkdownField.js';

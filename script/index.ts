@@ -12,6 +12,7 @@ export * from "./util/Recurrence.js";
 export * from "./util/importexport/Import.js";
 export * from "./util/importexport/Export.js";
 export * from "./customfields/index.js";
+export * from "./util/Markdown.js";
 export * from "./Entities.js";
 export * from "./main/index.js";
 export * from "./model/Link.js";

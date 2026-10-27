@@ -751,14 +751,6 @@ export class Client extends Observable<ClientEventMap> {
 			delete headers['Content-Type'];
 
 
-			// Event source will stop when document is hidden. Other tab is selected. When coming back check all sources for
-			// updates
-			document.addEventListener('visibilitychange', () => {
-				if (!document.hidden) {
-					this.updateAllDataSources(entities!);
-				}
-			});
-
 			this.SSEABortController = new AbortController()
 
 			// let retry = 0;
@@ -767,7 +759,8 @@ export class Client extends Observable<ClientEventMap> {
 				signal: this.SSEABortController.signal,
 				onmessage: (msg) => {
 
-					if(msg.event == "ping") {
+					// Ignore pings and empty messages. A parse error below would close the connection.
+					if(msg.event == "ping" || !msg.data) {
 						return;
 					}
 
@@ -812,6 +805,14 @@ export class Client extends Observable<ClientEventMap> {
 
 	private registerSSEEvents() {
 		this.SSEEventsRegistered = true;
+
+		// Event source will stop when document is hidden. Other tab is selected. When coming back check all sources for
+		// updates. Registered once as startSSE() is called again on every reconnect.
+		document.addEventListener('visibilitychange', () => {
+			if (!document.hidden && this.SSELastEntities) {
+				this.updateAllDataSources(this.SSELastEntities);
+			}
+		});
 
 		window.addEventListener('offline', () => {
 			console.log("Closing SSE because we're offline")
