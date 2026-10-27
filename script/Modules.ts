@@ -400,6 +400,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			name: "core",
 			package: "core",
 			entities: [
+				{name: "AppPassword"},
 				{
 					name: 'Alert',
 					relations: {

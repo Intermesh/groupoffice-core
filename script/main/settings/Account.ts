@@ -25,10 +25,12 @@ import {imagefield} from "../../components";
 import {User, userDS} from "../../auth";
 import {modules} from "../../Modules";
 import {client} from "../../jmap";
+import {AppPasswords} from "./AppPasswords.js";
 
 export class Account extends AbstractSettingsPanel {
 	private passwordFieldSet;
 	private convertToLocalFieldset;
+	private appPasswords: AppPasswords;
 	constructor() {
 		super("account", t("Account"), "account_box");
 		const core = modules.get("core", "core")!;
@@ -164,7 +166,9 @@ export class Account extends AbstractSettingsPanel {
 
 					clientFld.value = [];
 				})
-			)
+			),
+
+			this.appPasswords = new AppPasswords()
 		))
 	}
 
@@ -181,6 +185,7 @@ export class Account extends AbstractSettingsPanel {
 
 	async load(user: User): Promise<any> {
 		const ret = super.load(user);
+		void this.appPasswords.load(user);
 
 		// Disable password fieldset if there's no password authentication method.
 		// User logged in via imap or ldap authenticator for example.

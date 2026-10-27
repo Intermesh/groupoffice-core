@@ -6,3 +6,4 @@ export * from './Groups.js';
 export * from './Notifications.js';
 export * from './VisibleTo.js';
 export * from './Modules.js';
+export * from './AppPasswords.js';
