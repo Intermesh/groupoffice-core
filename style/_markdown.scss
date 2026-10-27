@@ -2,7 +2,7 @@
 @use '../../goui/style/config';
 
 // EasyMDE and CodeMirror base styles
-@use '../../../../node_modules/easymde/dist/easymde.min';
+@use 'easymde/dist/easymde.min';
 
 .goui-markdown-field {
 	display: flex;
