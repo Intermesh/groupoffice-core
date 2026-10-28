@@ -2,6 +2,7 @@ import {FormWindow} from "../components/index.js";
 import {a, comp, fieldset, Format, p, t, textfield, Window} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
 import {LegacyApi} from "../LegacyApi";
+import {modules} from "../Modules";
 
 export class AboutWindow extends Window {
 	constructor() {
@@ -34,6 +35,10 @@ export class AboutWindow extends Window {
 			if (!client.user.isAdmin) {
 				return;
 			}
+			const coreModule = modules.get("core", "core"),
+				s = coreModule!.settings;
+			console.log(s);
+
 			const resp = await la.call() as any;
 			if (resp.data && resp.data.has_usage) {
 				this.items.insert(2, fieldset({
@@ -47,22 +52,22 @@ export class AboutWindow extends Window {
 					textfield({
 						label: t("Files"),
 						readOnly: true,
-						value: `${Format.fileSize(resp.data.file_storage_usage)} / ${resp.data.quota ? Format.fileSize(resp.data.quota): "-"}`
+						value: `${Format.fileSize(s.fileStorageUsage)} / ${resp.data.quota ? Format.fileSize(resp.data.quota): "-"}`
 					}),
 					textfield({
 						label: t("E-mail"),
 						readOnly: true,
-						value: resp.data.mailbox_usage ? Format.fileSize(resp.data.mailbox_usage) : '-'
+						value: s.mailboxUsage ? Format.fileSize(s.mailboxUsage) : '-'
 					}),
 					textfield({
 						label: t("Total"),
 						readOnly: true,
-						value: resp.data.total_usage
+						value: Format.fileSize((s.mailboxUsage+s.databaseUsage + s.fileStorageUsage))
 					}),
 					textfield({
 						label: t("Date"),
 						readOnly: true,
-						value: resp.data.date ? Format.smartDateTime(resp.data.date) : t("Never")
+						value: s.cronLastRun ? Format.smartDateTime(s.cronLastRun) : t("Never")
 					})
 				));
 			}
