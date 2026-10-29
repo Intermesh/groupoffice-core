@@ -41,12 +41,16 @@
   "keywords": [
     "Typescript",
     "Framework",
-    "Group-Office"
+    "GroupOffice"
   ],
   "homepage": "https://github.com/Intermesh/groupoffice-core#readme",
   "name": "@intermesh/groupoffice-core",
   "description": "Run \"npm install\" to install. Then run \"npm start\" for watch mode or build once with \"npm run build\"",
-  "version": "2.0.8",
+  "version": "2.0.9",
+  "publishConfig": {
+    "access": "public",
+    "tag": "develop"
+  },
   "exports": {
     ".": {
       "types": "./script/index.ts",
