@@ -527,15 +527,38 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 		});
 
+
+		// Load the server module entities
+		const addModule = (m:Module) => {
+			if (!m.package) {
+				m.package = "legacy";
+			}
+			const id = m.package + "/" + m.name;
+			this.serverModules[id] = m;
+		};
+
 		await moduleDS.get().then( serverMods => {
-			serverMods.list.map(m => {
-				if (!m.package) {
-					m.package = "legacy";
-				}
-				const id = m.package + "/" + m.name;
-				this.serverModules[id] = m;
-			})
+			serverMods.list.map(addModule)
 		});
+
+		// When changes are made to the module settings for example via system setings, we update our collection.
+		moduleDS.on("change", ev => {
+			ev.changes.updated?.forEach(async (moduleId)=> {
+				const m = await moduleDS.single(moduleId);
+				addModule(m);
+			});
+
+			ev.changes.created?.forEach(async (moduleId)=> {
+
+				// todo, this probably needs a whole reload
+				const m = await moduleDS.single(moduleId);
+				addModule(m);
+			});
+
+			ev.changes.destroyed?.forEach( (moduleId)=> {
+				// todo, this probably needs a whole reload
+			});
+		})
 
 
 		await this.legacyInit();
