@@ -707,7 +707,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 
 		const mod = this.get(pkg, name);
-		if(!mod) {
+		if(!mod || !mod.enabled) {
 			return false;
 		}
 
