@@ -131,7 +131,7 @@ class Main extends Component<MainPanelEventMap> {
 		} else {
 			const coreMod = modules.get("core", "core");
 
-			if(coreMod?.settings.defaultPinnedTabs) {
+			if(coreMod?.settings.defaultPinnedTabs.length ) {
 				this.pinned = coreMod?.settings.defaultPinnedTabs;
 			}
 		}
