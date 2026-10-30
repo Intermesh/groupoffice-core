@@ -605,6 +605,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 
 
 			//legacy
+			GO.moduleManager.onAddModule(config.name);
 			if(config.initModule) {
 				config.initModule.call(go.Modules);
 			}
