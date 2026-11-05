@@ -105,11 +105,11 @@ export abstract class AbstractCustomField {
 
 	protected getColumnConfig() : TableColumnConfig {
 		return {
-			id: this.field.databaseName,
-			property: "customFields/" + this.field.databaseName,
+			id: "customFields/" + this.field.databaseName,
 			header: this.field.name,
 			hidden: this.field.hiddenInGrid,
-			resizable: true
+			resizable: true,
+			sortable: true
 		}
 	}
 }
