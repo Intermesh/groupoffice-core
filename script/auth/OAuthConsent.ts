@@ -82,11 +82,16 @@ class OAuthConsent {
 				title: t("Connect {name}").replace("{name}", details.clientName),
 				modal: true,
 				closable: false,
-				width: 640
+				width: 640,
+				// The panels of modules can be long, like a list of items. They scroll, the buttons stay visible.
+				height: Math.min(720, window.innerHeight - 40),
+				cls: "vbox"
 			},
-			comp({cls: "pad", html}),
-			...panels.map(p => p.panel.component),
-			tbar({},
+			comp({cls: "scroll", flex: 1},
+				comp({cls: "pad", html}),
+				...panels.map(p => p.panel.component)
+			),
+			tbar({cls: "border-top"},
 				btn({
 					text: t("Deny"),
 					handler: () => this.submit(details.requestId, "deny", {})
