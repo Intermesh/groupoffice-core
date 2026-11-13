@@ -131,7 +131,7 @@ export class SelectSearchPanel extends Component {
 				})
 				,
 				column({
-					header: "Name",
+					header: t("Name"),
 					id: "name",
 					sortable: true,
 					resizable: true,

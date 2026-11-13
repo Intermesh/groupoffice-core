@@ -149,7 +149,7 @@ export class Login extends Window<LoginEventMap> {
 				}),
 
 				textfield({
-					label: "Code",
+					label: t("Code"),
 					name: "otp_code",
 					required: true,
 					autocomplete: "one-time-code"
@@ -302,7 +302,7 @@ export class Login extends Window<LoginEventMap> {
 					Notifier.error(response.statusText);
 			}
 		} catch (e) {
-			Notifier.error("Sorry, an unexpected error occurred: " + e);
+			Notifier.error(t("Sorry, an unexpected error occurred") + ": " + e);
 		} finally {
 			this.unmask();
 		}
@@ -313,7 +313,7 @@ export class Login extends Window<LoginEventMap> {
 		const success = await client.authenticate();
 		if(!success) {
 			//???
-			Notifier.error("Sorry, an unexpected error occurred");
+			Notifier.error(t("Sorry, an unexpected error occurred"));
 		} else {
 			Notifier.success(t("Logged in successfully"));
 			this.close();
