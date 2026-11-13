@@ -2,5 +2,6 @@
 
 export * from './AuthManager.js';
 export * from './Login.js';
+export * from './OAuthConsent.js';
 export * from './RegisterForm.js';
 export * from './User.js';
