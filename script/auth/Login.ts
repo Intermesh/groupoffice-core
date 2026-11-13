@@ -256,7 +256,7 @@ export class Login extends Window<LoginEventMap> {
 			this.registerForm.on("submit", ({target}) => {
 				if(target.isValid()) {
 					this.close();
-					Notifier.success(t("Registration and successful"));
+					Notifier.success(t("Registration successful"));
 					this.fire("login", {});
 				}
 			});
