@@ -42,6 +42,14 @@ export class MarkdownField extends Field {
 			status: ["upload-image"],
 			minHeight: "100px",
 			uploadImage: true,
+			// Only these texts are shown with a custom imageUploadFunction
+			imageTexts: {
+				sbInit: t("Attach files by dropping or pasting them"),
+				sbOnDragEnter: t("Drop here to attach"),
+				sbOnDrop: t("Uploading...")
+			},
+			// The upload function shows errors with the Notifier, the default is an alert() with the same message
+			errorCallback: () => {},
 			imagePathAbsolute: true,
 			imageUploadFunction: (file, onSuccess, onError) => {
 				Promise.all([client.upload(file), MarkdownField.getImageSize(file)]).then(([r, size]) => {
