@@ -11,7 +11,9 @@ export interface OAuthConsentDetails {
 	redirectHost: string,
 	/** The client runs on the user's own computer */
 	localhostOnly: boolean,
-	scopes: {name: string, description: string}[]
+	scopes: {name: string, description: string}[],
+	/** Identifies the request, so the decision can't approve another request that replaced it */
+	requestId: string
 }
 
 /**
@@ -87,7 +89,7 @@ class OAuthConsent {
 			tbar({},
 				btn({
 					text: t("Deny"),
-					handler: () => this.submit("deny", {})
+					handler: () => this.submit(details.requestId, "deny", {})
 				}),
 				"->",
 				btn({
@@ -101,7 +103,7 @@ class OAuthConsent {
 							}
 							data[p.scope] = p.panel.getData();
 						}
-						this.submit("approve", data);
+						this.submit(details.requestId, "approve", data);
 					}
 				})
 			)
@@ -113,12 +115,13 @@ class OAuthConsent {
 	/**
 	 * A real form post, so the browser follows the redirect to the application
 	 */
-	private submit(decision: "approve" | "deny", data: Record<string, any>): void {
+	private submit(requestId: string, decision: "approve" | "deny", data: Record<string, any>): void {
 		const form = document.createElement("form");
 		form.method = "POST";
 		form.action = client.uri + "oauth.php/authorize";
 
 		const fields: Record<string, string> = {
+			requestId,
 			decision,
 			data: JSON.stringify(data),
 			CSRFToken: client.session?.CSRFToken ?? ""
