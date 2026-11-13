@@ -169,7 +169,7 @@ export class SelectSearchPanel extends Component<SelectSearchPanelEventMap> {
 				})
 				,
 				column({
-					header: "Name",
+					header: t("Name"),
 					id: "name",
 					sortable: true,
 					resizable: true,

@@ -56,7 +56,7 @@ export class RecurrencePicker extends CardContainer<RecurrencePickerEventMap> {
 
 		this.weeklyOptions = checkboxgroup({
 			itemId: 'weeklyOptions',
-			label: "Weekdays",
+			label: t("Weekdays"),
 			options: [0, 1, 2, 3, 4, 5, 6].map(i => {
 				return {label: DateTime.dayNames[DateTime.dayMap[i]].substring(0, 2), name: DateTime.dayMap[i]}
 			})

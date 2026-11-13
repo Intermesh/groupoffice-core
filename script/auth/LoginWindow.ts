@@ -225,7 +225,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 				}),
 
 				textfield({
-					label: "Code",
+					label: t("Code"),
 					name: "otp_code",
 					required: true,
 					autocomplete: "one-time-code"
@@ -338,7 +338,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 			this.registerForm.on("submit", ({target}) => {
 				if(target.isValid()) {
 					this.close();
-					Notifier.success(t("Registration and successful"));
+					Notifier.success(t("Registration successful"));
 					this.fire("login", {});
 				}
 			});
@@ -385,7 +385,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 					Notifier.error(response.statusText);
 			}
 		} catch (e) {
-			Notifier.error("Sorry, an unexpected error occurred: " + e);
+			Notifier.error(t("Sorry, an unexpected error occurred") + ": " + e);
 		} finally {
 			this.unmask();
 		}
@@ -395,7 +395,7 @@ export class LoginWindow extends Window<LoginEventMap> {
 		client.session = await response.json();
 		const success = await client.authenticate();
 		if(!success) {
-			Notifier.error("Sorry, an unexpected error occurred");
+			Notifier.error(t("Sorry, an unexpected error occurred"));
 		} else {
 			//Notifier.success(t("Welcome back, {name}!").replace('{name}', client.user.displayName));
 			this.hide();
