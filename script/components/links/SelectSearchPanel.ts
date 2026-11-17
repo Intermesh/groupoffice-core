@@ -22,6 +22,27 @@ export class SelectSearchPanel extends Component {
 	public readonly resultTable
 	private searchField: TextField;
 
+	/**
+	 * Search while typing from this number of characters. Enter searches right away for any text.
+	 */
+	public static minChars = 3;
+
+	private lastSearchText = "";
+
+	/**
+	 * Load the results for the text
+	 *
+	 * @param text The search text
+	 * @param force Also search when the text didn't change. Otherwise the buffered input after enter would search twice.
+	 */
+	private search(text: string, force = false) {
+		if(!force && text === this.lastSearchText) {
+			return;
+		}
+		this.lastSearchText = text;
+		this.resultTable.store.setFilter("search", {text});
+		void this.resultTable.store.load();
+	}
 
 	constructor(private multiSelect: boolean = true) {
 		super();
@@ -75,14 +96,21 @@ export class SelectSearchPanel extends Component {
 							})]
 					})
 						.on("input", ({value}) => {
-							this.resultTable.store.setFilter("search", {text: value});
-							void this.resultTable.store.load();
+							if(value === "" || value.trim().length >= SelectSearchPanel.minChars) {
+								this.search(value);
+							}
 						}, {buffer: 300})
 						.on("focus", ({target}) => {target.select()})
 						.on("render", ({target}) => {
 							target.el.addEventListener("keydown", (ev) => {
 								if(ev.key == "ArrowDown") {
 									this.resultTable.focus();
+								}
+
+								if(ev.key == "Enter") {
+									// search right away, also when shorter than minChars
+									ev.preventDefault();
+									this.search(target.value, true);
 								}
 
 							})
