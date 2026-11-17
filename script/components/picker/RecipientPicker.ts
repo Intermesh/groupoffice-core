@@ -20,7 +20,6 @@ import {
 import {groupDS, principalDS} from "../../auth/index.js";
 import {ExtJSWrapper} from "../ExtJSWrapper.js";
 import {jmapds} from "../../jmap/index.js";
-import {modules} from "../../Modules.js";
 
 
 interface RecipientPickerComponent extends Component {
@@ -142,7 +141,8 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 	 */
 	public static defaultTypes(): (new () => RecipientPickerComponent)[] {
 		const types: (new () => RecipientPickerComponent)[] = [UserPicker, AddressBookPicker];
-		if(modules.isAvailable("business", "newsletters")) {
+		// go.Modules (ExtJS) instead of modules from Modules.ts, which imports the components and would make a circular import
+		if(go.Modules.isAvailable("business", "newsletters")) {
 			types.push(
 				class extends AddressListPicker { constructor() { super("Contact"); } },
 				class extends AddressListPicker { constructor() { super("User"); } }
