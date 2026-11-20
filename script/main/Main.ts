@@ -27,7 +27,7 @@ import {Notifier} from "./Notifier";
 import {MainPanelConfig, modules} from "../Modules.js";
 import {customFields} from "../customfields/index.js";
 import {authManager, oauthConsent, RecoveryWindow} from "../auth/index.js";
-import {SystemSettingsWindow} from "./systemsettings/index.js";
+import {systemSettingsPanels, SystemSettingsWindow} from "./systemsettings/index.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
 import {LicenseWindow} from "./LicenseWindow.js";
@@ -150,7 +150,7 @@ class Main extends Component<MainPanelEventMap> {
 			btn({icon: "account_circle", text: t("Account settings")}).on('click',() => {
 				void router.goto("usersettings");
 			}),
-			btn({icon: "settings", text: t("System settings")}).on('click',() => {
+			btn({icon: "settings", text: t("System settings"), hidden: !systemSettingsPanels.hasVisiblePanels()}).on('click',() => {
 				void router.goto("systemsettings");
 			}),
 			btn({
@@ -338,6 +338,9 @@ class Main extends Component<MainPanelEventMap> {
 
 	private setupRoutes() {
 		router.add(/^systemsettings\/?([^\/]+)?/, (selectedItemId) => {
+			if(!systemSettingsPanels.hasVisiblePanels()) {
+				return;
+			}
 			const s = new SystemSettingsWindow(selectedItemId)
 			s.show();
 		});
