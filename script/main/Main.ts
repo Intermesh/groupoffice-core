@@ -245,6 +245,8 @@ class Main extends Component<MainPanelEventMap> {
 
 		this.setupRoutes();
 
+		this.preventFileDropNavigation();
+
 		document.addEventListener("keydown", ev => {
 			if((ev.ctrlKey || ev.metaKey) && ev.shiftKey && ev.key.toLowerCase() == "f") {
 				ev.preventDefault();
@@ -252,6 +254,31 @@ class Main extends Component<MainPanelEventMap> {
 			}
 		});
 
+	}
+
+	/**
+	 * A file dropped outside a drop zone would make the browser open it and leave GroupOffice
+	 *
+	 * Drop zones call preventDefault() on "dragover" to accept the drop, so only "dragover" events that no drop zone
+	 * handled get the "none" drop effect.
+	 */
+	private preventFileDropNavigation() {
+		const isFileDrag = (e: DragEvent) => !!e.dataTransfer && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].kind == "file";
+
+		document.addEventListener("dragover", e => {
+			if(e.defaultPrevented || !isFileDrag(e)) {
+				return;
+			}
+			e.dataTransfer!.dropEffect = "none";
+			e.preventDefault();
+		});
+
+		// Cancelling the drop never hurts. A drop zone has handled it already.
+		document.addEventListener("drop", e => {
+			if(isFileDrag(e)) {
+				e.preventDefault();
+			}
+		});
 	}
 
 	/**
