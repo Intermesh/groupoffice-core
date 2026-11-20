@@ -14,6 +14,7 @@ import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {userDS} from "../../auth";
 import {languagefield} from "../../components/index.js";
+import {client} from "../../jmap/index.js";
 
 userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 
@@ -37,6 +38,10 @@ userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 						{value:'dark', text: t('Dark')},
 						{value:'system', text: t('System default')}
 					]}).on('setvalue',({target,newValue}) => {
+						if(this.user && this.user.id != client.user.id) {
+							// Don't apply another user's scheme to this page
+							return;
+						}
 						const bcl = document.body.classList;
 						['light','dark','system'].forEach(name => {
 							bcl.remove(name);
