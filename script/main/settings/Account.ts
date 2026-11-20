@@ -176,11 +176,22 @@ export class Account extends AbstractSettingsPanel {
 
 	async save(): Promise<boolean> {
 
+		const currentPasswordFld = this.form!.findField("currentPassword")!;
+
 		if (this.currentPasswordRequired) {
-			this.form!.findField("currentPassword")!.value = await this.findAncestorByType(UserSettingsWindow)!.currentPasswordPrompt();
+			const currentPassword = await this.findAncestorByType(UserSettingsWindow)!.currentPasswordPrompt();
+			if (!currentPassword) {
+				return false;
+			}
+			currentPasswordFld.value = currentPassword;
 		}
 
-		return super.save();
+		try {
+			return await super.save();
+		} finally {
+			// The current password is only valid for this save. Ask again next time.
+			currentPasswordFld.reset();
+		}
 	}
 
 	async load(user: User): Promise<any> {

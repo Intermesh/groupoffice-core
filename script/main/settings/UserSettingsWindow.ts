@@ -20,9 +20,14 @@ export class UserSettingsWindow extends Window {
 
 	private cards: CardContainer;
 
-	private _currentPasswordPrompt : Promise<string> | undefined;
+	private _currentPasswordPrompt : Promise<string | undefined> | undefined;
 
-	public currentPasswordPrompt() : Promise<string> {
+	/**
+	 * Ask for the current password once per save. Panels that save at the same time share the answer.
+	 *
+	 * Resolves to undefined when the user cancels the prompt.
+	 */
+	public currentPasswordPrompt() : Promise<string | undefined> {
 		if(this._currentPasswordPrompt) {
 			return this._currentPasswordPrompt;
 		}
@@ -32,12 +37,13 @@ export class UserSettingsWindow extends Window {
 			title: t("Enter password"),
 			text: t("Your current password is required to save these changes")
 		}).then(v => {
-			if(v) {
-				return v;
-			} else {
-				return this.currentPasswordPrompt();
+			if(!v) {
+				// Cancelled, ask again on the next save
+				this._currentPasswordPrompt = undefined;
+				return undefined;
 			}
-		})
+			return v;
+		});
 
 		return this._currentPasswordPrompt;
 	}
@@ -114,9 +120,12 @@ export class UserSettingsWindow extends Window {
 		try {
 			this.mask();
 			const p = await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
-			this._currentPasswordPrompt = undefined;
 			return p.filter(i => !i).length === 0;
+		} catch(e) {
+			void Window.error(e);
+			return false;
 		} finally {
+			this._currentPasswordPrompt = undefined;
 			this.unmask();
 		}
 	}
