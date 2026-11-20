@@ -10,7 +10,7 @@ class SystemSettingsTools extends AbstractModuleSystemSettingsPanel {
 		this.cls = "fit vbox scroll";
 
 		const buttons = [
-			this.buildButton("/install/gotest.php", t("System check")),
+			this.buildButton(BaseHref + "install/gotest.php", t("System check")),
 			this.buildButton(GO.url("maintenance/checkDatabase"), t("Database check")),
 			this.buildButton(GO.url("maintenance/buildSearchCache"), t("Update search index")),
 			this.buildButton(GO.url("maintenance/buildSearchCache", {reset: 1}), t("Update search index (Complete rebuild)")),
