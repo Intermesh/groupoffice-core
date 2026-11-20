@@ -42,6 +42,12 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 					name: "lostPasswordURL",
 					label: t("Lost password URL"),
 					hint: t("You can set an URL to handle lost passwords in an alternative way")
+				}),
+
+				checkbox({
+					name: "forceAppPasswords",
+					label: t("Force app passwords"),
+					hint: t("Force external apps like WebDAV and ActiveSync to authenticate with app passwords, these can be created in the user settings.")
 				})
 			),
 
