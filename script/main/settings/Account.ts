@@ -66,10 +66,6 @@ export class Account extends AbstractSettingsPanel {
 				})
 					.on("generatepassword", ({target, password}) => {
 						(target.nextSibling() as TextField).value = password;
-						this.currentPasswordRequired = !modules.get("core", "core")!.userRights.mayChangeUsers || this.form?.currentId == client.user.id;
-					})
-					.on("change", () => {
-						this.currentPasswordRequired = !modules.get("core", "core")!.userRights.mayChangeUsers || this.form?.currentId == client.user.id;
 					}),
 				textfield({
 					itemId: "confirmPassword",
@@ -172,13 +168,39 @@ export class Account extends AbstractSettingsPanel {
 		))
 	}
 
+	/**
+	 * Set to true by other components in this panel that need the current password to save, like the OTP setup.
+	 */
 	public currentPasswordRequired = false;
+
+	/**
+	 * Check if the user must enter the current password to save the changes.
+	 *
+	 * The server requires it when users change their own password, e-mail or recovery e-mail address. Administrators
+	 * and user managers who change another user don't need it.
+	 */
+	private needCurrentPassword(): boolean {
+		if (this.currentPasswordRequired) {
+			return true;
+		}
+
+		if (client.user.isAdmin) {
+			return false;
+		}
+
+		if (modules.get("core", "core")!.userRights.mayChangeUsers && this.form!.currentId != client.user.id) {
+			return false;
+		}
+
+		const modified = this.form!.modified;
+		return ["password", "email", "recoveryEmail"].some(name => name in modified);
+	}
 
 	async save(): Promise<boolean> {
 
 		const currentPasswordFld = this.form!.findField("currentPassword")!;
 
-		if (this.currentPasswordRequired) {
+		if (this.needCurrentPassword()) {
 			const currentPassword = await this.findAncestorByType(UserSettingsWindow)!.currentPasswordPrompt();
 			if (!currentPassword) {
 				return false;
@@ -187,7 +209,11 @@ export class Account extends AbstractSettingsPanel {
 		}
 
 		try {
-			return await super.save();
+			const success = await super.save();
+			if (success) {
+				this.currentPasswordRequired = false;
+			}
+			return success;
 		} finally {
 			// The current password is only valid for this save. Ask again next time.
 			currentPasswordFld.reset();
