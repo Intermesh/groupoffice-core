@@ -61,19 +61,20 @@ export class UserSettingsWindow extends Window {
 		const pnls : Component[] = [];
 
 		for(const p of userSettingsPanels.getPanels()) {
-			const panel = new p;
-
-			panel.on("show", ({target}) => {
-				if (target.itemId) {
-					router.setPath("usersettings/" + target.itemId);
-				}
-			})
-			pnls.push(panel);
+			pnls.push(new p);
 		}
 
 		// User custom field sets shown as a tab get their own page. The others are in the account page.
 		customFields.getFieldSets("User").filter(fs => fs.isTab).forEach(fs => {
 			pnls.push(new CustomFieldSetPanel(fs));
+		});
+
+		pnls.forEach(panel => {
+			panel.on("show", ({target}) => {
+				if (target.itemId) {
+					router.setPath("usersettings/" + target.itemId);
+				}
+			})
 		});
 
 		this.items.add(

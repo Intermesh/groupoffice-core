@@ -24,16 +24,18 @@ class Modules extends AbstractSettingsPanel {
 	/**
 	 * The panels the edited user has access to. The others are hidden.
 	 */
-	private getAllowedPanels() {
-		return this.findChildrenByType(AppSettingsPanel).filter(p => !p.hidden);
-	}
+	private allowedPanels: AppSettingsPanel[] = [];
 
 	async load(user: User): Promise<any> {
-		this.findChildrenByType(AppSettingsPanel).forEach(p => {
-			p.hidden = !p.isAllowed(user);
+		this.allowedPanels = this.findChildrenByType(AppSettingsPanel).filter(p => {
+			if (p.isAllowed(user)) {
+				return true;
+			}
+			p.hidden = true;
+			return false;
 		});
 
-		return Promise.all(this.getAllowedPanels().map(p => {
+		return Promise.all(this.allowedPanels.map(p => {
 			return p.load(user).catch(e => {
 				console.error("Load error in module panel: ", p, e);
 			});
@@ -44,7 +46,7 @@ class Modules extends AbstractSettingsPanel {
 	 * Saves all module panels. Returns false when one of them failed so the window stays open.
 	 */
 	async save(): Promise<boolean> {
-		const panels = this.getAllowedPanels(),
+		const panels = this.allowedPanels,
 			results = await Promise.allSettled(panels.map(p => p.save()));
 
 		let success = true;
