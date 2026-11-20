@@ -15,6 +15,8 @@ import {
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
+import {customFields} from "../../customfields/index.js";
+import {CustomFieldSetPanel} from "./CustomFieldSetPanel.js";
 
 export class UserSettingsWindow extends Window {
 
@@ -68,6 +70,11 @@ export class UserSettingsWindow extends Window {
 			})
 			pnls.push(panel);
 		}
+
+		// User custom field sets shown as a tab get their own page. The others are in the account page.
+		customFields.getFieldSets("User").filter(fs => fs.isTab).forEach(fs => {
+			pnls.push(new CustomFieldSetPanel(fs));
+		});
 
 		this.items.add(
 

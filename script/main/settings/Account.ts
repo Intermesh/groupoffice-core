@@ -4,6 +4,7 @@ import {
 	btn,
 	checkbox,
 	comp,
+	ContainerField,
 	containerfield,
 	datasourceform,
 	DateTime,
@@ -27,6 +28,7 @@ import {User, userDS} from "../../auth";
 import {modules} from "../../Modules";
 import {client} from "../../jmap";
 import {AppPasswords} from "./AppPasswords.js";
+import {customFields, FormFieldset} from "../../customfields/index.js";
 
 export class Account extends AbstractSettingsPanel {
 	private passwordFieldSet;
@@ -36,7 +38,9 @@ export class Account extends AbstractSettingsPanel {
 		super("account", t("Account"), "account_box");
 		const core = modules.get("core", "core")!;
 		const rights = core.userRights,
-			settings = core.settings;
+			settings = core.settings,
+			// User custom field sets shown as a tab are added as a page by the UserSettingsWindow
+			customFieldsets = customFields.getFieldSets("User").filter(fs => !fs.isTab).map(fs => new FormFieldset(fs));
 
 		this.items.add(this.form = datasourceform({dataSource: userDS, width: 700},
 			fieldset({},
@@ -165,8 +169,18 @@ export class Account extends AbstractSettingsPanel {
 				})
 			),
 
-			this.appPasswords = new AppPasswords()
+			this.appPasswords = new AppPasswords(),
+
+			...customFieldsets
 		))
+
+		// Every custom field set has a "customFields" field. Merge them, otherwise the last one overwrites the others.
+		this.form.on("beforesave", ({data}) => {
+			const modified = customFieldsets.map(fs => fs.findChildByType(ContainerField)!).filter(f => f.isModified());
+			if (modified.length) {
+				data.customFields = Object.assign({}, ...modified.map(f => f.value));
+			}
+		});
 
 		this.form.on("saveerror", ({error}) => {
 			const currentPasswordError = error.type == "invalidProperties" ? error.validationErrors?.currentPassword : undefined;
