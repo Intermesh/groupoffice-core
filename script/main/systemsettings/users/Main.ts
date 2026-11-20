@@ -1,5 +1,5 @@
 import {btn, checkbox, comp, hr, menu, mstbar, searchbtn, t, tbar} from "@intermesh/goui";
-import {systemSettingsPanels} from "../SystemSettingsWindow.js";
+import {adminOrCoreRight, systemSettingsPanels} from "../SystemSettingsWindow.js";
 import {AbstractSystemSettingsPanel} from "../AbstractSystemSettingsPanel.js";
 import {UserTable} from "./UserTable.js";
 import {CreateUserDialog} from "./CreateUserDialog.js";
@@ -156,4 +156,4 @@ class Main extends AbstractSystemSettingsPanel {
 
 }
 
-systemSettingsPanels.add(Main);
+systemSettingsPanels.add(Main, adminOrCoreRight("mayChangeUsers"));

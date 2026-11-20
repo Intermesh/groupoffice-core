@@ -3,7 +3,7 @@ import {ArrayUtil, btn, column, store, Store, t, table} from "@intermesh/goui";
 import {EntityDialog} from "../../customfields/index.js";
 import {modules} from "../../Modules.js";
 import {entities} from "../../Entities.js";
-import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {adminOrCoreRight, systemSettingsPanels} from "./SystemSettingsWindow.js";
 
 interface EntityWithCustomfields {
 	entityName: string,
@@ -104,4 +104,4 @@ class CustomFields extends AbstractSystemSettingsPanel {
 }
 
 
-systemSettingsPanels.add(CustomFields);
+systemSettingsPanels.add(CustomFields, adminOrCoreRight("mayChangeCustomFields"));
