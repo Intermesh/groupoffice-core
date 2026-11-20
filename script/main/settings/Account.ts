@@ -84,7 +84,7 @@ export class Account extends AbstractSettingsPanel {
 							const passwordFld = target.previousSibling() as TextField;
 
 							if(target.value != passwordFld.value) {
-								target.setInvalid("The passwords don't match");
+								target.setInvalid(t("The passwords didn't match"));
 							}
 						}
 					}
