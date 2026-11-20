@@ -36,6 +36,9 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 		this.cls = "card module vbox";
 		this.itemId = m.id;
 
+		// Only administrators may install, uninstall, enable or disable modules
+		const isAdmin = client.user.isAdmin;
+
 		this.items.add(
 
 			comp({cls: "desc"},
@@ -54,7 +57,7 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 				checkbox({
 					type: "switch",
 					name: "enabled",
-					hidden: !m.installed,
+					hidden: !m.installed || !isAdmin,
 					disabled: !m.available,
 					value: m.enabled,
 					listeners:{
@@ -106,7 +109,7 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 				this.deleteBtn = btn({
 					title: t("Delete"),
 					icon: "delete",
-					hidden: !m.installed || m.enabled,
+					hidden: !m.installed || m.enabled || !isAdmin,
 					handler: async () => {
 
 						try {
@@ -122,7 +125,7 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 
 				btn({
 					cls: "filled primary",
-					hidden: m.installed,
+					hidden: m.installed || !isAdmin,
 					text: t("Install"),
 					handler: async () => {
 

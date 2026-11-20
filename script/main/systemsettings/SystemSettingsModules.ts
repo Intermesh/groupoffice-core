@@ -1,6 +1,7 @@
 import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, TextField, textfield, Window} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
-import {systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {adminOnly, systemSettingsPanels} from "./SystemSettingsWindow.js";
+import {modules} from "../../Modules.js";
 import {client, jmapds} from "../../jmap/index.js";
 import {InstallModuleTile} from "./InstallModuleTile.js";
 
@@ -42,6 +43,8 @@ class SystemSettingsModules extends AbstractSystemSettingsPanel {
 					text: t("Install"),
 					cls: "accent filled",
 					icon: "add",
+					// installing modules is for administrators only. Others only manage the settings of their modules.
+					hidden: !client.user.isAdmin,
 					handler: () => {
 						const win = new InstallWindow();
 						win.on("close", () => this.reload())
@@ -202,4 +205,5 @@ class ModuleSystemSettings {
 
 export const moduleSystemSettings = new ModuleSystemSettings();
 
-systemSettingsPanels.add(SystemSettingsModules);
+// Administrators and users that may manage a module. The server only returns the modules they may manage.
+systemSettingsPanels.add(SystemSettingsModules, () => adminOnly() || modules.getAll().some(m => m.enabled && m.userRights?.mayManage));
