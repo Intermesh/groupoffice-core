@@ -14,7 +14,8 @@ import {
 	t,
 	Table,
 	table,
-	tbar
+	tbar,
+	Window
 } from "@intermesh/goui";
 import {client} from "../jmap/index.js";
 import {FieldSetDialog} from "./FieldSetDialog.js";
@@ -49,6 +50,19 @@ export class CustomFieldEntityPanel extends Component {
 		this.table = table({
 			store: this.store,
 			cls: "bg-lowest",
+			// sort field sets and fields with drag and drop. Fields can be moved to another field set.
+			draggableRows: true,
+			dropBetween: true,
+			listeners: {
+				dropallowed: ({source, fromIndex, toIndex}) => {
+					return source === this.table && this.isDropAllowed(fromIndex, toIndex);
+				},
+				drop: ({source, fromIndex, toIndex}) => {
+					if (source === this.table && this.isDropAllowed(fromIndex, toIndex)) {
+						void this.onDrop(fromIndex, toIndex);
+					}
+				}
+			},
 			columns: [
 				column({
 					id: "name",
@@ -224,7 +238,7 @@ export class CustomFieldEntityPanel extends Component {
 					databaseName: field.databaseName,
 					type: field.type,
 					fieldId: field.id,
-					fieldSetId: undefined,
+					fieldSetId: fieldset.id,
 					isFieldSet: false,
 					sortOrder: field.sortOrder,
 					// aclId: undefined,
@@ -239,6 +253,84 @@ export class CustomFieldEntityPanel extends Component {
 		this.store.loadData(tableData);
 	}
 
+
+	/**
+	 * Field sets may only be dropped before another field set or at the end. Fields must be dropped below a field set.
+	 *
+	 * @param fromIndex The store index of the dragged row
+	 * @param toIndex The store index the row is inserted before
+	 */
+	private isDropAllowed(fromIndex: number, toIndex: number): boolean {
+		const dragged = this.store.get(fromIndex);
+		if (!dragged) {
+			return false;
+		}
+
+		if (dragged.isFieldSet) {
+			const over = this.store.get(toIndex);
+			return !over || over.isFieldSet;
+		}
+
+		// The first row is always a field set, so a field must be dropped after it
+		return toIndex > 0;
+	}
+
+	/**
+	 * Save the new order after a drop
+	 *
+	 * @param fromIndex The store index of the dragged row
+	 * @param toIndex The store index the row is inserted before
+	 */
+	private async onDrop(fromIndex: number, toIndex: number) {
+		const dragged = this.store.get(fromIndex)!;
+
+		this.mask();
+		try {
+			if (dragged.isFieldSet) {
+				// Only the field set order changes. Reload afterward so the fields move along with their field set.
+				const fieldSetIds = this.store.data.filter(r => r.isFieldSet && r !== dragged).map(r => r.fieldSetId!);
+				const insertAt = this.store.data.slice(0, toIndex).filter(r => r.isFieldSet && r !== dragged).length;
+				fieldSetIds.splice(insertAt, 0, dragged.fieldSetId!);
+
+				await Promise.all(fieldSetIds.map((id, sortOrder) => fieldSetDS.update(id, {sortOrder})));
+			} else {
+				this.store.move(fromIndex, toIndex);
+
+				// Give every field the field set above it and a new sort order. Only save the changed fields.
+				const updates: Promise<any>[] = [];
+				let fieldSetId: EntityID | undefined, sortOrder = 0;
+				for (const r of this.store.data) {
+					if (r.isFieldSet) {
+						fieldSetId = r.fieldSetId;
+						continue;
+					}
+
+					const changes: Partial<StoreEntity> = {};
+					if (r.sortOrder !== sortOrder) {
+						changes.sortOrder = sortOrder;
+					}
+					if (r.fieldSetId !== fieldSetId) {
+						changes.fieldSetId = fieldSetId;
+					}
+
+					if (Object.keys(changes).length) {
+						Object.assign(r, changes);
+						updates.push(fieldDS.update(r.fieldId!, changes));
+					}
+					sortOrder++;
+				}
+
+				await Promise.all(updates);
+			}
+		} catch (e) {
+			void Window.error(e);
+		} finally {
+			this.unmask();
+		}
+
+		// load the saved order and permissions from the server
+		await this.load();
+	}
 
 	private async getTypeMenuButtons(record: StoreEntity): Promise<Button[]> {
 
