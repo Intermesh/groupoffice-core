@@ -66,7 +66,7 @@ export class Account extends AbstractSettingsPanel {
 				}),
 				passwordfield({
 					autocomplete: "new-password",
-					minLength: settings.minPasswordLength,
+					minLength: settings.passwordMinLength,
 					required: false,
 					name: "password"
 				})
