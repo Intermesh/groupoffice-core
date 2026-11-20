@@ -10,6 +10,7 @@ import {
 	DateTime,
 	displayfield, Fieldset,
 	fieldset,
+	Format,
 	hiddenfield,
 	MapField,
 	mapfield,
@@ -115,7 +116,7 @@ export class Account extends AbstractSettingsPanel {
 					suffix:'MB',
 					decimals:0,
 					hint:	t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")}),
-				numberfield({name:'disk_usage',decimals:0, label: t('Space used'),suffix:'b', readOnly:true})
+				displayfield({name:'disk_usage', label: t('Space used'), renderer: v => v === null || v === undefined ? "-" : Format.fileSize(v)})
 			),
 
 			fieldset({legend: t("Authorized clients")},
