@@ -78,11 +78,9 @@ userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 
 				fieldset({legend: t('Global'), minWidth: 300, flex: 1},
 					// select({name: 'start_module', label: t("Start in module"), listeners: {render: e => e.target.store!.load()}, store: datasourcestore({dataSource:moduleDS}), valueField: "name", textRenderer: record => record.title}),
-					select({name: 'max_rows_list', label:t("Maximum items in list"), options: [
-							{text: '10', value: 10},
-							{text: '20', value: 20},
-							{text: '50', value: 50},
-					]}),
+					select({name: 'max_rows_list', label:t("Maximum number of rows in lists"), options: [10, 15, 20, 25, 30, 50].map(n => {
+						return {text: n + "", value: n};
+					})}),
 					select({name: 'sort_name', label: t("Sort names by"), options: [
 						{value: 'first_name', text: t("First name")},
 						{value: 'last_name', text: t("Last name")}
@@ -96,10 +94,11 @@ userSettingsPanels.add(class Appearance extends AbstractSettingsPanel {
 				fieldset({legend: t("Regional"), minWidth: 300, flex: 1},
 					timezonefield(),
 					languagefield(),
+					dateformatfield(),
 					timeformatfield(),
 					checkbox({name: 'shortDateInList',label: t("Use short format for date and time in lists")}),
 					firstweekdayfield(),
-					// select({name: 'holidayset',label: t("Holidays"), options:[]}), // GO.lang.holidaySets ? Deprecate in favour of new calendar holidays?
+					holidaysetfield()
 				)
 			))
 
@@ -119,6 +118,16 @@ export function dateformatfield(config?: FieldConfig<SelectField>) {
 			{value: 'Y-m-d', text: t("Year-Month-Day",'users','core')},
 			{value: 'Y.m.d', text: t("Year.Month.Day",'users','core')}
 		], ...config});
+}
+
+/**
+ * Select the set of public holidays, used by the calendar, absence and registration modules
+ */
+export function holidaysetfield(config?: FieldConfig<SelectField>) {
+	const sets: {iso: string, label: string}[] = GO.lang?.holidaySets ?? [];
+	return select({name: 'holidayset', label: t("Holidays"), options: sets.map(s => {
+			return {value: s.iso, text: s.label};
+		}), ...config});
 }
 
 export function timeformatfield(config?: FieldConfig<SelectField>) {
