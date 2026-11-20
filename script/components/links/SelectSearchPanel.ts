@@ -51,6 +51,16 @@ export class SelectSearchPanel extends Component<SelectSearchPanelEventMap> {
 		void this.resultTable.store.load();
 	}
 
+	/**
+	 * Put the text in the search field and search right away
+	 *
+	 * @param text The search text
+	 */
+	public setSearchText(text: string) {
+		this.searchField.value = text;
+		this.search(text, true);
+	}
+
 	constructor(protected multiSelect: boolean = true) {
 		super();
 

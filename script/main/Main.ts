@@ -198,9 +198,8 @@ class Main extends Component<MainPanelEventMap> {
 				this.menu,
 				tbar({cls: "header-right"},
 					this.notifier.btn,
-					btn({icon: "search"}).on('click',() => {
-						const m = new MainSearchWindow();
-						m.show();
+					btn({icon: "search", title: t("Search") + " (" + (navigator.platform.startsWith("Mac") ? "⌘ + ⇧" : "CTRL + SHIFT") + " + F)"}).on('click',() => {
+						this.search();
 					}),
 
 					btn({
@@ -246,6 +245,28 @@ class Main extends Component<MainPanelEventMap> {
 
 		this.setupRoutes();
 
+		document.addEventListener("keydown", ev => {
+			if((ev.ctrlKey || ev.metaKey) && ev.shiftKey && ev.key.toLowerCase() == "f") {
+				ev.preventDefault();
+				this.search();
+			}
+		});
+
+	}
+
+	/**
+	 * Open the global search
+	 *
+	 * Legacy code can use go.util.search(text).
+	 *
+	 * @param text Search for this text right away
+	 */
+	public search(text?: string) {
+		const m = new MainSearchWindow();
+		m.show();
+		if(text) {
+			m.search(text);
+		}
 	}
 
 	private setupRoutes() {

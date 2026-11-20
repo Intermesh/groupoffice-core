@@ -41,6 +41,15 @@ export class MainSearchWindow extends Window {
 
 	}
 
+	/**
+	 * Search for the text right away
+	 *
+	 * @param text The search text
+	 */
+	public search(text: string) {
+		this.selectSearchPanel.setSearchText(text);
+	}
+
 	protected createModalOverlay() {
 		const o = super.createModalOverlay();
 		o.el.addEventListener("click", () => {
