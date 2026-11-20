@@ -1,5 +1,5 @@
 import {
-	avatar, browserStoreConnection, btn,
+	avatar, browserStoreConnection, btn, Button,
 	column,
 	datasourcestore,
 	DataSourceStore,
@@ -12,9 +12,12 @@ import {User, userDS} from "../../../auth/index.js";
 import {client, img} from "../../../jmap/index.js";
 import {UserSettingsWindow} from "../../settings/index.js";
 import {customFields} from "../../../customfields/index.js";
+import {modules} from "../../../Modules.js";
 
 export class UserTable extends Table<DataSourceStore> {
 	constructor() {
+		let loginAsBtn: Button, archiveBtn: Button, deleteBtn: Button;
+
 		super(
 			datasourcestore({
 				queryParams: {limit: 20},
@@ -109,7 +112,17 @@ export class UserTable extends Table<DataSourceStore> {
 				...customFields.getTableColumns("User"),
 
 				menucolumn({
-					menu: menu({},
+					menu: menu({
+							listeners: {
+								beforeshow: ({target}) => {
+									const user = this.store.get(target.dataSet.rowIndex) as User | undefined;
+									const isAdmin = client.user.isAdmin;
+									loginAsBtn.disabled = !isAdmin || !user?.enabled;
+									archiveBtn.disabled = !modules.get("core", "core")?.userRights.mayChangeUsers || user?.id == client.user.id;
+									deleteBtn.disabled = !isAdmin;
+								}
+							}
+						},
 						btn({
 							icon: "edit",
 							text: t("Edit"),
@@ -118,29 +131,46 @@ export class UserTable extends Table<DataSourceStore> {
 								this.edit(rowIndex)
 							}
 						}),
-						btn({
+						loginAsBtn = btn({
 							icon: "swap_horiz",
-							text: t("Login as"),
+							text: t("Login as this user"),
 							handler: async (b) => {
 								const rowIndex = b.parent!.dataSet.rowIndex;
 								const user = this.store.get(rowIndex) as User;
-								await browserStoreConnection.deleteDatabase();
-								const result = await client.jmap("User/loginAs", {userId: user.id});
-								if(!result.success) {
-									void Window.error(t("Failed to login as this user"));
+								try {
+									await browserStoreConnection.deleteDatabase();
+									const result = await client.jmap("User/loginAs", {userId: user.id});
+									if (!result.success) {
+										void Window.error(t("Failed to login as this user"));
+										return;
+									}
+								} catch (e) {
+									void Window.error(e);
 									return;
 								}
 								window.location.replace(BaseHref);
 							}
 						}),
 						"-",
-						btn({
+						archiveBtn = btn({
 							icon: "archive",
-							text: t("Archive")
+							text: t("Archive user"),
+							handler: async (b) => {
+								const user = this.store.get(b.parent!.dataSet.rowIndex) as User;
+								await this.archive(user);
+							}
 						}),
-						btn({
+						deleteBtn = btn({
 							icon: "delete",
-							text: t("Delete")
+							text: t("Delete"),
+							handler: async (b) => {
+								const user = this.store.get(b.parent!.dataSet.rowIndex) as User;
+								try {
+									await userDS.confirmDestroy([user.id]);
+								} catch (e) {
+									void Window.error(e);
+								}
+							}
 						})
 						)
 				})
@@ -158,8 +188,36 @@ export class UserTable extends Table<DataSourceStore> {
 		this.on("delete", async ({target}) => {
 			const ids = this.rowSelection!.getSelected()!.map(row => row.record.id);
 
-			await userDS.confirmDestroy(ids);
+			try {
+				await userDS.confirmDestroy(ids);
+			} catch (e) {
+				void Window.error(e);
+			}
 		});
+	}
+
+	/**
+	 * Archive a user after confirmation. This disables the user, revokes all group memberships and makes their items
+	 * invisible.
+	 */
+	private async archive(user: User) {
+		if (user.id == client.user.id) {
+			void Window.error(t("You can't archive yourself"));
+			return;
+		}
+
+		if (!await Window.confirm(t("Archiving a user will disable them, revoke all group memberships and make their items invisible. Are you sure?"))) {
+			return;
+		}
+
+		this.mask();
+		try {
+			await userDS.update(user.id, {enabled: false, archive: true});
+		} catch (e) {
+			void Window.error(e);
+		} finally {
+			this.unmask();
+		}
 	}
 
 	private edit(rowIndex: number) {
