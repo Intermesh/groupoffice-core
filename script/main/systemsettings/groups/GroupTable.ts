@@ -1,9 +1,16 @@
-import {btn, column, datasourcestore, DataSourceStore, menu, menucolumn, t, Table} from "@intermesh/goui";
-import {Group, groupDS, Principal, principalDS} from "../../../auth/index.js";
+import {btn, Button, column, datasourcestore, DataSourceStore, menu, menucolumn, t, Table, Window} from "@intermesh/goui";
+import {AclLevel, Group, groupDS, Principal, principalDS} from "../../../auth/index.js";
 import {GroupDialog} from "./GroupDialog.js";
+
+/**
+ * The Administrators, Everyone and Internal groups. Their IDs are hard coded in the Group model and they can't be deleted.
+ */
+const SYSTEM_GROUP_MAX_ID = 3;
 
 export class GroupTable extends Table<DataSourceStore> {
 	constructor() {
+		let deleteBtn: Button;
+
 		super(
 			datasourcestore({
 				queryParams: {limit: 20},
@@ -45,7 +52,14 @@ export class GroupTable extends Table<DataSourceStore> {
 				}),
 
 				menucolumn({
-					menu: menu({},
+					menu: menu({
+							listeners: {
+								beforeshow: ({target}) => {
+									const group = this.store.get(target.dataSet.rowIndex) as Group | undefined;
+									deleteBtn.disabled = !group || !GroupTable.mayDelete(group);
+								}
+							}
+						},
 						btn({
 							icon: "edit",
 							text: t("Edit"),
@@ -57,9 +71,17 @@ export class GroupTable extends Table<DataSourceStore> {
 
 						"-",
 
-						btn({
+						deleteBtn = btn({
 							icon: "delete",
-							text: t("Delete")
+							text: t("Delete"),
+							handler: async (b) => {
+								const group = this.store.get(b.parent!.dataSet.rowIndex) as Group;
+								try {
+									await groupDS.confirmDestroy([group.id]);
+								} catch (e) {
+									void Window.error(e);
+								}
+							}
 						})
 						)
 				})
@@ -77,9 +99,20 @@ export class GroupTable extends Table<DataSourceStore> {
 		this.on("delete", async ({target}) => {
 			const ids = this.rowSelection!.getSelected()!.map(row => row.record.id);
 
-			await groupDS.confirmDestroy(ids);
+			try {
+				await groupDS.confirmDestroy(ids);
+			} catch (e) {
+				void Window.error(e);
+			}
 		});
 
+	}
+
+	/**
+	 * The system groups can't be deleted and the user needs delete permission
+	 */
+	private static mayDelete(group: Group): boolean {
+		return parseInt(group.id) > SYSTEM_GROUP_MAX_ID && group.permissionLevel >= AclLevel.DELETE;
 	}
 
 	private edit(rowIndex: number) {

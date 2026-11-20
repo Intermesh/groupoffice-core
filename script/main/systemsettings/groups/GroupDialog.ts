@@ -8,7 +8,7 @@ import {GroupModuleTable} from "./GroupModuleTable.js";
 export class GroupDialog extends FormWindow {
 	private groupUserTbl: GroupUserTable;
 	private readonly usersField: HiddenField;
-	private readonly moduleTable!: GroupModuleTable;
+	private readonly moduleTable?: GroupModuleTable;
 
 	constructor() {
 		super("Group");
@@ -93,7 +93,8 @@ export class GroupDialog extends FormWindow {
 			this.groupUserTbl.store.setFilter('sort', {'groupMember': this.form.currentId});
 			this.groupUserTbl.store.load();
 
-			this.moduleTable.load(this.form.currentId!);
+			// The module permissions are only available to administrators
+			this.moduleTable?.load(this.form.currentId!);
 		});
 	}
 }
