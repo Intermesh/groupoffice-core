@@ -30,6 +30,7 @@ import {authManager, oauthConsent, RecoveryWindow} from "../auth/index.js";
 import {SystemSettingsWindow} from "./systemsettings/index.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
+import {LicenseWindow} from "./LicenseWindow.js";
 
 
 type MainPanelCreator = {
@@ -151,6 +152,14 @@ class Main extends Component<MainPanelEventMap> {
 			}),
 			btn({icon: "settings", text: t("System settings")}).on('click',() => {
 				void router.goto("systemsettings");
+			}),
+			btn({
+				icon: "app_registration",
+				text: t("Register"),
+				// Not when the license is set in the configuration file
+				hidden: !client.user.isAdmin || (modules.get("core", "core")?.settings.readOnlyKeys ?? []).indexOf("license") > -1
+			}).on('click',() => {
+				new LicenseWindow().show();
 			}),
 			"-",
 			btn({icon: "info", text: t("About")}).on('click',() => {
