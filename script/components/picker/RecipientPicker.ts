@@ -1,5 +1,6 @@
 import {
 	btn,
+	Button,
 	cardmenu,
 	cards,
 	checkboxselectcolumn,
@@ -22,8 +23,11 @@ import {jmapds} from "../../jmap/index.js";
 
 
 interface RecipientPickerComponent extends Component {
-	getAll(): Promise<Recipient[]>;
-	getSelected(): Recipient[];
+	/**
+	 * Get all results. When not implemented the "Add all results" button is hidden.
+	 */
+	getAll?(): Promise<Recipient[]>;
+	getSelected(): Recipient[] | Promise<Recipient[]>;
 }
 
 interface Recipient {
@@ -37,6 +41,16 @@ interface Recipient {
 interface RecipientPickerEventMap extends WindowEventMap {
 	select: {
 		recipients: Recipient[]
+	}
+}
+
+function contactToRecipient(contact:any) : Recipient {
+	return {
+		entity: "Contact",
+		id: "Contact:"+contact.id,
+		avatarId: contact.photoBlobId,
+		name: contact.name,
+		email: contact.emailAddresses[0]?.email,
 	}
 }
 
@@ -64,28 +78,81 @@ export class AddressBookPicker extends ExtJSWrapper implements RecipientPickerCo
 
 	async getAll(): Promise<Recipient[]> {
 		const ids = await this.extJSComp.addAll();
-		return jmapds<Recipient>("Contact").get(ids).then(r => r.list.map(this.contactToRecipient));
-	}
-
-	private contactToRecipient(contact:any) : Recipient {
-		return {
-			entity: "Contact",
-			id: "Contact:"+contact.id,
-			avatarId: contact.photoBlobId,
-			name: contact.name,
-			email: contact.emailAddresses[0]?.email,
-		}
+		return jmapds("Contact").get(ids).then(r => r.list.map(contactToRecipient));
 	}
 
 	getSelected(): Recipient[] {
-		return this.extJSComp.grid.getSelectionModel().getSelections().map((r:any) => this.contactToRecipient(r.data));
+		return this.extJSComp.grid.getSelectionModel().getSelections().map((r:any) => contactToRecipient(r.data));
+	}
+}
+
+/**
+ * Selects the contacts or users of address lists from the newsletters module
+ */
+export class AddressListPicker extends ExtJSWrapper implements RecipientPickerComponent {
+	/**
+	 * @param entityName "Contact" or "User"
+	 */
+	constructor(private readonly entityName: "Contact" | "User") {
+		const panelCls = entityName == "Contact" ?
+			go.modules.business.newsletters.SelectContactDialogPanel :
+			go.modules.business.newsletters.SelectUserDialogPanel;
+
+		// no title so the ExtJS panel doesn't render a header inside the card
+		super(new panelCls({title: undefined}));
+
+		this.title = panelCls.prototype.title;
+		this.cls = "fit";
+
+		// the ExtJS panel calls dialog.addSelection() on double click
+		this.extJSComp.dialog = {
+			addSelection: async () => {
+				const dlg = this.findAncestorByType(RecipientPicker)!;
+				dlg.fire("select", {recipients: await this.getSelected()});
+				dlg.close();
+			}
+		};
+	}
+
+	async getSelected(): Promise<Recipient[]> {
+		const ids: string[] = await this.extJSComp.addSelection();
+		if(!ids.length) {
+			return [];
+		}
+
+		if(this.entityName == "Contact") {
+			return jmapds("Contact").get(ids).then(r => r.list.map(contactToRecipient));
+		}
+
+		return principalDS.get(ids).then(r => r.list.map(p => ({
+			entity: "User",
+			id: p.id,
+			avatarId: p.avatarId,
+			name: p.name,
+			email: p.email
+		})));
 	}
 }
 
 export class RecipientPicker extends Window<RecipientPickerEventMap> {
 
+	/**
+	 * The default picker cards: users, contacts and the address lists of the newsletters module if available
+	 */
+	public static defaultTypes(): (new () => RecipientPickerComponent)[] {
+		const types: (new () => RecipientPickerComponent)[] = [UserPicker, AddressBookPicker];
+		// go.Modules (ExtJS) instead of modules from Modules.ts, which imports the components and would make a circular import
+		if(go.Modules.isAvailable("business", "newsletters")) {
+			types.push(
+				class extends AddressListPicker { constructor() { super("Contact"); } },
+				class extends AddressListPicker { constructor() { super("User"); } }
+			);
+		}
+		return types;
+	}
+
 	private cards;
-	constructor(types = [UserPicker, AddressBookPicker]) {
+	constructor(types: (new () => RecipientPickerComponent)[] = RecipientPicker.defaultTypes()) {
 		super();
 
 		this.modal = true;
@@ -97,22 +164,30 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 
 		this.title = t("Select people");
 
+		let addAllBtn: Button;
+
 		this.items.add(
 			cardmenu(),
 
-			this.cards = cards({flex: 1},
+			this.cards = cards({flex: 1,
+					listeners: {
+						cardchange: () => {
+							addAllBtn.hidden = !(this.cards.activeItemComponent as RecipientPickerComponent).getAll;
+						}
+					}
+				},
 				...types.map(type => new type),
 				),
 
 			tbar({cls: "border-top"},
 				"->",
 
-				btn({
+				addAllBtn = btn({
 					text: t("Add all results"),
 					cls: "filled primary",
 					handler: async ()=> {
 
-						const recipients = await  (this.cards.activeItemComponent as RecipientPickerComponent).getAll();
+						const recipients = await (this.cards.activeItemComponent as RecipientPickerComponent).getAll!();
 
 						const confirmed = await Window.confirm(t("Are you sure you want to select all {count} results?").replace('{count}', recipients.length), t("Confirm"));
 						if(!confirmed) {
@@ -127,8 +202,8 @@ export class RecipientPicker extends Window<RecipientPickerEventMap> {
 				btn({
 					text: t("Add selection"),
 					cls: "filled primary",
-					handler: ()=>{
-						const recipients = (this.cards.activeItemComponent as RecipientPickerComponent).getSelected()
+					handler: async ()=>{
+						const recipients = await (this.cards.activeItemComponent as RecipientPickerComponent).getSelected();
 
 						this.fire("select", {recipients});
 						this.close();
