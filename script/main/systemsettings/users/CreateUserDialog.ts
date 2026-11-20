@@ -92,7 +92,7 @@ export class CreateUserDialog extends FormWindow {
 							const passwordFld = target.previousSibling() as TextField;
 
 							if(target.value != passwordFld.value) {
-								target.setInvalid("The passwords don't match");
+								target.setInvalid(t("The passwords didn't match"));
 							}
 						}
 					}
@@ -120,7 +120,7 @@ export class CreateUserDialog extends FormWindow {
 						columns: [
 							checkboxselectcolumn(),
 							column({
-								header: "Name",
+								header: t("Name"),
 								id: "name",
 								sortable: true,
 								resizable: true

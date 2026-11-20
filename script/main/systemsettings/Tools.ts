@@ -32,7 +32,7 @@ class SystemSettingsTools extends AbstractModuleSystemSettingsPanel {
 
 		this.items.add(
 			tbar({},
-				h2("Admin tools")
+				h2(t("Admin tools"))
 			),
 			comp({
 					cls: "vbox pad gap",

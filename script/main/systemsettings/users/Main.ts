@@ -106,7 +106,7 @@ class Main extends AbstractSystemSettingsPanel {
 								}),
 								btn({
 									icon: "csv",
-									text: "Comma Seperated Values",
+									text: t("Comma Separated Values"),
 									handler: () => {
 										Export.toFile(
 											'User',

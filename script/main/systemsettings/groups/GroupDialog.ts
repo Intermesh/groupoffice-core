@@ -21,7 +21,7 @@ export class GroupDialog extends FormWindow {
 
 		this.generalTab.items.add(
 			fieldset({},
-				textfield({label: "Name", name: "name"})
+				textfield({label: t("Name"), name: "name"})
 			),
 			this.usersField = hiddenfield({name: "users"}),
 
