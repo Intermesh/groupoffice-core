@@ -5,6 +5,7 @@ import {
 	Component,
 	fieldset,
 	numberfield,
+	ObjectUtil,
 	select,
 	t,
 	TextField,
@@ -115,7 +116,10 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 		this.mask();
 		try {
 
-			const response = await client.jmap("core/Settings/sendTestMessage", this.form.value.settings);
+			// Only send the changed settings. The server uses the saved values for the others. The SMTP password is never
+			// sent to the client, so sending the empty field would clear it.
+			const changed = ObjectUtil.diff(this.settingsForm.getOldValue(), this.settingsForm.value);
+			const response = await client.jmap("core/Settings/sendTestMessage", changed);
 
 			if (!response.success) {
 				throw response;
