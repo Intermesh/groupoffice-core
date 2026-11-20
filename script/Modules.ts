@@ -246,7 +246,7 @@ export interface Module extends BaseEntity {
 	/**
 	 * Rights per groupId (groupId is the key)
 	 */
-	permissions: Record<EntityID, Record<string, boolean>>
+	permissions: Record<EntityID, {rights: Record<string, boolean>}>
 	version: number,
 
 	/**
@@ -619,7 +619,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			}
 
 			config.userSettingsPanels?.forEach(p => {
-				moduleSettings.addPanel(p);
+				moduleSettings.addPanel(p, config.package, config.name);
 			})
 
 			config.systemSettingsPanels?.forEach(p => {
@@ -720,7 +720,7 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 	}
 
 	/**
-	 * Check if the current user has this module
+	 * Check if the current user, or the given user, has this module
 	 */
 	public isAvailable(pkg:string, name:string, user?:User, right:string = "mayRead") : boolean {
 
@@ -739,17 +739,22 @@ console.log(document.body.style.getPropertyValue("--fg-main"));
 			// checking for current user
 			return mod.userRights[right];
 		} else {
+			// administrators have all modules
+			if(user.isAdmin) {
+				return true;
+			}
+
 			//if a user is given we must check the groups
 			for(let groupId in mod.permissions) {
-				const allowed = mod.permissions[groupId]?.[right];
+				const allowed = mod.permissions[groupId]?.rights?.[right];
 
-				if(allowed && user.groups.indexOf(groupId) != -1) {
+				if(allowed && user.groups?.some((g:EntityID) => g == groupId)) {
 					return true;
 				}
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	/**

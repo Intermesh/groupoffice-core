@@ -2,6 +2,7 @@ import {ArrayUtil, comp, Panel, t, Window} from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {User} from "../../auth/index.js";
+import {modules} from "../../Modules.js";
 
 class Modules extends AbstractSettingsPanel {
 	constructor() {
@@ -11,12 +12,28 @@ class Modules extends AbstractSettingsPanel {
 
 		this.items.add(
 			comp({cls: "user-settings-modules"},
-			...ArrayUtil.multiSort(moduleSettings.getPanels().map(p => new p), [{property: "title"}]))
+			...ArrayUtil.multiSort(moduleSettings.getPanels().map(e => {
+				const p = new e.cmp;
+				p.modulePackage = e.package;
+				p.moduleName = e.name;
+				return p;
+			}), [{property: "title"}]))
 		)
 	}
 
+	/**
+	 * The panels the edited user has access to. The others are hidden.
+	 */
+	private getAllowedPanels() {
+		return this.findChildrenByType(AppSettingsPanel).filter(p => !p.hidden);
+	}
+
 	async load(user: User): Promise<any> {
-		return Promise.all(this.findChildrenByType(AppSettingsPanel).map(p => {
+		this.findChildrenByType(AppSettingsPanel).forEach(p => {
+			p.hidden = !p.isAllowed(user);
+		});
+
+		return Promise.all(this.getAllowedPanels().map(p => {
 			return p.load(user).catch(e => {
 				console.error("Load error in module panel: ", p, e);
 			});
@@ -27,7 +44,7 @@ class Modules extends AbstractSettingsPanel {
 	 * Saves all module panels. Returns false when one of them failed so the window stays open.
 	 */
 	async save(): Promise<boolean> {
-		const panels = this.findChildrenByType(AppSettingsPanel),
+		const panels = this.getAllowedPanels(),
 			results = await Promise.allSettled(panels.map(p => p.save()));
 
 		let success = true;
@@ -47,6 +64,17 @@ class Modules extends AbstractSettingsPanel {
 
 
 export class AppSettingsPanel extends Panel {
+
+	/**
+	 * Package of the module that registered this panel
+	 */
+	public modulePackage?: string;
+
+	/**
+	 * Name of the module that registered this panel
+	 */
+	public moduleName?: string;
+
 	constructor() {
 		super();
 		this.baseCls = 'panel app-settings-panel';
@@ -64,14 +92,36 @@ export class AppSettingsPanel extends Panel {
 	public async load(user:User) :Promise<any> {
 		return Promise.resolve();
 	}
+
+	/**
+	 * Check if this panel is shown for the user that is edited, which may be another user than the logged-in user.
+	 *
+	 * By default the edited user needs access to the module of the panel. Override it for another check, for example
+	 * `return client.user.isAdmin;` for a panel that only administrators may use.
+	 *
+	 * @param user The edited user
+	 */
+	public isAllowed(user: User): boolean {
+		if (!this.modulePackage || !this.moduleName) {
+			return true;
+		}
+		return modules.isAvailable(this.modulePackage, this.moduleName, user);
+	}
 }
 
 
 class ModuleSettings {
-	private panels: typeof AppSettingsPanel[] = [];
+	private panels: {cmp: typeof AppSettingsPanel, package?: string, name?: string}[] = [];
 
-	public addPanel(cmp: typeof AppSettingsPanel) {
-		this.panels.push(cmp);
+	/**
+	 * Add a panel to the "Modules" page of the user settings
+	 *
+	 * @param cmp The panel class
+	 * @param pkg Package of the module. The panel is only shown for users that have access to the module.
+	 * @param name Name of the module
+	 */
+	public addPanel(cmp: typeof AppSettingsPanel, pkg?: string, name?: string) {
+		this.panels.push({cmp, package: pkg, name});
 	}
 
 	public getPanels() {
