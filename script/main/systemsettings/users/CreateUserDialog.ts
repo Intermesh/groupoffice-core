@@ -75,7 +75,7 @@ export class CreateUserDialog extends FormWindow {
 			fieldset({},
 				passwordfield({
 					autocomplete: "new-password",
-					minLength: settings.minPasswordLength,
+					minLength: settings.passwordMinLength,
 					required: true,
 
 				})
