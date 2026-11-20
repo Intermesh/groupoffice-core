@@ -658,15 +658,18 @@ export class Client extends Observable<ClientEventMap> {
 
 			console.debug("Starting SSE");
 
-			const url = this.uri + 'sse.php?types=' +		entities.join(',') + (this.debugParam ? '&'+this.debugParam : '');
-			const headers = this.buildHeaders();
-			delete headers['Content-Type'];
+			// The entity names go in the POST body: in the query string they grew with every installed
+			// entity until the URL hit the web server's request line limit (414).
+			const url = this.uri + 'sse.php' + (this.debugParam ? '?'+this.debugParam : '');
+			const headers = this.buildHeaders({'Content-Type': 'application/json'});
 
 
 			this.SSEABortController = new AbortController()
 
 			// let retry = 0;
 			void fetchEventSource(url,{
+				method: 'POST',
+				body: JSON.stringify(entities),
 				headers: headers,
 				signal: this.SSEABortController.signal,
 				onmessage: (msg) => {
