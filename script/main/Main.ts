@@ -26,7 +26,7 @@ import {Launcher} from "./Launcher.js";
 import {Notifier} from "./Notifier";
 import {MainPanelConfig, modules} from "../Modules.js";
 import {customFields} from "../customfields/index.js";
-import {authManager, RecoveryWindow} from "../auth/index.js";
+import {authManager, oauthConsent, RecoveryWindow} from "../auth/index.js";
 import {SystemSettingsWindow} from "./systemsettings/index.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
@@ -186,6 +186,14 @@ class Main extends Component<MainPanelEventMap> {
 		// Authenticate
 		await authManager.requireLogin();
 
+		// api/oauth.php sends the user here to log in. Continue the authorization of the application.
+		const urlParams = new URLSearchParams(location.search);
+		if(urlParams.has("oauthAuthorize")) {
+			location.replace(BaseHref + "api/oauth.php/authorize");
+			// don't build the UI while the browser leaves
+			return new Promise<void>(() => {});
+		}
+
 		main.initState();
 
 		void this.notifier.load();
@@ -248,6 +256,12 @@ class Main extends Component<MainPanelEventMap> {
 		this.setupRoutes();
 
 		this.preventFileDropNavigation();
+
+		// api/oauth.php asks the user to approve an application that registered itself. Modules have registered their
+		// consent panels when their scripts loaded.
+		if(urlParams.has("oauthConsent")) {
+			void oauthConsent.open();
+		}
 
 		document.addEventListener("keydown", ev => {
 			if((ev.ctrlKey || ev.metaKey) && ev.shiftKey && ev.key.toLowerCase() == "f") {
