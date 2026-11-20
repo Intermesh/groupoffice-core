@@ -119,8 +119,9 @@ class DefaultPermissionsWindow extends Window {
 							return;
 						}
 
-						await this.save(record);
-						await this.reset(record, true);
+						if(await this.save(record)) {
+							await this.reset(record, true);
+						}
 
 					}
 				}),
@@ -133,8 +134,9 @@ class DefaultPermissionsWindow extends Window {
 							return;
 						}
 
-						await this.save(record);
-						await this.reset(record, false);
+						if(await this.save(record)) {
+							await this.reset(record, false);
+						}
 
 					}
 				}),
@@ -146,8 +148,9 @@ class DefaultPermissionsWindow extends Window {
 					cls: "filled primary",
 					text: t("Save"),
 					handler: async() => {
-						await this.save(record)
-						this.close();
+						if(await this.save(record)) {
+							this.close();
+						}
 					}
 
 				})
@@ -160,10 +163,10 @@ class DefaultPermissionsWindow extends Window {
 	private async reset(record:Record, add:boolean) {
 		this.mask();
 		try {
-			return client.jmap("share/Acl/reset", {
+			await client.jmap("core/Acl/reset", {
 				add,
 				entity: record.name
-			})
+			});
 		} catch(e) {
 			void Window.error(e);
 		}	finally {
@@ -171,12 +174,19 @@ class DefaultPermissionsWindow extends Window {
 		}
 	}
 
-	private async save(record:Record) {
+	/**
+	 * Save the default permissions
+	 *
+	 * @return false when saving failed
+	 */
+	private async save(record:Record) : Promise<boolean> {
 		this.mask();
 		try {
-			return moduleDS.update(record.moduleId, {["entities/" + record.name + "/defaultAcl"]: this.sharePanel.value})
+			await moduleDS.update(record.moduleId, {["entities/" + record.name + "/defaultAcl"]: this.sharePanel.value});
+			return true;
 		} catch(e) {
 			void Window.error(e);
+			return false;
 		}	finally {
 			this.unmask();
 		}
