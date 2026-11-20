@@ -17,7 +17,8 @@ import {
 	selectfield,
 	t,
 	TextField,
-	textfield
+	textfield,
+	Window
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
 import {userSettingsPanels, UserSettingsWindow} from "./UserSettingsWindow.js";
@@ -166,6 +167,16 @@ export class Account extends AbstractSettingsPanel {
 
 			this.appPasswords = new AppPasswords()
 		))
+
+		this.form.on("saveerror", ({error}) => {
+			const currentPasswordError = error.type == "invalidProperties" ? error.validationErrors?.currentPassword : undefined;
+			if (currentPasswordError) {
+				// 1 is ErrorCode::REQUIRED, otherwise the entered password was wrong
+				void Window.alert(currentPasswordError.code == 1 ?
+					t("Your current password is required to save these changes") :
+					t("The current password you entered was incorrect"), t("Invalid password"));
+			}
+		});
 	}
 
 	/**
