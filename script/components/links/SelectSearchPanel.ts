@@ -105,7 +105,7 @@ export class SelectSearchPanel extends Component<SelectSearchPanelEventMap> {
 								}
 							}
 						}
-					})
+					}, entities.getSearchLinkConfigs())
 				)
 			),
 

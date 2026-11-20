@@ -281,6 +281,15 @@ class Entities {
 	}
 
 
+	/**
+	 * Get link configurations without the entities that are left out of the search in the system settings
+	 */
+	getSearchLinkConfigs() : LinkConfig[] {
+		const excluded: string[] = modules.get("core", "core")?.settings.searchExcludedEntities ?? [];
+		return this.getLinkConfigs().filter(cfg => !excluded.includes(cfg.entity));
+	}
+
+
 	getLinkConfig(entity: string, filter?: string) {
 
 		const all = this.getLinkConfigs();

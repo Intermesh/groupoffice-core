@@ -6,6 +6,7 @@ export * from './General.js';
 export * from './Appearance.js';
 export * from './Notifications.js';
 export * from './Authentication.js';
+export * from './Search.js';
 export * from './AuthAllowGroupGrid.js';
 export * from './DefaultPermissionsPanel.js';
 export * from './CustomFields.js';

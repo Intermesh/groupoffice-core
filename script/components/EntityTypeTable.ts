@@ -2,11 +2,14 @@ import {column, Config, createComponent, store, Store, Table} from "@intermesh/g
 import {entities, LinkConfig} from "../Entities";
 
 export class EntityTypeTable extends Table<Store<LinkConfig>> {
-	constructor() {
+	/**
+	 * @param linkConfigs The entity types to show. Defaults to all link configurations.
+	 */
+	constructor(linkConfigs: LinkConfig[] = entities.getLinkConfigs()) {
 
 		super(
 			store({
-				data: entities.getLinkConfigs()
+				data: linkConfigs
 			}),
 			[
 				column({
@@ -30,4 +33,4 @@ export class EntityTypeTable extends Table<Store<LinkConfig>> {
 	}
 }
 
-export const entityttypeable = (config?: Config<EntityTypeTable>) => createComponent(new EntityTypeTable(), config);
+export const entityttypeable = (config?: Config<EntityTypeTable>, linkConfigs?: LinkConfig[]) => createComponent(new EntityTypeTable(linkConfigs), config);
