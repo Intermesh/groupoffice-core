@@ -26,7 +26,7 @@ import {Launcher} from "./Launcher.js";
 import {Notifier} from "./Notifier";
 import {MainPanelConfig, modules} from "../Modules.js";
 import {customFields} from "../customfields/index.js";
-import {authManager} from "../auth/index.js";
+import {authManager, RecoveryWindow} from "../auth/index.js";
 import {SystemSettingsWindow} from "./systemsettings/index.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
@@ -181,6 +181,8 @@ class Main extends Component<MainPanelEventMap> {
 		// Loads all module scripts before authentication
 		await modules.loadCapabilities();
 
+		await this.openPasswordRecovery();
+
 		// Authenticate
 		await authManager.requireLogin();
 
@@ -254,6 +256,21 @@ class Main extends Component<MainPanelEventMap> {
 			}
 		});
 
+	}
+
+	/**
+	 * The password recovery e-mail links to "#recover/<hash>". It opens before the login, because the user can't log in.
+	 */
+	private async openPasswordRecovery() {
+		const match = /^#?recover\/([a-f0-9]{40})-?(.*)/.exec(location.hash);
+		if(!match) {
+			return;
+		}
+
+		// So the router doesn't handle it, and a reload doesn't open it again
+		history.replaceState(null, "", location.pathname + location.search);
+
+		await new RecoveryWindow(match[1]).verifyAndShow(match[2]);
 	}
 
 	/**

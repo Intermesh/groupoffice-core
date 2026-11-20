@@ -47,6 +47,15 @@ export interface ForgottenData {
 	email: String
 }
 
+/**
+ * Check the hash of a password recovery link, or set a new password with it
+ */
+export interface RecoverData {
+	action: "recover",
+	hash: string,
+	newPassword?: string
+}
+
 interface ClientEventMap  extends ObservableEventMap {
 	authenticated: {session: any}
 	logout: {}
@@ -445,7 +454,7 @@ export class Client extends Observable<ClientEventMap> {
 	}
 
 
-	public auth(data: LoginData | RegisterData | ForgottenData) {
+	public auth(data: LoginData | RegisterData | ForgottenData | RecoverData) {
 
 		return fetch(this.uri + "auth.php" + (this.debugParam ? '?'+this.debugParam : ''), {
 			signal: AbortSignal.timeout(this.requestTimeout),
