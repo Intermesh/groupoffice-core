@@ -2,18 +2,22 @@ import {AbstractSettingsPanel} from "./AbstractSettingsPanel";
 import {
 	btn,
 	checkboxcolumn,
-	column, datasourceform,
+	column,
+	comp,
+	datasourceform,
 	datasourcestore,
 	HiddenField,
 	hiddenfield,
 	menu,
 	menucolumn,
+	searchbtn,
 	t,
-	Table
+	Table,
+	tbar
 } from "@intermesh/goui";
 import {userSettingsPanels} from "./UserSettingsWindow.js";
 import {groupDS, Principal, principalDS, User, userDS} from "../../auth/index.js";
-import {modules} from "../../Modules.js";
+import {client} from "../../jmap/index.js";
 
 userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 	private groupTbl;
@@ -25,12 +29,11 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 			name: "groups"
 		})
 
-		this.cls = "fit scroll bg-lowest";
+		this.cls = "fit vbox bg-lowest";
 
 
 		this.groupTbl = new Table(
 			datasourcestore({
-				queryParams: {limit: 20},
 				dataSource: groupDS,
 				sort: [{
 					property: "name"
@@ -47,8 +50,6 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 						r.userCount = r.users.length;
 						r.users = (await principalDS.get(r.users.slice(0, 5))).list;
 						r.selected = this.hiddenFld.value && (this.hiddenFld.value as Array<any>).indexOf(r.id) > -1;
-
-						console.log(r.selected);
 					}));
 
 					return records;
@@ -74,7 +75,8 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 
 				checkboxcolumn({
 					id: "selected",
-					checkboxConfig:{disabled: !modules.get("core", "core")!.userRights.mayChangeUsers},
+					// Only administrators may add users to groups other than the default groups
+					checkboxConfig:{disabled: !client.user.isAdmin},
 					listeners: {
 						change: ev => {
 							const groupId = ev.record.id, groupIds = this.hiddenFld.value as Array<string>;
@@ -89,9 +91,23 @@ userSettingsPanels.add(class Groups extends AbstractSettingsPanel {
 				})
 			])
 
-		this.groupTbl.fit = true;
+		this.groupTbl.scrollLoad = true;
 
-		this.items.add(this.groupTbl, this.form = datasourceform({dataSource: userDS}, this.hiddenFld));
+		this.items.add(
+			tbar({},
+				"->",
+				searchbtn({
+					listeners: {
+						input: ({text}) => {
+							this.groupTbl.store.setFilter("search", {text});
+							void this.groupTbl.store.load();
+						}
+					}
+				})
+			),
+			comp({flex: 1, cls: "scroll"}, this.groupTbl),
+			this.form = datasourceform({dataSource: userDS}, this.hiddenFld)
+		);
 
 		this.on("show", () => {
 			this.groupTbl.store.load();
