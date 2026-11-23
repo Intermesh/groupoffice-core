@@ -290,6 +290,57 @@ class Main extends Component<MainPanelEventMap> {
 	}
 
 	/**
+	 * TEMPORARY: runs the legacy function of a "?f=" link, until these links are replaced by normal routes.
+	 *
+	 * GO::createExternalUrl() creates these links, for example to a ticket in a notification e-mail, for
+	 * links/openModelLink and for the mailto handler that opens the e-mail composer. "f" is base64 encoded JSON with
+	 * the module "m", the function "f" and the parameter "p". Only the functions in the list below may be called,
+	 * because anyone can send a user such a link.
+	 *
+	 * Call it after the router started, so the default route doesn't replace what the function opens.
+	 */
+	public runExternalFunction() {
+		const allowed: Record<string, string[]> = {
+			tickets: ["showTicket"],
+			links: ["openModelLink"],
+			email: ["showComposer"]
+		};
+
+		const url = new URL(location.href);
+		const f = url.searchParams.get("f");
+		if(!f) {
+			return;
+		}
+
+		// Remove it so a reload doesn't run it again
+		url.searchParams.delete("f");
+		history.replaceState(history.state, "", url.toString());
+
+		let fp: {m: string, f: string, p: any};
+		try {
+			// a "+" that wasn't URL encoded becomes a space
+			const bytes = Uint8Array.from(atob(f.replace(/ /g, "+")), c => c.charCodeAt(0));
+			fp = JSON.parse(new TextDecoder().decode(bytes));
+		} catch(e) {
+			console.error("Invalid external function", e);
+			return;
+		}
+
+		if(!fp || !Object.hasOwn(allowed, fp.m) || !allowed[fp.m].includes(fp.f)) {
+			console.error("External function not allowed", fp);
+			return;
+		}
+
+		const fn = GO[fp.m]?.[fp.f];
+		if(typeof fn != "function") {
+			// The module isn't available to this user
+			return;
+		}
+
+		fn.call(window, fp.p);
+	}
+
+	/**
 	 * Print the active module panel, if it supports printing
 	 *
 	 * @return true when the panel printed
