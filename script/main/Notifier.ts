@@ -14,7 +14,6 @@ import {
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
 import {entities} from "../Entities";
-import {modules} from "../Modules.js";
 
 
 export interface AlertEntity extends DefaultEntity{
@@ -122,7 +121,7 @@ export class Notifier extends Observable {
 				this.alertCount = alerts.length;
 				this.updateCount();
 				return Promise.all(promises).then(() => {
-					this.notifyAlerts(alerts);
+					void this.notifyAlerts(alerts);
 					return alerts;
 				});
 			}
@@ -265,15 +264,16 @@ export class Notifier extends Observable {
 		if(existing) {
 			this.remove(existing);
 		}
+		if(msg.tag) {
+			// so it's shown again when it returns
+			this.closeDesktopNotification(msg.tag);
+		}
 		if(!silent) {
 			msg.onClose?.();
 		}
 	}
 
 	private remove(msg:INotification) {
-		if(msg.tag) {
-			this.closeDesktopNotification(msg.tag);
-		}
 		this.store.remove(msg);
 		this.msgList.onStoreLoad();
 		this.count--;
@@ -359,6 +359,15 @@ export class Notifier extends Observable {
 		});
 	}
 
+	private async hasPushSubscription(): Promise<boolean> {
+		try {
+			const registration = await navigator.serviceWorker?.getRegistration();
+			return !!(await registration?.pushManager?.getSubscription());
+		} catch {
+			return false;
+		}
+	}
+
 	private closeDesktopNotification(key: string) {
 		this.notifiedTexts.delete(key);
 		this.desktopNotifications.get(key)?.close();
@@ -368,14 +377,15 @@ export class Notifier extends Observable {
 	/**
 	 * Show desktop notifications for alerts that weren't shown yet
 	 */
-	private notifyAlerts(alerts: AlertEntity[]) {
-		// The webpush module pushes the alerts to the browser itself
-		if(modules.isAvailable("community", "webpush")) {
+	private async notifyAlerts(alerts: AlertEntity[]) {
+		// With a push subscription of the webpush module the alerts are pushed to the browser by the server
+		if(await this.hasPushSubscription()) {
 			return;
 		}
 
+		const now = new Date();
 		for(const alert of alerts) {
-			if(!alert.entityData || (alert.data && "progress" in alert.data)) {
+			if(!alert.entityData || (alert.data && "progress" in alert.data) || (alert.staleAt && now > new Date(alert.staleAt))) {
 				continue;
 			}
 			const key = 'alert-' + alert.id;
