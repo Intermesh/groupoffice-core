@@ -58,7 +58,7 @@ class Authentication extends AbstractModuleSystemSettingsPanel {
 
 				comp({
 					tagName: "p",
-					text: t("Define which groups are allowed to login from which IP addresses. You can use '*' to match any charachters and '?'" +
+					text: t("Define which groups are allowed to login from which IP addresses. You can use '*' to match any characters and '?'" +
 						" to match any single character. eg. '192.168.1?.*'. Be careful, You can lock yourself out!")
 				}),
 
