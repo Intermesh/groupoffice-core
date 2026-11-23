@@ -34,6 +34,7 @@ export class PdfTemplateDialog extends FormWindow {
 					sortable.on("sort", ({toIndex, fromIndex}) => {
 						target.value = ArrayUtil.move(target.value, fromIndex, toIndex);
 					})
+					sortable.connect();
 				}
 			},
 			/**

@@ -104,7 +104,7 @@ class Main extends Component<MainPanelEventMap> {
 					this.saveState();
 				}
 			}
-		});
+		}).connect();
 
 		this.notifier = new Notifier();
 
