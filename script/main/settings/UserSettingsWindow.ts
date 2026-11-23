@@ -13,7 +13,7 @@ import {
 	ArrayUtil
 } from "@intermesh/goui";
 import {AbstractSettingsPanel} from "./AbstractSettingsPanel.js";
-import {User} from "../../auth/index.js";
+import {User, userDS} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
 import {customFields} from "../../customfields/index.js";
 import {CustomFieldSetPanel} from "./CustomFieldSetPanel.js";
@@ -137,13 +137,31 @@ export class UserSettingsWindow extends Window {
 
 	/**
 	 * Saves all settings panels. Returns true if all panels were saved successfully.
+	 *
+	 * When the logged-in user changed their own settings, the page is reloaded so the language, theme and the settings
+	 * the old framework reads when the page loads are applied.
+	 *
 	 * @returns
 	 */
 	public async save() {
 		try {
 			this.mask();
+
+			const ownSettings = this.user.id == client.user.id,
+				// copy, because the cached user is changed when it's saved
+				before = ownSettings ? structuredClone(await userDS.single(this.user.id)) : undefined;
+
 			const p = await Promise.all(this.findChildrenByType(AbstractSettingsPanel).map((i) => i.save()))
-			return p.filter(i => !i).length === 0;
+			const success = p.filter(i => !i).length === 0;
+
+			if(success && before) {
+				const after = await userDS.single(this.user.id);
+				if(after && JSON.stringify(after) !== JSON.stringify(before)) {
+					void this.reload(after.language != before.language ? after.language : undefined);
+				}
+			}
+
+			return success;
 		} catch(e) {
 			void Window.error(e);
 			return false;
@@ -151,6 +169,23 @@ export class UserSettingsWindow extends Window {
 			this._currentPasswordPrompt = undefined;
 			this.unmask();
 		}
+	}
+
+	/**
+	 * Reloads the page when the pending requests are done
+	 *
+	 * @param language The new language of the user, when it changed
+	 */
+	private async reload(language?: string) {
+		while(client.isBusy() || Ext.Ajax.isLoading()) {
+			await new Promise(resolve => setTimeout(resolve, 300));
+		}
+
+		let url = BaseHref;
+		if(language) {
+			url += "?SET_LANGUAGE=" + encodeURIComponent(language);
+		}
+		document.location.href = url;
 	}
 
 	public async load(user:User) {
