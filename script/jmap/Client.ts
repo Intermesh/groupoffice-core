@@ -605,6 +605,9 @@ export class Client extends Observable<ClientEventMap> {
 				}
 			};
 			xhr.onload = () => {
+				if (xhr.status === 401) {
+					this.sessionExpired();
+				}
 				if (xhr.status > 201) {
 					const text = xhr.statusText || 'Upload failed';
 					Notifier.notify({category:"status",variant:'error', text})
