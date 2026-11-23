@@ -170,9 +170,8 @@ class Main extends Component<MainPanelEventMap> {
 				window.open("https://www.group-office.com/documentation.html", "_blank");
 			}),
 			"-",
-			btn({icon: "exit_to_app", text: t("Logout")}).on('click',async () => {
-				await client.logout();
-				document.location.reload();
+			btn({icon: "exit_to_app", text: t("Logout")}).on('click',() => {
+				void authManager.logout();
 			})
 		);
 	}

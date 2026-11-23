@@ -41,6 +41,21 @@ class AuthManager extends Observable<AuthManagerEventMap> {
 	}
 
 	/**
+	 * Log out and reload to show the login
+	 *
+	 * The logout button, the legacy go.AuthenticationManager.logout() and the logout after inactivity use this.
+	 */
+	public async logout() {
+		root.mask();
+		try {
+			await client.logout();
+		} catch(e) {
+			console.error(e);
+		}
+		document.location.reload();
+	}
+
+	/**
 	 * Will continue if user is authenticated and present login dialog if not
 	 *
 	 * @todo what if there are concurrent requests to this method?

@@ -5,6 +5,7 @@
  */
 
 import {
+	browserStoreConnection,
 	DateTime,
 	EntityID,
 	Format,
@@ -320,7 +321,7 @@ export class Client extends Observable<ClientEventMap> {
 	private requestsInProgress = 0;
 
 	public isBusy() {
-		return this.requestsInProgress > 0;
+		return this.requestsInProgress > 0 || this._requests.length > 0;
 	}
 
 	private loggingOut = false;
@@ -375,19 +376,54 @@ export class Client extends Observable<ClientEventMap> {
 		}
 	}
 
+	/**
+	 * Log out
+	 *
+	 * Waits for running requests, also those of the legacy code, deletes the data cached in the browser (IndexedDB) and
+	 * ends the session on the server. Reload the page afterwards to show the login, or use authManager.logout() which
+	 * does that.
+	 */
 	public async logout() {
-		await fetch(this.uri + "auth.php" + (this.debugParam ? '?'+this.debugParam : ''), {
-			signal: AbortSignal.timeout(this.requestTimeout),
-			method: "DELETE",
-			mode: "cors",
-			credentials: "include",
-			headers: this.buildHeaders()
-		});
+		this.loggingOut = true;
+		this.stopSSE();
 
-		this.CSRFToken = "";
-		this.accessToken = "";
-		sessionStorage.removeItem("accessToken");
-		this.fire("logout", this);
+		await this.waitForRequests();
+
+		try {
+			browserStoreConnection.disconnect();
+			// Another tab could block the deletion
+			await Promise.race([
+				browserStoreConnection.deleteDatabase(),
+				new Promise(resolve => setTimeout(resolve, 3000))
+			]);
+		} catch(e) {
+			console.error("Failed to delete the browser database", e);
+		}
+
+		try {
+			await fetch(this.uri + "auth.php" + (this.debugParam ? '?' + this.debugParam : ''), {
+				signal: AbortSignal.timeout(this.requestTimeout),
+				method: "DELETE",
+				mode: "cors",
+				credentials: "include",
+				headers: this.buildHeaders()
+			});
+		} finally {
+			this.CSRFToken = "";
+			this.accessToken = "";
+			sessionStorage.removeItem("accessToken");
+			this.fire("logout", {});
+		}
+	}
+
+	/**
+	 * Wait until the JMAP requests and the legacy Ext.Ajax requests are done, but not longer than maxWait milliseconds
+	 */
+	private async waitForRequests(maxWait = 10000) {
+		const until = Date.now() + maxWait;
+		while(Date.now() < until && (this.isBusy() || window.Ext?.Ajax?.isLoading())) {
+			await new Promise(resolve => setTimeout(resolve, 300));
+		}
 	}
 
 	private static blobCache: Record<string, Promise<any>> = {};
