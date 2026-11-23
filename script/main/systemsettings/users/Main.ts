@@ -6,6 +6,8 @@ import {CreateUserDialog} from "./CreateUserDialog.js";
 import {Import} from "../../../util/importexport/Import.js";
 import {Export} from "../../../util/importexport/Export.js";
 import {UserDefaultsWindow} from "./UserDefaultsWindow.js";
+import {PermissionOverviewWindow} from "./PermissionOverviewWindow.js";
+import {client} from "../../../jmap/index.js";
 
 class Main extends AbstractSystemSettingsPanel {
 	private userTbl: UserTable;
@@ -74,6 +76,16 @@ class Main extends AbstractSystemSettingsPanel {
 							text: t("User defaults"),
 							handler: () => {
 								const win = new UserDefaultsWindow();
+								win.show();
+							}
+						}),
+						btn({
+							icon: "share",
+							text: t("Permissions overview"),
+							// core/Acl/overview is for administrators only
+							hidden: !client.user.isAdmin,
+							handler: () => {
+								const win = new PermissionOverviewWindow();
 								win.show();
 							}
 						}),
