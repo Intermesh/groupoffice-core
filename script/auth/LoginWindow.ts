@@ -405,6 +405,13 @@ export class LoginWindow extends Window<LoginEventMap> {
 		if(!success) {
 			Notifier.error(t("Sorry, an unexpected error occurred"));
 		} else {
+			// The page has the translations of the login screen. Reload for the user's own language, like the theme.
+			if(client.user.language && client.user.language != GO.lang.iso) {
+				const url = new URL(document.location.href);
+				url.searchParams.delete("lang");
+				document.location.replace(url.toString());
+				return;
+			}
 			//Notifier.success(t("Welcome back, {name}!").replace('{name}', client.user.displayName));
 			this.hide();
 			this.fire("login", {});
