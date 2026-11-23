@@ -54,8 +54,9 @@ export class Account extends AbstractSettingsPanel {
 					textfield({name: "username", label: t("Username"), required: true, pattern: "[A-Za-z0-9_\\-.@]*"}),
 					textfield({name: "email", label: t("E-mail"),type:'email', required: true}),
 					textfield({name: "recoveryEmail", label: t("Recovery e-mail"),type:'email', required: true,
-						hint:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'
-							+t('Please use an email address that you can access from outside Group-Office.')
+						// The hint is plain text, so the two sentences are joined with a space
+						hint:t('The recovery e-mail is used to send a forgotten password request to.') + ' '
+							+ t('Please use an email address that you can access from outside Group-Office.')
 					}),
 				)
 			),
