@@ -9,6 +9,9 @@ class Appearance extends AbstractModuleSystemSettingsPanel {
 		super("appearance", t("Appearance"),"core", "core", "palette");
 		this.cls = "hbox fit scroll";
 
+		this.reloadOnChange = ["logoId", "logoIdDark", "primaryColor", "secondaryColor", "tertiaryColor", "accentColor",
+			"primaryDark", "secondaryDark", "tertiaryDark", "accentDark"];
+
 		this.settingsForm.items.add(
 			// Light theme fieldset
 			fieldset({flex: 1},

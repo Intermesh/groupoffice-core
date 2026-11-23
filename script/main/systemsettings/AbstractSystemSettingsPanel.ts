@@ -18,4 +18,12 @@ export abstract class AbstractSystemSettingsPanel extends Component {
 	public async load() :Promise<any> {
 		return Promise.resolve();
 	}
+
+	/**
+	 * Check if the page must be reloaded after saving, because the changes only apply on a new page load. Like the
+	 * title, logo or colours. Called before {@link save()}.
+	 */
+	public needsReload(): boolean {
+		return false;
+	}
 }

@@ -73,11 +73,18 @@ export class SystemSettingsWindow extends Window {
 	}
 
 	public async save() {
+		const panels = this.findChildrenByType(AbstractSystemSettingsPanel),
+			reload = panels.some(p => p.needsReload());
 		try {
 			this.mask();
-			await Promise.all(this.findChildrenByType(AbstractSystemSettingsPanel).map((i) => i.save()))
+			await Promise.all(panels.map((i) => i.save()))
 		} finally {
 			this.unmask();
+		}
+
+		if (reload) {
+			// reload without the #systemsettings route so new settings like the title, logo and colours apply
+			window.location.replace(window.location.pathname);
 		}
 	}
 

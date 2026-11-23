@@ -14,6 +14,8 @@ class General extends AbstractModuleSystemSettingsPanel {
 	constructor() {
 		super("general", t("General"), "core", "core", "description");
 
+		this.reloadOnChange = ["title"];
+
 		this.loginMessageField = htmlfield({
 			name: "loginMessage",
 			label: t("Login message"),

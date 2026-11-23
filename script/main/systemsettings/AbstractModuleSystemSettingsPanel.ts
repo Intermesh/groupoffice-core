@@ -11,6 +11,11 @@ export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPan
 	 */
 	protected readOnlyKeys: string[] = [];
 
+	/**
+	 * Settings that only apply after a page reload. The page reloads after saving when one of them changed.
+	 */
+	protected reloadOnChange: string[] = [];
+
 	private readonly readOnlyNotice: Component;
 
 	constructor( itemId:string,  title:string, protected modulePackage:string, protected moduleName:string, icon:MaterialIcon) {
@@ -81,6 +86,10 @@ export class AbstractModuleSystemSettingsPanel extends AbstractSystemSettingsPan
 		}
 
 		this.readOnlyNotice.hidden = !hasReadOnlyFields;
+	}
+
+	public needsReload(): boolean {
+		return this.reloadOnChange.some(name => this.settingsForm.findFields(name).some(f => !f.disabled && f.isModified()));
 	}
 
 	async save(): Promise<any> {
