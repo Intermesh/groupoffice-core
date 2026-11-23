@@ -55,9 +55,8 @@ export class Recurrence {
 
 		if(config.rule.interval) cfg.interval = config.rule.interval;
 		if(config.rule.until) {
-			cfg.until = config.rule.until.length > 10 ?
-				ICAL.Time.fromDateTimeString(config.rule.until) :
-				ICAL.Time.fromDateString(config.rule.until);
+			// An until without time includes that whole day, also for events with a time. Like CalendarEvent::recurrenceUntil() on the server.
+			cfg.until = ICAL.Time.fromDateTimeString(config.rule.until.length > 10 ? config.rule.until : config.rule.until + "T23:59:59");
 		}
 		if(config.rule.count) cfg.count = config.rule.count;
 		if(config.rule.firstDayOfWeek) cfg.wkst = this.dayNb(config.rule.firstDayOfWeek);
