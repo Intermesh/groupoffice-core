@@ -29,7 +29,8 @@ import {Notifier} from "./Notifier";
 import {MainPanelConfig, modules} from "../Modules.js";
 import {customFields} from "../customfields/index.js";
 import {authManager, oauthConsent, RecoveryWindow} from "../auth/index.js";
-import {systemSettingsPanels, SystemSettingsWindow} from "./systemsettings/index.js";
+import {AbstractSystemSettingsPanel, ModuleInfo, systemSettingsPanels, SystemSettingsWindow} from "./systemsettings/index.js";
+import {ModuleDialog} from "./systemsettings/ModuleDialog.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
 import {LicenseWindow} from "./LicenseWindow.js";
@@ -161,7 +162,8 @@ class Main extends Component<MainPanelEventMap> {
 				new LicenseWindow().show();
 			}),
 			"-",
-			btn({icon: "info", text: t("About")}).on('click',() => {
+			// The "hideAbout" config option hides it for users that aren't administrators
+			btn({icon: "info", text: t("About"), hidden: !!GO.settings?.config?.hideAbout && !client.user.isAdmin}).on('click',() => {
 				const aboutWin = new AboutWindow();
 				aboutWin.show();
 			}),
@@ -438,7 +440,14 @@ class Main extends Component<MainPanelEventMap> {
 			if(!systemSettingsPanels.hasVisiblePanels()) {
 				return;
 			}
-			const s = new SystemSettingsWindow(selectedItemId)
+			let s = new SystemSettingsWindow(selectedItemId);
+
+			// "systemsettings/<module name>" opens the settings dialog of the module, as on its tile in "Modules"
+			const mod = selectedItemId ? modules.getAll().find(m => m.name == selectedItemId) : undefined;
+			if(mod && !s.findChild(c => c instanceof AbstractSystemSettingsPanel && c.itemId == selectedItemId)) {
+				s = new SystemSettingsWindow("modules");
+				void this.openModuleSettings(mod.package + "/" + mod.name);
+			}
 			s.show();
 		});
 
@@ -449,6 +458,23 @@ class Main extends Component<MainPanelEventMap> {
 
 
 		this.addLegacyDefaultRoutes();
+	}
+
+	/**
+	 * Open the settings dialog of a module
+	 *
+	 * @param moduleId "package/name"
+	 */
+	private async openModuleSettings(moduleId: string) {
+		const response = await client.jmap("core/ModuleInfo/get", {ids: [moduleId]});
+		const info = response.list[0] as ModuleInfo | undefined;
+		// Without the right to manage the module the user doesn't get it
+		if(!info || !info.available || !info.model) {
+			return;
+		}
+		const d = new ModuleDialog(info);
+		void d.load(info.model.id);
+		d.show();
 	}
 
 	private addPanelMenuItem(m: MainPanelCreator) {
