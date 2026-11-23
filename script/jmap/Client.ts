@@ -59,6 +59,11 @@ export interface RecoverData {
 interface ClientEventMap  extends ObservableEventMap {
 	authenticated: {session: any}
 	logout: {}
+	/**
+	 * The server no longer accepts the session of the logged-in user, for example because it expired or the user logged
+	 * out in another tab. Fires once.
+	 */
+	sessionexpired: {}
 }
 
 
@@ -318,6 +323,24 @@ export class Client extends Observable<ClientEventMap> {
 		return this.requestsInProgress > 0;
 	}
 
+	private loggingOut = false;
+	private sessionExpiredFired = false;
+
+	/**
+	 * Fires "sessionexpired" when the server refuses the session of the logged-in user
+	 *
+	 * Not before the user is logged in, because then the server refuses the session as expected, and not while logging
+	 * out. Fires once.
+	 */
+	public sessionExpired() {
+		if(!this._user || this.loggingOut || this.sessionExpiredFired) {
+			return;
+		}
+		this.sessionExpiredFired = true;
+		this.stopSSE();
+		this.fire("sessionexpired", {});
+	}
+
 	private async request(data?: Object, tries = 1) : Promise<Response> {
 
 		this.requestsInProgress++;
@@ -332,6 +355,10 @@ export class Client extends Observable<ClientEventMap> {
 			});
 
 			this.nextRequestTimeout = undefined;
+
+			if (response.status === 401) {
+				this.sessionExpired();
+			}
 
 			if (!response.ok) {
 				// network request fails. Try 3 times with 100ms delay
@@ -653,6 +680,11 @@ export class Client extends Observable<ClientEventMap> {
 
 					const success = response[0] !== "error";
 
+					// The controllers refuse calls without a valid session with this error
+					if (!success && (response[1] as any)?.type === "unauthorized") {
+						this.sessionExpired();
+					}
+
 					if (success) {
 						this._requestData[callId].resolve(response[1]);
 					} else {
@@ -769,6 +801,18 @@ export class Client extends Observable<ClientEventMap> {
 				body: JSON.stringify(entities),
 				headers: headers,
 				signal: this.SSEABortController.signal,
+				onopen: async (response) => {
+					if(response.status === 401) {
+						this.sessionExpired();
+						// Throwing stops retrying when the connection was aborted
+						this.stopSSE();
+						throw new Error("Session expired");
+					}
+					const contentType = response.headers.get('content-type');
+					if(!contentType?.startsWith('text/event-stream')) {
+						throw new Error(`Expected content-type to be text/event-stream, Actual: ${contentType}`);
+					}
+				},
 				onmessage: (msg) => {
 
 					// Ignore pings and empty messages. A parse error below would close the connection.
