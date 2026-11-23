@@ -42,11 +42,16 @@ export interface AlertEntity extends DefaultEntity{
 // "beforeshow"
 // "beforenotify"
 
-type SoundName = 'question' | 'email' | 'reminders';
-//type IconName = 'reminder' | 'email';
+/**
+ * The kind of sound. "email" and "reminder" can be muted separately in the user settings.
+ */
+type SoundType = 'question' | 'email' | 'reminder';
 
-const iconPath = 'views/goui/groupoffice-core/style/resources/notify/';
-const soundPath = 'views/goui/groupoffice-core/style/resources/sounds/';
+// The resources are next to the dist folder of this package
+const resourcePath = new URL('../style/resources/', import.meta.url).href;
+const iconPath = resourcePath + 'notify/';
+const soundPath = resourcePath + 'sounds/';
+const soundFiles: Record<SoundType, string> = {question: 'question', email: 'email', reminder: 'email'};
 const queue: (() => void)[] = [];
 const defaultIcon = iconPath+'reminder.png'
 const defaultTitle = t("Reminders");
@@ -339,13 +344,20 @@ export class Notifier extends Observable {
 		})
 	}
 
-	playSound(filename: SoundName = 'question') {
+	/**
+	 * Play a notification sound unless the user muted it in the settings
+	 *
+	 * Browsers only play sound after the user interacted with the page, so before that it's queued.
+	 *
+	 * @param type "email" and "reminder" can be muted separately
+	 */
+	playSound(type: SoundType = 'question') {
 		if(!GO.util.empty(go.User.mute_sound) ||
-			(filename === 'email' && go.User.mute_new_mail_sound) ||
-			(filename === 'question' && go.User.mute_reminder_sound)) {
+			(type === 'email' && !GO.util.empty(go.User.mute_new_mail_sound)) ||
+			(type === 'reminder' && !GO.util.empty(go.User.mute_reminder_sound))) {
 			return;
 		}
-		const play= () => {new Audio(soundPath+filename+'.mp3').play().catch(() => {})}
+		const play= () => {new Audio(soundPath+soundFiles[type]+'.mp3').play().catch((e) => {console.warn("Could not play notifier sound: " + e.message)})}
 
 		if (audioUnlocked) play();
 		else queue.push(play);
