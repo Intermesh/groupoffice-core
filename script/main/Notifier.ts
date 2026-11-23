@@ -253,6 +253,23 @@ export class Notifier extends Observable {
 		this.updateCount();
 	}
 
+	/**
+	 * Remove a notification from the notification panel
+	 *
+	 * @param msg the notification or one with the same tag
+	 * @param silent don't call onClose, for example when the notification is postponed instead of dismissed
+	 */
+	close(msg: INotification, silent = false) {
+		// remove from list, if in list. otherwise its an alert
+		const existing = this.store.has(msg) ? msg : (msg.tag ? this.store.find(v => v.tag === msg.tag) : undefined);
+		if(existing) {
+			this.remove(existing);
+		}
+		if(!silent) {
+			msg.onClose?.();
+		}
+	}
+
 	private remove(msg:INotification) {
 		if(msg.tag) {
 			this.closeDesktopNotification(msg.tag);
@@ -424,12 +441,7 @@ export class Notifier extends Observable {
 
 	private card(msg: INotification)
 	{
-		const rm = () => {
-			// remove from list, if in list. otherwise its an alert
-			if(this.store.has(msg))
-				this.remove(msg);
-			msg.onClose?.();
-		}
+		const rm = () => this.close(msg);
 		const items: Component[] = [comp({text:msg.text})];
 		const actions = [msg.actions?.primary,msg.actions?.secondary].filter(Boolean);
 		if(msg.category==='progress') {
@@ -451,7 +463,11 @@ export class Notifier extends Observable {
 			),
 			...items,
 			...(actions.length ? [comp({},...Object.values(actions).map(a =>
-				btn({text:a!.text, icon:a!.icon}).on('click', ()=>{a!.run(); })))] : [])
+				// the button is passed so an action can align a menu to it
+				btn({text:a!.text, icon:a!.icon}).on('click', ({target, ev})=>{
+					ev.stopPropagation();
+					(a!.run as (button: Button) => void)(target);
+				})))] : [])
 		);
 
 		// if (msg.time && msg.time > now) {
