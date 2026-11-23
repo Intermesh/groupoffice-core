@@ -1,6 +1,6 @@
 import {FormWindow} from "../../../components/index.js";
 import {
-	autocompletechips, browser, btn, checkbox,
+	autocompletechips, browser, btn, checkbox, Component,
 	checkboxselectcolumn,
 	column,
 	datasourcestore,
@@ -14,7 +14,18 @@ import {groupDS, userDS} from "../../../auth/index.js";
 import {modules} from "../../../Modules.js";
 import {UserSettingsWindow} from "../../settings/index.js";
 
+/**
+ * Adds to the dialog, like the mailbox options of the serverclient module
+ *
+ * @param dialog The dialog. Use its form events to act on save.
+ * @param container The container with the fields, to add a fieldset to
+ */
+export type CreateUserDialogExtension = (dialog: CreateUserDialog, container: Component) => void;
 
+/**
+ * Functions that modules register in their init() to add to the dialog for creating users
+ */
+export const createUserDialogExtensions: CreateUserDialogExtension[] = [];
 
 export class CreateUserDialog extends FormWindow {
 	constructor() {
@@ -160,5 +171,7 @@ export class CreateUserDialog extends FormWindow {
 
 				)
 		);
+
+		createUserDialogExtensions.forEach(fn => fn(this, this.generalTab));
 	}
 }
