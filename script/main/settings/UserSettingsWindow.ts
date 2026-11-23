@@ -17,6 +17,7 @@ import {User, userDS} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
 import {customFields} from "../../customfields/index.js";
 import {CustomFieldSetPanel} from "./CustomFieldSetPanel.js";
+import {setPagePath} from "../systemsettings/SystemSettingsWindow.js";
 
 export class UserSettingsWindow extends Window {
 
@@ -68,7 +69,8 @@ export class UserSettingsWindow extends Window {
 		this.routed = user.id == client.user.id && router.getPath().startsWith("usersettings");
 
 		this.on("close", () => {
-			if(this.routed) {
+			// Not when the back button or a link closed it, then the URL is the page to go to
+			if(this.routed && router.getPath().startsWith("usersettings")) {
 				router.setPath("");
 			}
 		})
@@ -87,7 +89,7 @@ export class UserSettingsWindow extends Window {
 		pnls.forEach(panel => {
 			panel.on("show", ({target}) => {
 				if (this.routed && target.itemId) {
-					router.setPath("usersettings/" + target.itemId);
+					setPagePath("usersettings", target.itemId);
 				}
 			})
 		});
@@ -127,12 +129,21 @@ export class UserSettingsWindow extends Window {
 			await this.load(user);
 
 			if(selectedItemId) {
-				const active = this.cards.findItem(selectedItemId)
-				if(active) {
-					this.cards.activeItem = active;
-				}
+				this.selectItem(selectedItemId);
 			}
 		})
+	}
+
+	/**
+	 * Show a settings page
+	 *
+	 * @param itemId the item ID of the panel
+	 */
+	public selectItem(itemId: string) {
+		const active = this.cards.findItem(itemId);
+		if(active) {
+			this.cards.activeItem = active;
+		}
 	}
 
 	/**

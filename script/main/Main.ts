@@ -447,24 +447,57 @@ class Main extends Component<MainPanelEventMap> {
 			if(!systemSettingsPanels.hasVisiblePanels()) {
 				return;
 			}
-			let s = new SystemSettingsWindow(selectedItemId);
+			// The back button within the settings switches the page of the open window
+			let s = this.routedSettingsWindow instanceof SystemSettingsWindow ? this.routedSettingsWindow : new SystemSettingsWindow(undefined);
 
 			// "systemsettings/<module name>" opens the settings dialog of the module, as on its tile in "Modules"
-			const mod = selectedItemId ? modules.getAll().find(m => m.name == selectedItemId) : undefined;
-			if(mod && !s.findChild(c => c instanceof AbstractSystemSettingsPanel && c.itemId == selectedItemId)) {
-				s = new SystemSettingsWindow("modules");
-				void this.openModuleSettings(mod.package + "/" + mod.name);
+			if(selectedItemId && !s.selectItem(selectedItemId)) {
+				const mod = modules.getAll().find(m => m.name == selectedItemId);
+				if(mod) {
+					s.selectItem("modules");
+					void this.openModuleSettings(mod.package + "/" + mod.name);
+				}
 			}
-			s.show();
+			this.showRoutedSettingsWindow(s);
 		});
 
 		router.add(/^usersettings\/?([^\/]+)?/, (selectedItemId) => {
-			const s = new UserSettingsWindow(selectedItemId);
-			s.show();
+			const s = this.routedSettingsWindow instanceof UserSettingsWindow ? this.routedSettingsWindow : new UserSettingsWindow(selectedItemId);
+			if(selectedItemId) {
+				s.selectItem(selectedItemId);
+			}
+			this.showRoutedSettingsWindow(s);
+		});
+
+		// The back button or a link to another page closes the settings
+		router.on("change", ({path}) => {
+			if(this.routedSettingsWindow && !path.startsWith(this.routedSettingsWindow instanceof SystemSettingsWindow ? "systemsettings" : "usersettings")) {
+				this.routedSettingsWindow.close();
+			}
 		});
 
 
 		this.addLegacyDefaultRoutes();
+	}
+
+	/**
+	 * The settings window that the URL opened
+	 */
+	private routedSettingsWindow?: SystemSettingsWindow | UserSettingsWindow;
+
+	private showRoutedSettingsWindow(w: SystemSettingsWindow | UserSettingsWindow) {
+		if(this.routedSettingsWindow === w) {
+			return;
+		}
+		// Going from the system settings straight to the user settings
+		this.routedSettingsWindow?.close();
+		this.routedSettingsWindow = w;
+		w.on("close", () => {
+			if(this.routedSettingsWindow === w) {
+				this.routedSettingsWindow = undefined;
+			}
+		});
+		w.show();
 	}
 
 	/**

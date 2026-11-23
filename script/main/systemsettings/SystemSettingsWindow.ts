@@ -5,6 +5,22 @@ import {User} from "../../auth/index.js";
 import {client} from "../../jmap/index.js";
 import {modules} from "../../Modules.js";
 
+/**
+ * Put the page of a settings window in the URL
+ *
+ * The first page that shows for "#systemsettings" replaces that URL, so the back button leaves the settings in one step.
+ *
+ * @param prefix "systemsettings" or "usersettings"
+ * @param itemId the item ID of the page
+ */
+export function setPagePath(prefix: string, itemId: string | number) {
+	if(router.getPath() === prefix) {
+		history.replaceState(history.state, "", "#" + prefix + "/" + itemId);
+	} else {
+		router.setPath(prefix + "/" + itemId);
+	}
+}
+
 export class SystemSettingsWindow extends Window {
 
 	private cards: CardContainer;
@@ -16,7 +32,10 @@ export class SystemSettingsWindow extends Window {
 		this.maximizable = false;
 
 		this.on("close", () => {
-			router.setPath("");
+			// Not when the back button or a link closed it, then the URL is the page to go to
+			if(router.getPath().startsWith("systemsettings")) {
+				router.setPath("");
+			}
 		})
 
 		const pnls : Component[] = [];
@@ -26,7 +45,7 @@ export class SystemSettingsWindow extends Window {
 
 			panel.on("show", ({target}) => {
 				if (target.itemId) {
-					router.setPath("systemsettings/" + target.itemId);
+					setPagePath("systemsettings", target.itemId);
 				}
 			})
 			pnls.push(panel);
@@ -61,15 +80,27 @@ export class SystemSettingsWindow extends Window {
 		)
 
 		if(selectedItemId) {
-			const active = this.cards.findItem(selectedItemId)
-			if(active) {
-				this.cards.activeItem = active;
-			}
+			this.selectItem(selectedItemId);
 		}
 
 		this.on("render", () => {
 			void this.load(user);
 		})
+	}
+
+	/**
+	 * Show a settings page
+	 *
+	 * @param itemId the item ID of the panel
+	 * @return false when there is no such page
+	 */
+	public selectItem(itemId: string): boolean {
+		const active = this.cards.findItem(itemId);
+		if(!active) {
+			return false;
+		}
+		this.cards.activeItem = active;
+		return true;
 	}
 
 	public async save() {
