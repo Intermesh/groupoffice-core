@@ -80,7 +80,7 @@ class General extends AbstractModuleSystemSettingsPanel {
 					listeners: {
 						setvalue: ({newValue}) => {
 
-							this.loginMessageField!.disabled = !newValue;
+							this.loginMessageField!.disabled = !newValue || this.isReadOnly("loginMessage");
 						}
 					}
 				}),

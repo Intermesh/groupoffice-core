@@ -82,7 +82,7 @@ class Notifications extends AbstractModuleSystemSettingsPanel {
 					listeners: {
 						change: ({newValue}) => {
 							if (this.verifyCertField) {
-								this.verifyCertField.disabled = (newValue == null);
+								this.verifyCertField.disabled = (newValue == null) || this.isReadOnly("smtpEncryptionVerifyCertificate");
 							}
 						}
 					}
