@@ -662,6 +662,16 @@ class Modules {
 	}
 
 
+	/**
+	 * Public data of a module for before login, like the sign-in buttons of the login screen
+	 *
+	 * The server module provides it with getLoginData(). Undefined when the module has none.
+	 */
+	public async getLoginData<T = any>(pkg: string, name: string): Promise<T | undefined> {
+		const capabilities = await client.getCapabilities();
+		return capabilities.modules.find(m => m.package === pkg && m.name === name)?.loginData;
+	}
+
 	public getConfig(pkg:string, name:string) {
 		return this.clientModules[pkg + "/" +name] ?? undefined;
 	}

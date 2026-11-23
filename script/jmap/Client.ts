@@ -118,7 +118,7 @@ export interface ResultReference  {
 
 export interface Capabilities {
 	title:string
-	modules: {name: string, package: string, entry: string}[]
+	modules: {name: string, package: string, entry: string, loginData?: any}[]
 	languages: Record<string, string>
 	settings: any
 }
