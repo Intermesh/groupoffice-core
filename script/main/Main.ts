@@ -34,6 +34,7 @@ import {ModuleDialog} from "./systemsettings/ModuleDialog.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
 import {LicenseWindow} from "./LicenseWindow.js";
+import {watchOnlineStatus, welcome} from "./StartupDialogs.js";
 
 
 type MainPanelCreator = {
@@ -265,10 +266,14 @@ class Main extends Component<MainPanelEventMap> {
 
 		this.preventFileDropNavigation();
 
+		watchOnlineStatus();
+
 		// api/oauth.php asks the user to approve an application that registered itself. Modules have registered their
 		// consent panels when their scripts loaded.
 		if(urlParams.has("oauthConsent")) {
 			void oauthConsent.open();
+		} else {
+			void welcome();
 		}
 
 		document.addEventListener("keydown", ev => {
