@@ -7,7 +7,6 @@ import {
 	p,
 	Component,
 	span,
-	Form,
 	containerfield, ContainerField
 } from "@intermesh/goui";
 import {customFields, CustomField, FieldSet as CustomFieldSet} from "./CustomFields.js";
@@ -157,6 +156,17 @@ export class FormFieldset extends Fieldset {
 	}
 
 	/**
+	 * The custom field values of the entity this fieldset is in, from all its fieldsets.
+	 *
+	 * They are read from the closest container field, which is the form or a container field like the "profile" of a
+	 * user, so a condition can use a field of another fieldset.
+	 */
+	private getCustomFieldValues(): Record<string, any> {
+		const value = this.findAncestorByType(ContainerField)?.value as Record<string, any> | undefined;
+		return value?.customFields ?? this.container.value;
+	}
+
+	/**
 	 * Required condition validator
 	 */
 	private checkRequiredCondition(formField: FormField): boolean {
@@ -168,8 +178,6 @@ export class FormFieldset extends Fieldset {
 		}
 
 		let requiredConditionMatches = false;
-
-		const form = this.findAncestorByType(Form)!, formValue = form.value;
 
 		if (!customField.relatedFieldCondition) {
 			return false;
@@ -184,7 +192,7 @@ export class FormFieldset extends Fieldset {
 
 			const scope = {
 				getValue: (v:any) =>{return v === true ? "1" : v ===false ? "0" : v === null || v === undefined ? '' : v;},
-				...formValue.customFields
+				...this.getCustomFieldValues()
 			}
 
 			requiredConditionMatches = func.call(scope) as boolean;
