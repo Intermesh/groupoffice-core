@@ -356,15 +356,20 @@ class Modules {
 	}
 
 	private applyCustomStyle(settings:any) {
+		// No ";" between the rules: it would become part of the next selector and invalidate the dark rule
 		let style = "<style> :root, body {";
-		style += this.printCustomStyle(settings, 'Color') + "};";
+		style += this.printCustomStyle(settings, 'Color') + "}";
 		style += "body.dark{" + this.printCustomStyle(settings, 'Dark');
-		style += "};</style>";
+		style += "}</style>";
 
 		document.head.insertAdjacentHTML('beforeend', style);
 
-		(document.getElementsByTagName("meta") as any)["theme-color"].content = document.body.style.getPropertyValue("--fg-main");
-console.log(document.body.style.getPropertyValue("--fg-main"));
+		// The colours are in the style block above, not on the body, so take the main colour from the settings.
+		// Without one, keep the colour that index.php printed.
+		const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+		if(themeColor && settings.primaryColor) {
+			themeColor.content = "#" + settings.primaryColor;
+		}
 	}
 
 	private printCustomStyle(settings:any, theme = 'Color') {
