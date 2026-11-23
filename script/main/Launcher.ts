@@ -6,6 +6,7 @@ export class Launcher extends Menu {
 	private searchFld;
 	private allButtons;
 	private modulesContainer;
+	private searchTexts: Record<string, string> = {};
 	constructor() {
 		super();
 
@@ -18,6 +19,7 @@ export class Launcher extends Menu {
 		})
 
 		this.allButtons = ArrayUtil.multiSort(main.getPanels(), [{property:"title"}]).map(m => {
+			this.searchTexts[m.id] = (m.id.replace("-", "") + " " + m.title).toLowerCase();
 			return comp({
 					itemId: m.id,
 					cls: "launcher-item"
@@ -68,7 +70,8 @@ export class Launcher extends Menu {
 				.on("input", ({value}) => {
 					if(value) {
 						this.modulesContainer.items.replace(...this.allButtons.filter((b) => {
-							return b.text.toLowerCase().startsWith(value.toLowerCase());
+							// Match the text anywhere in the module name or title, like the old start menu
+							return this.searchTexts[b.itemId].includes(value.toLowerCase());
 						}));
 					} else {
 						this.modulesContainer.items.replace(...this.allButtons);
