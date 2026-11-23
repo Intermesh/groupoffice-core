@@ -25,7 +25,7 @@ class GroupTable extends Table<DataSourceStore> {
 
 	levels?:{ [key: string]: any }[]
 
-	constructor(sharePanel: ModulePermissionPanel, module:ModuleInfo) {
+	constructor(sharePanel: ModulePermissionPanel, module:ModuleInfo, showUse = true) {
 
 
 		const columns = [
@@ -66,7 +66,7 @@ class GroupTable extends Table<DataSourceStore> {
 				}
 			}),
 
-			checkboxcolumn({
+			...(showUse ? [checkboxcolumn({
 				id: "mayRead",
 				header: t("Use"),
 				width: 200,
@@ -89,7 +89,7 @@ class GroupTable extends Table<DataSourceStore> {
 						}
 					})
 				}
-			})
+			})] : [])
 
 		]
 		for(let right of module.rights) {
@@ -161,7 +161,11 @@ export class ModulePermissionPanel extends Field {
 	private readonly groupTable: GroupTable;
 
 	public levels?:{ [key: string]: any }[]
-	constructor(module:ModuleInfo) {
+	/**
+	 * @param module The module to set the permissions of
+	 * @param showUse Show the "Use" column for the mayRead right. Hide it for core, which every user must be able to use.
+	 */
+	constructor(module:ModuleInfo, showUse = true) {
 		super("div");
 
 		this.name = "permissions";
@@ -169,7 +173,7 @@ export class ModulePermissionPanel extends Field {
 
 		this.title = t("Permissions");
 
-		this.groupTable = new GroupTable(this, module);
+		this.groupTable = new GroupTable(this, module, showUse);
 
 		this.items.add(
 			tbar({},
