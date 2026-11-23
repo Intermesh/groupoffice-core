@@ -25,6 +25,17 @@ export class UserSettingsWindow extends Window {
 	private _currentPasswordPrompt : Promise<string | undefined> | undefined;
 
 	/**
+	 * The user that is edited, which may be another user than the logged-in user
+	 */
+	private readonly user: User;
+
+	/**
+	 * True when the window was opened by the "usersettings" route. Only then it keeps the URL up to date. Another
+	 * user is edited from the system settings, which have their own URL.
+	 */
+	private readonly routed: boolean;
+
+	/**
 	 * Ask for the current password once per save. Panels that save at the same time share the answer.
 	 *
 	 * Resolves to undefined when the user cancels the prompt.
@@ -53,9 +64,13 @@ export class UserSettingsWindow extends Window {
 		super();
 		this.title = t("My Account");
 		this.maximized = true;
+		this.user = user;
+		this.routed = user.id == client.user.id && router.getPath().startsWith("usersettings");
 
 		this.on("close", () => {
-			router.setPath("");
+			if(this.routed) {
+				router.setPath("");
+			}
 		})
 
 		const pnls : Component[] = [];
@@ -71,7 +86,7 @@ export class UserSettingsWindow extends Window {
 
 		pnls.forEach(panel => {
 			panel.on("show", ({target}) => {
-				if (target.itemId) {
+				if (this.routed && target.itemId) {
 					router.setPath("usersettings/" + target.itemId);
 				}
 			})
