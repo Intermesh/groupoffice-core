@@ -59,7 +59,7 @@ export async function welcome() {
 			root.mask();
 			try {
 				client.raiseNextRequestTimeout(180000);
-				await client.jmap("System/demo");
+				await client.jmap("core/System/demo");
 			} catch(e) {
 				void Window.error(e);
 			} finally {

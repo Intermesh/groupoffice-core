@@ -64,7 +64,7 @@ export class AboutWindow extends Window {
 	}
 
 	private async load() {
-		const about = await client.jmap("System/about") as About;
+		const about = await client.jmap("core/System/about") as About;
 
 		this.setVersion(about.version, about.latestVersion);
 
