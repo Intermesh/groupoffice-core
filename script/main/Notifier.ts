@@ -7,6 +7,7 @@ import {
 	btn,
 	tbar,
 	Window,
+	win,
 	INotification,
 	h3,
 	Notifier as GOUINotifier,
@@ -294,10 +295,31 @@ export class Notifier extends Observable {
 		if (Notification.permission !== 'default') {
 			return Promise.resolve(Notification.permission === 'granted');
 		}
-		this.permissionRequest ??= Window.alert(
-				t("Please choose if you'd like to allow desktop notifications by Group-Office after pressing 'Ok'."),
-				t("Setup notifications")
-			)
+		// Window.alert() has no button, while the text asks to press "Ok"
+		this.permissionRequest ??= new Promise<void>(resolve => {
+				const w = win({
+						title: t("Setup notifications"),
+						modal: true,
+						width: 600,
+						listeners: {
+							close: () => resolve()
+						}
+					},
+					comp({
+						cls: "pad",
+						text: t("Please choose if you'd like to allow desktop notifications by Group-Office after pressing 'Ok'.")
+					}),
+					tbar({},
+						"->",
+						btn({
+							cls: "filled primary",
+							text: t("Ok"),
+							handler: () => w.close()
+						})
+					)
+				);
+				w.show();
+			})
 			.then(() => Notification.requestPermission())
 			.then(p => p === 'granted')
 			.catch(() => false);
