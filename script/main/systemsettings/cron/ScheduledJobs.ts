@@ -65,11 +65,11 @@ class ScheduledJobs extends AbstractModuleSystemSettingsPanel {
 				}),
 				datecolumn({
 					header: t("Running since"),
-					id: "completedAt"
+					id: "runningSince"
 				}),
 				column({
 					header: t("Error"),
-					id: "runningSince"
+					id: "lastError"
 				}),
 				column({
 					header: t("Module"),
