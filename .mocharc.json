@@ -1,0 +1,11 @@
+{
+  "extension": ["ts"],
+  "node-option": [
+    "no-warnings",
+    "experimental-specifier-resolution=node",
+    "import=tsx"
+  ],
+  "require": ["jsdom-global/register.js", "./tests/setup.ts"],
+  "spec": ["tests/**/*.ts"],
+  "ignore": ["tests/setup.ts"]
+}
