@@ -1,4 +1,5 @@
 import {
+	ArrayUtil,
 	avatar,
 	btn, Button,
 	cardmenu,
@@ -11,6 +12,7 @@ import {
 	hr,
 	Menu,
 	menu,
+	p,
 	router,
 	sortable,
 	t,
@@ -112,14 +114,6 @@ class Main extends Component<MainPanelEventMap> {
 		}).connect();
 
 		this.notifier = new Notifier();
-
-		// default route opens first module
-		router.add(() => {
-			const firstId = this.menu.items!.first()!.itemId + "";
-			router.setPath(firstId);
-			this.openPanel(firstId);
-		});
-
 
 	}
 
@@ -253,18 +247,15 @@ class Main extends Component<MainPanelEventMap> {
 
 
 
-		let first = true;
-		this.pinned.forEach((panelId, index) => {
+		this.pinned.forEach((panelId) => {
 			if(this.panelConfigs[panelId]) {
 				this.addPanelMenuItem(this.panelConfigs[panelId]);
-				if(first) {
-					this.openPanel(panelId);
-					first = false;
-				}
 			}
 		})
 
 		this.menu.items.add(hr({itemId: "pinned-splitter", cls: "sortable"}));
+
+		this.openDefaultPanel();
 
 		this.setupRoutes();
 
@@ -580,6 +571,10 @@ class Main extends Component<MainPanelEventMap> {
 		});
 
 		router.add(() => {
+			if(router.getPath() === "") {
+				this.openDefaultPanel();
+				return;
+			}
 			// fallback on legacy router
 			go.Router.check();
 		})
@@ -620,6 +615,34 @@ class Main extends Component<MainPanelEventMap> {
 
 	}
 
+
+	/**
+	 * Open the first pinned panel, or the first panel when none is pinned
+	 *
+	 * Shows a message when the user has no modules at all.
+	 */
+	private openDefaultPanel() {
+		const panelId = this.pinned.find(id => this.panelConfigs[id]) ??
+			ArrayUtil.multiSort(this.getPanels(), [{property: "title"}])[0]?.id;
+
+		if(panelId) {
+			this.openPanel(panelId);
+			return;
+		}
+
+		let noModules = this.container.findChild("no-modules");
+		if(!noModules) {
+			noModules = comp({
+					itemId: "no-modules",
+					cls: "pad",
+					title: t("No modules available")
+				},
+				p(t("You have a valid account but you don't have access to any of the modules. Please contact the administrator if you feel this is an error."))
+			);
+			this.container.items.add(noModules);
+		}
+		noModules.show();
+	}
 
 	/**
 	 * Get a panel only when it has been created already
