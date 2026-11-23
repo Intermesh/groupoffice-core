@@ -14,6 +14,7 @@ import {
 } from "@intermesh/goui";
 import {jmapds} from "../jmap";
 import {entities} from "../Entities";
+import {modules} from "../Modules.js";
 
 
 export interface AlertEntity extends DefaultEntity{
@@ -54,7 +55,6 @@ const soundPath = resourcePath + 'sounds/';
 const soundFiles: Record<SoundType, string> = {question: 'question', email: 'email', reminder: 'email'};
 const queue: (() => void)[] = [];
 const defaultIcon = iconPath+'reminder.png'
-const defaultTitle = t("Reminders");
 const seconds = (when: Date) => Math.ceil((when.getTime() - (new Date()).getTime()) / 1000);
 
 
@@ -67,7 +67,10 @@ window.addEventListener('pointerdown', () => {
 export class Notifier extends Observable {
 
 	declare btn: Button
-	private canNotify = false
+	private permissionRequest?: Promise<boolean>
+	/** Text of the desktop notifications shown by key, so the same message isn't shown again on every check */
+	private readonly notifiedTexts = new Map<string, string>()
+	private readonly desktopNotifications = new Map<string, Notification>()
 	private readonly store: Store<INotification>
 	private panel
 	private count = 0
@@ -118,7 +121,10 @@ export class Notifier extends Observable {
 				}
 				this.alertCount = alerts.length;
 				this.updateCount();
-				return Promise.all(promises).then(() => alerts);
+				return Promise.all(promises).then(() => {
+					this.notifyAlerts(alerts);
+					return alerts;
+				});
 			}
 		});
 
@@ -147,7 +153,10 @@ export class Notifier extends Observable {
 				emptyStateHtml: '',
 				store: this.alertStore,
 				renderer: (alert:any) => {
-					const closeFn = ()=>{jmapds("Alert").destroy(alert.id);};
+					const closeFn = ()=>{
+						this.closeDesktopNotification('alert-' + alert.id);
+						jmapds("Alert").destroy(alert.id);
+					};
 					const clickFn = () => {
 						const e = entities.get(alert.entity);
 						e.goto(alert.entityId);
@@ -180,8 +189,11 @@ export class Notifier extends Observable {
 
 		GOUINotifier.on('notify',({msg})=>{
 
+			// legacy code often doesn't pass a category
+			const category = msg.category ?? 'message';
+
 			// what is msg already exists?
-			switch(msg.category) {
+			switch(category) {
 				case 'status':
 					return true; // goui toast
 				case 'system':
@@ -190,6 +202,9 @@ export class Notifier extends Observable {
 					sidePanel.show(); // severe, open panel
 				case 'message':
 				case 'progress':
+					if(category === 'alarm' || category === 'message') {
+						this.desktopNotify(msg);
+					}
 					this.add(msg);
 			}
 
@@ -239,25 +254,134 @@ export class Notifier extends Observable {
 	}
 
 	private remove(msg:INotification) {
+		if(msg.tag) {
+			this.closeDesktopNotification(msg.tag);
+		}
 		this.store.remove(msg);
 		this.msgList.onStoreLoad();
 		this.count--;
 		this.updateCount();
 	}
 
-	async initNotifications() {
+	/**
+	 * Ask the user once per session for permission to show desktop notifications
+	 *
+	 * Browsers only show the permission prompt after a user action, so the user presses "Ok" in a dialog first.
+	 *
+	 * @return true if desktop notifications may be shown
+	 */
+	initNotifications(): Promise<boolean> {
 		if (!('Notification' in window) || !isSecureContext) {
+			return Promise.resolve(false);
+		}
+		if (Notification.permission !== 'default') {
+			return Promise.resolve(Notification.permission === 'granted');
+		}
+		this.permissionRequest ??= Window.alert(
+				t("Please choose if you'd like to allow desktop notifications by Group-Office after pressing 'Ok'."),
+				t("Setup notifications")
+			)
+			.then(() => Notification.requestPermission())
+			.then(p => p === 'granted')
+			.catch(() => false);
+
+		return this.permissionRequest;
+	}
+
+	/**
+	 * Show a desktop notification of the browser for a notification
+	 *
+	 * The same text with the same key is shown only once, until the notification is removed in GroupOffice.
+	 *
+	 * @param msg the notification
+	 * @param key identifies the notification, defaults to its tag
+	 */
+	private desktopNotify(msg: INotification, key = msg.tag) {
+		if (!('Notification' in window) || !isSecureContext || Notification.permission === 'denied' || !msg.text) {
 			return;
 		}
-		let p = Notification.permission;
-		if (p === 'default') {
-			try {
-				p = await Notification.requestPermission();
-			} catch {
+
+		const body = msg.text.stripTags();
+		if(key) {
+			if(this.notifiedTexts.get(key) === body) {
 				return;
 			}
+			this.notifiedTexts.set(key, body);
 		}
-		this.canNotify = (p === 'granted');
+
+		void this.initNotifications().then(granted => {
+			if(!granted) {
+				return;
+			}
+			try {
+				if(key) {
+					this.desktopNotifications.get(key)?.close();
+				}
+				const n = new Notification(msg.title || t("Reminders"), {
+					body,
+					tag: key,
+					icon: msg.icon?.link ?? defaultIcon
+				});
+				n.addEventListener("click", () => {
+					window.focus();
+					n.close();
+					msg.onClick?.();
+				});
+				if(key) {
+					this.desktopNotifications.set(key, n);
+					n.addEventListener("close", () => {
+						if(this.desktopNotifications.get(key) === n) {
+							this.desktopNotifications.delete(key);
+						}
+					});
+				}
+			} catch (e) {
+				// Mobile browsers only allow notifications from a service worker
+				console.warn("Desktop notification failed", e);
+			}
+		});
+	}
+
+	private closeDesktopNotification(key: string) {
+		this.notifiedTexts.delete(key);
+		this.desktopNotifications.get(key)?.close();
+		this.desktopNotifications.delete(key);
+	}
+
+	/**
+	 * Show desktop notifications for alerts that weren't shown yet
+	 */
+	private notifyAlerts(alerts: AlertEntity[]) {
+		// The webpush module pushes the alerts to the browser itself
+		if(modules.isAvailable("community", "webpush")) {
+			return;
+		}
+
+		for(const alert of alerts) {
+			if(!alert.entityData || (alert.data && "progress" in alert.data)) {
+				continue;
+			}
+			const key = 'alert-' + alert.id;
+			if(this.notifiedTexts.has(key)) {
+				continue;
+			}
+			const closeFn = () => {jmapds("Alert").destroy(alert.id);};
+			let notification: INotification | undefined;
+			try {
+				notification = this.notificationRenderers?.[alert.entity]?.(alert, closeFn);
+				notification ??= this.defaultNotificationRenderer(alert, closeFn);
+			} catch (e) {
+				console.warn("Failed to render alert", e, alert);
+				continue;
+			}
+			if(notification.category === 'progress') {
+				continue;
+			}
+			this.desktopNotify({
+				...notification,
+				onClick: notification.onClick ?? (() => entities.get(alert.entity).goto(alert.entityId))
+			}, key);
+		}
 	}
 
 	private defaultNotificationRenderer(alert:any, closeFn: () => void): INotification {
