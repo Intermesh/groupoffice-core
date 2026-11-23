@@ -1,9 +1,10 @@
-import {ArrayUtil, btn, comp, Component, h3, searchbtn, t, tbar, TextField, textfield, Window} from "@intermesh/goui";
+import {ArrayUtil, btn, Button, comp, Component, h3, searchbtn, t, tbar, TextField, textfield, Window} from "@intermesh/goui";
 import {AbstractSystemSettingsPanel} from "./AbstractSystemSettingsPanel.js";
 import {adminOnly, systemSettingsPanels} from "./SystemSettingsWindow.js";
 import {modules} from "../../Modules.js";
 import {client, jmapds} from "../../jmap/index.js";
 import {InstallModuleTile} from "./InstallModuleTile.js";
+import {LicenseWindow} from "../LicenseWindow.js";
 
 export interface ModuleInfo {
 	id: string
@@ -25,12 +26,26 @@ export interface ModuleInfo {
 
 class SystemSettingsModules extends AbstractSystemSettingsPanel {
 	private appContainer: Component;
+	private trialButton: Button;
 	constructor() {
 		super("modules", t("Modules"), "apps");
 
 		this.cls = "fit vbox";
 		this.items.add(
 			tbar({cls: "border-bottom"},
+				this.trialButton = btn({
+					icon: "star",
+					cls: "accent",
+					text: t("Trial license"),
+					hidden: !this.mayGetTrialLicense(),
+					handler: () => {
+						const win = new LicenseWindow();
+						win.on("close", () => {
+							this.trialButton.hidden = !this.mayGetTrialLicense();
+						});
+						win.show();
+					}
+				}),
 				"->",
 				searchbtn({
 					listeners: {
@@ -54,6 +69,14 @@ class SystemSettingsModules extends AbstractSystemSettingsPanel {
 			this.appContainer = comp({cls: "apps"},)
 			)
 	}
+	/**
+	 * Administrators can get a trial license when there's no license yet, and it isn't set in the configuration file
+	 */
+	private mayGetTrialLicense(): boolean {
+		const settings = modules.get("core", "core")?.settings;
+		return !!client.user.isAdmin && !settings?.license && (settings?.readOnlyKeys ?? []).indexOf("license") == -1;
+	}
+
 	async reload() {
 		response = undefined;
 		return this.load()
