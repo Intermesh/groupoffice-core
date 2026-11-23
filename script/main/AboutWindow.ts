@@ -1,77 +1,88 @@
-import {FormWindow} from "../components/index.js";
 import {a, comp, fieldset, Format, p, t, textfield, Window} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
-import {LegacyApi} from "../LegacyApi";
-import {modules} from "../Modules";
 
+/**
+ * The response of System/about
+ */
+interface About {
+	version: string
+	/**
+	 * Set when the server checks for updates and a newer release exists
+	 */
+	latestVersion: string | null
+	/**
+	 * Only for administrators
+	 */
+	usage?: {
+		users: number
+		fileStorage: number
+		database: number
+		mailbox: number
+		quota: number | null
+		calculatedAt: string | null
+	}
+}
+
+/**
+ * Shows the version, whether an update is available and, to administrators, the usage of this instance
+ *
+ * The "hideAbout" config option hides it for users that aren't administrators.
+ */
 export class AboutWindow extends Window {
+	private readonly version;
+
 	constructor() {
 		super();
-
-		const la = new LegacyApi("core", "about");
-
-		if (client.user.isAdmin) {
-
-		}
 
 		this.title = t("About");
 		this.cls = "about";
 
 		this.items.add(
 			comp({cls: "about-groupoffice-logo"}),
-
-			p({
-					html: t("Version: {version}<br/>Copyright &copy; 2003-{current_year}, {company_name}<br/>All rights reserved.")
-						.replace("{version}", client.session!.version)
-						.replace("{current_year}", (new Date).getFullYear())
-						.replace("{company_name}", "Intermesh")
-				}
-			),
-
-			a({href: "https://www.group-office.com", target: "_blank"})
+			this.version = p(),
+			a({href: "https://www.group-office.com", target: "_blank", text: "www.group-office.com"})
 		);
 
-		this.on("render", async () => {
-			if (!client.user.isAdmin) {
-				return;
-			}
-			const coreModule = modules.get("core", "core"),
-				s = coreModule!.settings;
-			console.log(s);
+		this.setVersion(client.session!.version);
 
-			const resp = await la.call() as any;
-			if (resp.data && resp.data.has_usage) {
-				this.items.insert(2, fieldset({
-						title: t("This instance is using")
-					},
-					textfield({
-						label: t("Users"),
-						readOnly: true,
-						value: resp.data.users
-					}),
-					textfield({
-						label: t("Files"),
-						readOnly: true,
-						value: `${Format.fileSize(s.fileStorageUsage)} / ${resp.data.quota ? Format.fileSize(resp.data.quota): "-"}`
-					}),
-					textfield({
-						label: t("E-mail"),
-						readOnly: true,
-						value: s.mailboxUsage ? Format.fileSize(s.mailboxUsage) : '-'
-					}),
-					textfield({
-						label: t("Total"),
-						readOnly: true,
-						value: Format.fileSize((s.mailboxUsage+s.databaseUsage + s.fileStorageUsage))
-					}),
-					textfield({
-						label: t("Date"),
-						readOnly: true,
-						value: s.cronLastRun ? Format.smartDateTime(s.cronLastRun) : t("Never")
-					})
-				));
-			}
+		this.on("render", () => {
+			void this.load();
 		});
+	}
 
+	private setVersion(version: string, latestVersion: string | null = null) {
+		let html = Format.escapeHTML(version);
+		if(latestVersion) {
+			html += ` <span class="success">(${t("update available")}: ${Format.escapeHTML(latestVersion)})</span>`;
+		}
+
+		// The key with line breaks is the one that is translated
+		this.version.html = t("Version: {version}<br/>\nCopyright (c) 2003-{current_year}, {company_name}<br/>\nAll rights reserved.")
+			.replace("{version}", html)
+			.replace("{current_year}", String((new Date).getFullYear()))
+			.replace("{company_name}", "Intermesh");
+	}
+
+	private async load() {
+		const about = await client.jmap("System/about") as About;
+
+		this.setVersion(about.version, about.latestVersion);
+
+		if(!about.usage) {
+			return;
+		}
+
+		const u = about.usage, field = (label: string, value: string) => textfield({label, value, readOnly: true});
+
+		this.items.insert(2, fieldset({
+				title: t("This instance is using")
+			},
+			field(t("Users"), String(u.users)),
+			field(t("Files"), Format.fileSize(u.fileStorage) + " / " + (u.quota ? Format.fileSize(u.quota) : "-")),
+			field(t("Database"), Format.fileSize(u.database)),
+			field(t("E-mail"), u.mailbox ? Format.fileSize(u.mailbox) : "-"),
+			field(t("Total"), Format.fileSize(u.fileStorage + u.database + u.mailbox)),
+			field(t("Date"), u.calculatedAt ? Format.smartDateTime(u.calculatedAt) : t("Never"))
+		));
 	}
 }
