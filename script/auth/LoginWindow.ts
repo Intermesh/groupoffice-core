@@ -281,9 +281,17 @@ export class LoginWindow extends Window<LoginEventMap> {
 					handler: async (form) => {
 						this.loginForm.show();
 
-						const response = await client.auth(Object.assign({action: "forgotten"}, form.value ) as ForgottenData);
-
-						Notifier.success(t("If an account was found, you should receive an e-mail with instructions shortly."));
+						try {
+							const response = await client.auth(Object.assign({action: "forgotten"}, form.value ) as ForgottenData);
+							if(!response.ok) {
+								throw new Error(response.status + " " + response.statusText);
+							}
+							Notifier.success(t("If an account was found, you should receive an e-mail with instructions shortly."));
+						} catch(e) {
+							// For example when the mail couldn't be sent. Before, this said the mail was sent.
+							console.error(e);
+							Notifier.error(t("Sorry, an error occurred"));
+						}
 
 					}
 				},
