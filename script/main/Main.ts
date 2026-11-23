@@ -239,6 +239,8 @@ class Main extends Component<MainPanelEventMap> {
 							if(!this.accountMenu) {
 								this.accountMenu = this.createAccountMenu();
 								this.accountMenu.alignTo = target.el;
+								// Otherwise it stays open over the page of a link or the back button
+								router.on("change", () => this.accountMenu!.hide());
 							}
 
 							this.accountMenu.show();
