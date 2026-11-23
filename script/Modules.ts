@@ -193,6 +193,13 @@ export interface ModuleConfig<T extends CmpMap>  {
 	panelConfig?:any
 
 	/**
+	 * The permission level the user needs on the module to see the legacy main panel. Defaults to read.
+	 *
+	 * @deprecated
+	 */
+	requiredPermissionLevel?: number
+
+	/**
 	 * Init function. Is called when the main Group-Office page loads
 	 * @deprecated
 	 */
@@ -247,6 +254,13 @@ export interface Module extends BaseEntity {
 	 * Rights per groupId (groupId is the key)
 	 */
 	permissions: Record<EntityID, {rights: Record<string, boolean>}>
+
+	/**
+	 * Permission level of the current user
+	 *
+	 * @deprecated Use userRights
+	 */
+	permissionLevel?: number,
 	version: number,
 
 	/**
@@ -666,7 +680,7 @@ class Modules {
 			console.warn(id + " already registered", config)
 
 			if(config.mainPanel) {
-				main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+				this.addLegacyMainPanel(config);
 			}
 
 			// if(config.initModule) {
@@ -690,8 +704,30 @@ class Modules {
 		}
 
 		if(config.mainPanel) {
-			main.addLegacyPanel(config.package,config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+			this.addLegacyMainPanel(config);
 		}
+	}
+
+	/**
+	 * Add the main panel of a legacy module when the user may use it
+	 *
+	 * Module scripts register before the server modules are loaded. Ext's document ready fires after they are loaded
+	 * in legacyInit(), so the rights are known then. Legacy module scripts are loaded for all modules, also the ones
+	 * the user has no access to.
+	 */
+	private addLegacyMainPanel(config: ModuleConfig<any>) {
+		Ext.onReady(() => {
+			const mod = this.get(config.package, config.name);
+			if(!mod || !mod.enabled || !mod.userRights.mayRead) {
+				return;
+			}
+
+			if(config.requiredPermissionLevel && (mod.permissionLevel ?? 0) < config.requiredPermissionLevel) {
+				return;
+			}
+
+			main.addLegacyPanel(config.package, config.name, config.title!, config.mainPanel, config.panelConfig ?? {});
+		});
 	}
 
 	/**
