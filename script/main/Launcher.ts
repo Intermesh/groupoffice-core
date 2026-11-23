@@ -88,32 +88,21 @@ export class Launcher extends Menu {
 
 	}
 
+	/**
+	 * Set the badge of a module. Ignored when the module isn't in the launcher.
+	 */
 	public setBadge(panelId:string, count:number|undefined) {
 		const cmp = this.allButtons.find(b => {
 			return b.itemId == panelId;
 		})
 
 		if(!cmp) {
-			throw "Not found";
+			return;
 		}
 
 		const badge = cmp.findChild("badge")!;
 
 		badge.hidden = !count;
 		badge.text = count ? count?.toString() : "";
-	}
-
-	public getBadge(panelId:string) {
-		const cmp = this.allButtons.find(b => {
-			return b.itemId == panelId;
-		})
-
-		if(!cmp) {
-			throw "Not found";
-		}
-
-		const badge = cmp.findChild("badge")!;
-
-		return parseInt(badge.text);
 	}
 }

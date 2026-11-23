@@ -68,6 +68,11 @@ class Main extends Component<MainPanelEventMap> {
 	private pinned:string[] = ["summary", "email", "calendar", "tasks", "addressbook", "files"];
 	private launcher?: Launcher;
 
+	/**
+	 * Badge counts per panel. Modules may set them before the launcher or the menu item of the panel exists.
+	 */
+	private badges: Record<string, number|undefined> = {};
+
 	constructor() {
 		super();
 
@@ -223,7 +228,7 @@ class Main extends Component<MainPanelEventMap> {
 					btn({
 						title: t("Launcher"),
 						icon: "apps",
-						menu: this.launcher = new Launcher()
+						menu: this.launcher = this.createLauncher()
 					}),
 
 					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
@@ -278,6 +283,14 @@ class Main extends Component<MainPanelEventMap> {
 			}
 		});
 
+	}
+
+	private createLauncher() {
+		const launcher = new Launcher();
+		for(const panelId in this.badges) {
+			launcher.setBadge(panelId, this.badges[panelId]);
+		}
+		return launcher;
 	}
 
 	/**
@@ -355,7 +368,7 @@ class Main extends Component<MainPanelEventMap> {
 
 	private addPanelMenuItem(m: MainPanelCreator) {
 
-		const badge = this.launcher!.getBadge(m.id)
+		const badge = this.badges[m.id];
 
 		const menuItem = comp({
 				cls: "pinned-item sortable",
@@ -438,7 +451,7 @@ class Main extends Component<MainPanelEventMap> {
 				)
 			}),
 
-			comp({cls: "goui-badge", hidden:!badge, itemId: "badge", text: badge.toString()})
+			comp({cls: "goui-badge", hidden:!badge, itemId: "badge", text: badge ? badge.toString() : ""})
 
 		);
 		this.menu.items.add(menuItem);
@@ -609,6 +622,26 @@ class Main extends Component<MainPanelEventMap> {
 
 
 	/**
+	 * Get a panel only when it has been created already
+	 *
+	 * Unlike getPanelById() it doesn't create the panel or its menu item.
+	 *
+	 * @param panelId
+	 */
+	public findPanel(panelId:string): Component | undefined {
+		return this.container.findChild(panelId);
+	}
+
+	/**
+	 * Check if a module registered a panel with this ID
+	 *
+	 * @param panelId
+	 */
+	public hasPanel(panelId:string): boolean {
+		return !!this.panelConfigs[panelId];
+	}
+
+	/**
 	 * Open a panel
 	 * @param panelId
 	 */
@@ -627,8 +660,18 @@ class Main extends Component<MainPanelEventMap> {
 		return cmp;
 	}
 
+	/**
+	 * Show a count on the launcher item and the menu item of a panel
+	 *
+	 * It may be called before the main layout has been built. The count shows when the items are created.
+	 *
+	 * @param panelId
+	 * @param count
+	 */
 	public setPanelBadge(panelId:string, count:number|undefined) {
-		this.launcher!.setBadge(panelId, count);
+		this.badges[panelId] = count;
+
+		this.launcher?.setBadge(panelId, count);
 
 		const pinned = this.menu.findChild(panelId);
 
