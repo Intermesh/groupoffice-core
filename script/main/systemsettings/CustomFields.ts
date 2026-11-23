@@ -98,7 +98,8 @@ class CustomFields extends AbstractSystemSettingsPanel {
 				}
 			}
 		}
-		this.store.loadData(ArrayUtil.multiSort(tableData, [{property: "entityName"}, {property: "moduleTitle"}]));
+		// Replace, because it loads when the window loads and again when the page is shown
+		this.store.loadData(ArrayUtil.multiSort(tableData, [{property: "entityName"}, {property: "moduleTitle"}]), false);
 	}
 
 }
