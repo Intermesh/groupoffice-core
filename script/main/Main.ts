@@ -201,6 +201,8 @@ class Main extends Component<MainPanelEventMap> {
 			return new Promise<void>(() => {});
 		}
 
+		// The pinned tabs are stored per user, so the next user of a shared browser doesn't get them
+		this.stateId = "groupoffice-main-" + client.user.id;
 		main.initState();
 
 		void this.notifier.load();
