@@ -10,8 +10,9 @@ import {
 	TextField,
 	textfield
 } from "@intermesh/goui";
-import {groupDS} from "../../../auth/index.js";
+import {groupDS, userDS} from "../../../auth/index.js";
 import {modules} from "../../../Modules.js";
+import {UserSettingsWindow} from "../../settings/index.js";
 
 
 
@@ -25,6 +26,17 @@ export class CreateUserDialog extends FormWindow {
 
 		this.width = 460;
 		this.height = 740;
+
+		// Continue with the other settings of the new user
+		this.form.on("save", async ({data, isNew}) => {
+			if(!isNew) {
+				return;
+			}
+			const user = await userDS.single(data.id);
+			if(user) {
+				new UserSettingsWindow(undefined, user).show();
+			}
+		});
 
 		const settings = modules.get("core", "core")!.settings;
 		this.generalTab.items.add(
