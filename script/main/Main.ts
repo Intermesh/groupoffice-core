@@ -220,7 +220,7 @@ class Main extends Component<MainPanelEventMap> {
 					}),
 
 					btn({
-						title: t("Launcher"),
+						title: t("Launcher") + " (" + (navigator.platform.startsWith("Mac") ? "⌘ + ⇧" : "CTRL + SHIFT") + " + M)",
 						icon: "apps",
 						menu: this.launcher = this.createLauncher()
 					}),
@@ -268,12 +268,53 @@ class Main extends Component<MainPanelEventMap> {
 		}
 
 		document.addEventListener("keydown", ev => {
-			if((ev.ctrlKey || ev.metaKey) && ev.shiftKey && ev.key.toLowerCase() == "f") {
+			if(!(ev.ctrlKey || ev.metaKey) || ev.altKey) {
+				return;
+			}
+			const key = ev.key.toLowerCase();
+			if(ev.shiftKey && key == "f") {
 				ev.preventDefault();
 				this.search();
+			} else if(ev.shiftKey && key == "m") {
+				ev.preventDefault();
+				this.launcher!.show();
+			} else if(!ev.shiftKey && key == "p") {
+				if(this.printActivePanel()) {
+					ev.preventDefault();
+				}
 			}
 		});
 
+	}
+
+	/**
+	 * Print the active module panel, if it supports printing
+	 *
+	 * @return true when the panel printed
+	 */
+	private printActivePanel(): boolean {
+		const pnl = this.container.activeItemComponent as any;
+		if(!pnl) {
+			return false;
+		}
+
+		// GOUI panels and legacy ExtJS panels with a print() function
+		const ext = pnl instanceof ExtJSWrapper ? pnl.extJSComp : undefined,
+			printable = ext ?? pnl;
+
+		if(typeof printable.print == "function") {
+			printable.print();
+			return true;
+		}
+
+		// Legacy panels print their detail view
+		const detail = ext?.findByType?.("displaypanel")[0];
+		if(detail) {
+			detail.print();
+			return true;
+		}
+
+		return false;
 	}
 
 	private createLauncher() {
