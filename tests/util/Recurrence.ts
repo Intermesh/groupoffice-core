@@ -47,6 +47,16 @@ describe('Recurrence class', () => {
 			.to.deep.equal(["2026-03-02 09:00", "2026-03-03 09:00", "2026-03-04 09:00"]);
 	});
 
+	it('Includes the occurrence on a date-only until', () => {
+		expect(occurrences({frequency: "daily", until: "2026-03-04"}, "2026-03-02 09:00", "2026-03-01 00:00", "2026-04-01 00:00"))
+			.to.deep.equal(["2026-03-02 09:00", "2026-03-03 09:00", "2026-03-04 09:00"]);
+	});
+
+	it('Includes the last day of a full-day event with a date-only until', () => {
+		expect(occurrences({frequency: "daily", until: "2026-03-04"}, "2026-03-02 00:00", "2026-03-01 00:00", "2026-04-01 00:00"))
+			.to.deep.equal(["2026-03-02 00:00", "2026-03-03 00:00", "2026-03-04 00:00"]);
+	});
+
 	it('Skips occurrences before the start of the period', () => {
 		expect(occurrences({frequency: "weekly"}, "2026-03-02 09:00", "2026-03-10 00:00", "2026-03-24 00:00"))
 			.to.deep.equal(["2026-03-16 09:00", "2026-03-23 09:00"]);
