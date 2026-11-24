@@ -53,16 +53,24 @@ const resourcePath = new URL('../style/resources/', import.meta.url).href;
 const iconPath = resourcePath + 'notify/';
 const soundPath = resourcePath + 'sounds/';
 const soundFiles: Record<SoundType, string> = {question: 'question', email: 'email', reminder: 'email'};
-const queue: (() => void)[] = [];
 const defaultIcon = iconPath+'reminder.png'
 const seconds = (when: Date) => Math.ceil((when.getTime() - (new Date()).getTime()) / 1000);
 
 
-let audioUnlocked = false;
-window.addEventListener('pointerdown', () => {
-	audioUnlocked = true;
-	while (queue.length) queue.shift()?.();
-}, { once: true });
+// Sound that the browser refused to play because the user didn't interact with the page yet.
+// Only the last one is kept, so several notifications don't all play at once.
+let pendingSound: (() => void) | undefined;
+
+const playPendingSound = () => {
+	const play = pendingSound;
+	pendingSound = undefined;
+	play?.();
+};
+
+// These events count as user activation. "pointerdown" doesn't for touch, so it's not used.
+for (const ev of ['pointerup', 'keydown', 'touchend']) {
+	window.addEventListener(ev, playPendingSound, {capture: true});
+}
 
 export class Notifier extends Observable {
 
@@ -79,6 +87,7 @@ export class Notifier extends Observable {
 	private msgList: List
 	private notificationRenderers: {[entityType:string]: (alert:any, closeFn: ()=>void) => INotification | undefined} = {};
 	private nextTriggerIntervalId?: any
+	private lastCount: number = 0;
 	constructor() {
 		super();
 
@@ -238,7 +247,11 @@ export class Notifier extends Observable {
 
 	private updateCount(){
 		const c = (this.alertCount + this.count);
+		if(c > this.lastCount && !go.User.mute_reminder_sound) {
+			this.playSound('reminder');
+		}
 		this.btn.el.dataset.count = ''+(c>0?c:'');
+		this.lastCount = c;
 	}
 
 	private add(msg: INotification) {
@@ -519,19 +532,31 @@ export class Notifier extends Observable {
 	/**
 	 * Play a notification sound unless the user muted it in the settings
 	 *
-	 * Browsers only play sound after the user interacted with the page, so before that it's queued.
+	 * Browsers only play sound after the user interacted with the page. Until then the last sound is kept and played on the next interaction.
 	 *
 	 * @param type "email" and "reminder" can be muted separately
 	 */
 	playSound(type: SoundType = 'question') {
 		if(!GO.util.empty(go.User.mute_sound) ||
-			(type === 'email' && !GO.util.empty(go.User.mute_new_mail_sound)) ||
-			(type === 'reminder' && !GO.util.empty(go.User.mute_reminder_sound))) {
+			(type === 'email' && go.User.mute_new_mail_sound) ||
+			(type === 'reminder' && go.User.mute_reminder_sound)) {
 			return;
 		}
-		const play= () => {new Audio(soundPath+soundFiles[type]+'.mp3').play().catch((e) => {console.warn("Could not play notifier sound: " + e.message)})}
+		const play = () => {
+			new Audio(soundPath + soundFiles[type] + '.mp3').play().catch((e) => {
+				if (e.name === 'NotAllowedError') {
+					// retry on the next user interaction
+					pendingSound = play;
+				} else {
+					console.warn("Could not play notifier sound: " + e.message);
+				}
+			});
+		};
 
-		if (audioUnlocked) play();
-		else queue.push(play);
+		if (navigator.userActivation?.hasBeenActive ?? true) {
+			play();
+		} else {
+			pendingSound = play;
+		}
 	}
 }
