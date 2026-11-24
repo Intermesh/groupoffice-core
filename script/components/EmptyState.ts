@@ -112,7 +112,8 @@ export class EmptyState extends Component {
 
 		return this.filterNames.some(name => {
 			const filter = store.getFilter(name);
-			return filter !== undefined && Object.values(filter).some(v => v !== undefined && v !== "" && !(Array.isArray(v) && !v.length));
+			// setFilter(name, null) keeps null in the store
+			return filter !== undefined && filter !== null && Object.values(filter).some(v => v !== undefined && v !== "" && !(Array.isArray(v) && !v.length));
 		});
 	}
 

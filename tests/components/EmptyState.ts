@@ -77,6 +77,15 @@ describe("EmptyState class", () => {
 			e.remove();
 		});
 
+		it("Ignores a filter that is set to null", function () {
+			const e = create();
+			(e.store as any).setFilter("search", null);
+
+			expect(e.isFiltered()).to.equal(false);
+
+			e.remove();
+		});
+
 		it("Ignores filters that aren't in filterNames, like the selected notebook", function () {
 			const e = create();
 			(e.store as any).setFilter("notebook", {noteBookId: [1]});
