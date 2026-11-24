@@ -355,6 +355,24 @@ button[data-count]::before {
 	}
 }
 
+// The empty state of a list with an explanation and an add button (EmptyState.ts)
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: dp(48) dp(24);
+
+	h3 {
+		margin: dp(16) 0 dp(8);
+		color: $colorText;
+	}
+
+	p {
+		max-width: dp(400);
+		margin: 0 0 dp(24);
+	}
+}
+
 .welcome {
 	.welcome-step {
 		align-items: center;
