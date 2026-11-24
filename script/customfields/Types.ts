@@ -37,6 +37,7 @@ import {
 	TextField
 } from "@intermesh/goui";
 import {principalcombo} from "../components/index";
+import DOMPurify from "dompurify";
 import {groupcombo} from "../components/GroupCombo";
 import {treeselect} from "./TreeSelectField";
 
@@ -445,7 +446,9 @@ export class HtmlCustomField extends AbstractCustomField {
 	createDetailField() {
 		return displayfield({
 			...this.getDetailFieldConfig(),
-			htmlEncode: false
+			htmlEncode: false,
+			// Values stored before they were sanitized on save may contain scripts
+			renderer: (v: string | undefined) => v ? DOMPurify.sanitize(v) : ""
 		})
 	}
 }
