@@ -82,7 +82,9 @@ export class EmptyState extends Component {
 	constructor(public readonly store: Store) {
 		super();
 
-		this.cls = "goui-empty-state empty-state";
+		// Not "empty-state" or "goui-empty-state": the legacy theme and GOUI style every icon in those, also the one of the
+		// add button
+		this.cls = "list-empty-state";
 
 		this.items.add(
 			this.iconEl = comp({tagName: "i", cls: "icon"}),
