@@ -29,6 +29,23 @@ export interface InstallModuleTileEventMap extends ComponentEventMap {
 
 export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 	private deleteBtn: Button;
+
+	/**
+	 * A badge for a module that isn't stable yet or will be removed. Stable modules have none.
+	 *
+	 * @param status "stable", "beta" or "deprecated", see go\core\Module::getStatus()
+	 */
+	private static statusBadge(status: string): Component[] {
+		const labels: Record<string, string> = {
+			beta: t("Beta"),
+			deprecated: t("Deprecated")
+		};
+		if(!labels[status]) {
+			return [];
+		}
+		return [comp({tagName: "span", cls: "module-status " + status, text: labels[status]})];
+	}
+
 	constructor(m:ModuleInfo) {
 		super();
 
@@ -46,7 +63,10 @@ export class InstallModuleTile extends Component<InstallModuleTileEventMap> {
 				img({src: client.downloadUrl("core/moduleIcon/" + m.id)}),
 
 				comp({} ,
-					h4(m.title),
+					comp({cls: "title"},
+						h4(m.title),
+						...InstallModuleTile.statusBadge(m.status)
+					),
 					p(m.description)
 				)
 			),

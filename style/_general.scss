@@ -98,7 +98,9 @@ h4.goui {
 
 .goui.card.module {
 
-	width: util.dp(400);
+	//width: util.dp(400);
+	margin-left: 0;
+	margin-right: util.dp(16);
 
 	&.installed {
 		.desc {
@@ -114,6 +116,36 @@ h4.goui {
 		display: flex;
 		flex-direction: row;
 		gap: util.dp(16);
+
+		.title {
+			display: flex;
+			align-items: center;
+			gap: util.dp(8);
+
+			h4 {
+				min-width: 0;
+			}
+		}
+
+		// See InstallModuleTile.statusBadge()
+		.module-status {
+			flex-shrink: 0;
+			font-size: util.sp(12);
+			font-weight: bold;
+			line-height: util.dp(20);
+			padding: 0 util.dp(8);
+			border-radius: util.dp(10);
+
+			&.beta {
+				background-color: var(--bg-warning);
+				color: var(--fg-warning);
+			}
+
+			&.deprecated {
+				background-color: var(--bg-error);
+				color: var(--fg-error);
+			}
+		}
 
 		> div {
 			min-width: 0;
