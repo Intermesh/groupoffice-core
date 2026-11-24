@@ -34,7 +34,7 @@ import {ModuleDialog} from "./systemsettings/ModuleDialog.js";
 import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
 import {LicenseWindow} from "./LicenseWindow.js";
-import {watchOnlineStatus, welcome} from "./StartupDialogs.js";
+import {watchOnlineStatus, welcome, whatsNew} from "./StartupDialogs.js";
 import {Tour} from "./Tour.js";
 
 /**
@@ -170,16 +170,18 @@ class Main extends Component<MainPanelEventMap> {
 
 	/**
 	 * Starts the tour at the first login of the user, once per browser
+	 *
+	 * @return Whether the tour started
 	 */
-	private startFirstTour() {
+	private startFirstTour(): boolean {
 		if((client.user.loginCount ?? 0) > 1) {
-			return;
+			return false;
 		}
 
 		const key = "tour-seen-" + client.user.id;
 		try {
 			if(localStorage.getItem(key)) {
-				return;
+				return false;
 			}
 			localStorage.setItem(key, "1");
 		} catch(e) {
@@ -187,6 +189,7 @@ class Main extends Component<MainPanelEventMap> {
 		}
 
 		this.startTour();
+		return true;
 	}
 
 	/**
@@ -392,8 +395,8 @@ class Main extends Component<MainPanelEventMap> {
 			const welcomeWindow = welcome();
 			if(welcomeWindow) {
 				welcomeWindow.on("close", () => this.startFirstTour());
-			} else {
-				this.startFirstTour();
+			} else if(!this.startFirstTour()) {
+				void whatsNew();
 			}
 		}
 

@@ -415,6 +415,34 @@ $zIndexTour: 39000;
 	}
 }
 
+// "What's new" for administrators after an upgrade (WhatsNewWindow.ts)
+.whats-new {
+	.whats-new-release + .whats-new-release {
+		margin-top: dp(24);
+	}
+
+	.whats-new-version {
+		align-items: baseline;
+
+		h3 {
+			margin: 0;
+		}
+
+		small {
+			color: $colorTextSecondary;
+		}
+	}
+
+	ul {
+		margin: dp(8) 0 0;
+		padding-left: dp(20);
+	}
+
+	li + li {
+		margin-top: dp(6);
+	}
+}
+
 // The empty state of a list with an explanation and an add button (EmptyState.ts)
 .list-empty-state {
 	display: flex;
