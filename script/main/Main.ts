@@ -35,6 +35,12 @@ import {UserSettingsWindow} from "./settings/index.js";
 import {AboutWindow} from "./AboutWindow.js";
 import {LicenseWindow} from "./LicenseWindow.js";
 import {watchOnlineStatus, welcome} from "./StartupDialogs.js";
+import {Tour} from "./Tour.js";
+
+/**
+ * Opened with "Documentation" in the account menu and the last step of the tour
+ */
+const documentationUrl = "https://www.group-office.com/documentation.html";
 
 
 type MainPanelCreator = {
@@ -71,6 +77,13 @@ class Main extends Component<MainPanelEventMap> {
 	 */
 	private pinned:string[] = ["summary", "email", "calendar", "tasks", "addressbook", "files"];
 	private launcher?: Launcher;
+
+	/**
+	 * Header elements that the tour points at
+	 */
+	private searchButton?: Button;
+	private launcherButton?: Button;
+	private avatarEl?: HTMLElement;
 
 	/**
 	 * Badge counts per panel. Modules may set them before the launcher or the menu item of the panel exists.
@@ -143,6 +156,91 @@ class Main extends Component<MainPanelEventMap> {
 
 	private accountMenu?: Menu;
 
+	/**
+	 * Starts the tour at the first login of the user, once per browser
+	 */
+	private startFirstTour() {
+		if((client.user.loginCount ?? 0) > 1) {
+			return;
+		}
+
+		const key = "tour-seen-" + client.user.id;
+		try {
+			if(localStorage.getItem(key)) {
+				return;
+			}
+			localStorage.setItem(key, "1");
+		} catch(e) {
+			// Without storage, like in a private window, the tour shows at every load of the first login
+		}
+
+		this.startTour();
+	}
+
+	/**
+	 * Shows the main parts of the screen. The user can start it from the account menu.
+	 */
+	public startTour() {
+		const shortcut = (key: string) => (navigator.platform.startsWith("Mac") ? "⌘ + ⇧" : "CTRL + SHIFT") + " + " + key;
+
+		new Tour([
+			{
+				icon: "waving_hand",
+				title: t("Welcome!"),
+				text: t("This short tour shows you around. Use the buttons or the arrow keys to continue.")
+			},
+			{
+				target: () => this.menu.el,
+				icon: "tab",
+				title: t("Modules"),
+				text: t("The modules you open show as tabs here. Right-click a tab to pin it, so it is here every time you log in. Drag the tabs to change their order.")
+			},
+			{
+				target: () => this.launcherButton?.el,
+				icon: "apps",
+				title: t("All modules"),
+				text: t("Open any module from here, also the ones that aren't pinned.") + " " + t("Shortcut") + ": " + shortcut("M")
+			},
+			{
+				target: () => this.searchButton?.el,
+				icon: "search",
+				title: t("Search"),
+				text: t("Search all modules at once.") + " " + t("Shortcut") + ": " + shortcut("F")
+			},
+			{
+				target: () => this.notifier.btn.el,
+				icon: "notifications",
+				title: t("Notifications"),
+				text: t("Reminders and other alerts show up here.")
+			},
+			{
+				target: () => this.avatarEl,
+				icon: "account_circle",
+				title: t("Your account"),
+				text: t("Change your settings, like your language and password, and log out here.")
+			},
+			{
+				icon: "link",
+				title: t("Links"),
+				text: t("Link items to each other, like an e-mail or a note to a contact. The links show in the detail of both items, so related information is always one click away.")
+			},
+			{
+				icon: "share",
+				title: t("Sharing"),
+				text: t("Address books, calendars, notebooks and other lists can be shared with colleagues. You choose who may read them and who may change them.")
+			},
+			{
+				icon: "check_circle",
+				title: t("That's it!"),
+				text: t("Take the tour again from the account menu, by clicking your picture or initials at the top right."),
+				link: {
+					text: t("Read the documentation"),
+					href: documentationUrl
+				}
+			}
+		]).start();
+	}
+
 
 	private createAccountMenu() {
 		return menu({isDropdown: true, removeOnClose: false},
@@ -168,8 +266,11 @@ class Main extends Component<MainPanelEventMap> {
 				const aboutWin = new AboutWindow();
 				aboutWin.show();
 			}),
+			btn({icon: "tour", text: t("Take the tour")}).on('click',() => {
+				this.startTour();
+			}),
 			btn({icon: "help", text: t("Documentation")}).on('click',() => {
-				window.open("https://www.group-office.com/documentation.html", "_blank");
+				window.open(documentationUrl, "_blank");
 			}),
 			"-",
 			btn({icon: "exit_to_app", text: t("Logout")}).on('click',() => {
@@ -220,17 +321,18 @@ class Main extends Component<MainPanelEventMap> {
 				this.menu,
 				tbar({cls: "header-right"},
 					this.notifier.btn,
-					btn({icon: "search", title: t("Search") + " (" + (navigator.platform.startsWith("Mac") ? "⌘ + ⇧" : "CTRL + SHIFT") + " + F)"}).on('click',() => {
+					this.searchButton = btn({icon: "search", title: t("Search") + " (" + (navigator.platform.startsWith("Mac") ? "⌘ + ⇧" : "CTRL + SHIFT") + " + F)"}).on('click',() => {
 						this.search();
 					}),
 
-					btn({
+					this.launcherButton = btn({
 						title: t("Launcher") + " (" + (navigator.platform.startsWith("Mac") ? "⌘ + ⇧" : "CTRL + SHIFT") + " + M)",
 						icon: "apps",
 						menu: this.launcher = this.createLauncher()
 					}),
 
 					avatar({style: {cursor: "pointer"}}).on('render',({target}) => {
+						this.avatarEl = target.el;
 						target.displayName = client.user.displayName
 						if(client.user.avatarId) {
 							target.backgroundImage = client.downloadUrl(client.user.avatarId);
@@ -275,7 +377,12 @@ class Main extends Component<MainPanelEventMap> {
 		if(urlParams.has("oauthConsent")) {
 			void oauthConsent.open();
 		} else {
-			void welcome();
+			const welcomeWindow = welcome();
+			if(welcomeWindow) {
+				welcomeWindow.on("close", () => this.startFirstTour());
+			} else {
+				this.startFirstTour();
+			}
 		}
 
 		document.addEventListener("keydown", ev => {

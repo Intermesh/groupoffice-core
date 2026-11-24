@@ -34,16 +34,20 @@ export function watchOnlineStatus() {
 /**
  * After the installation, shows the first administrator the welcome window with the system settings to go through and
  * the option to generate demo data
+ *
+ * @return The welcome window, when it is shown
  */
-export function welcome() {
+export function welcome(): WelcomeWindow | undefined {
 	if(client.user.id != "1" || !client.user.isAdmin) {
-		return;
+		return undefined;
 	}
 
 	const coreMod = modules.get("core", "core");
 	if(!coreMod || coreMod.settings.welcomeShown) {
-		return;
+		return undefined;
 	}
 
-	new WelcomeWindow().show();
+	const w = new WelcomeWindow();
+	w.show();
+	return w;
 }

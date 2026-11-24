@@ -355,6 +355,66 @@ button[data-count]::before {
 	}
 }
 
+// The guided tour (Tour.ts). Below alerts, so an error still shows above it.
+$zIndexTour: 39000;
+
+.tour-blocker {
+	position: fixed;
+	inset: 0;
+	z-index: $zIndexTour;
+
+	// A step without a target dims the whole screen. With a target the shadow of the spotlight does.
+	&.dim {
+		background-color: rgba(0, 0, 0, .5);
+	}
+}
+
+.tour-spotlight {
+	position: fixed;
+	z-index: $zIndexTour + 1;
+	border-radius: dp(8);
+	box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .5);
+	pointer-events: none;
+	transition: left .2s, top .2s, width .2s, height .2s;
+}
+
+.tour-card {
+	position: fixed;
+	z-index: $zIndexTour + 2;
+	width: dp(480);
+	max-width: calc(100vw - #{dp(24)});
+	padding: dp(16) dp(16) dp(8);
+	border-radius: dp(12);
+	background-color: $colorBackground;
+	color: $colorText;
+	box-shadow: 0 dp(8) dp(24) rgba(0, 0, 0, .3);
+
+	.tour-title {
+		align-items: center;
+
+		.icon {
+			color: $colorMain;
+		}
+
+		h3 {
+			margin: 0;
+		}
+	}
+
+	p {
+		margin: dp(12) 0;
+	}
+
+	.tour-link {
+		display: inline-block;
+		margin-bottom: dp(12);
+	}
+
+	.tour-progress {
+		color: $colorTextSecondary;
+	}
+}
+
 // The empty state of a list with an explanation and an add button (EmptyState.ts)
 .list-empty-state {
 	display: flex;
