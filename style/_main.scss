@@ -355,6 +355,22 @@ button[data-count]::before {
 	}
 }
 
+.welcome {
+	.welcome-step {
+		align-items: center;
+		padding: dp(12) 0;
+		border-bottom: 1px solid var(--fg-line);
+
+		h3 {
+			margin: 0;
+		}
+
+		p {
+			margin: dp(4) 0 0;
+		}
+	}
+}
+
 // The drop pin has the main color, like the header. Make it white while a tab of the main menu is dragged.
 body:has(.main-menu .drag-src) .goui.drop-pin {
 	&, &:after {

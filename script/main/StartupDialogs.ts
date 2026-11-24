@@ -1,6 +1,7 @@
-import {comp, root, router, t, win, Window} from "@intermesh/goui";
+import {comp, t, win, Window} from "@intermesh/goui";
 import {client} from "../jmap/index.js";
-import {modules, moduleDS} from "../Modules.js";
+import {modules} from "../Modules.js";
+import {WelcomeWindow} from "./WelcomeWindow.js";
 
 /**
  * Shows a modal window while the browser is offline, for example when the Wi-Fi is out of reach
@@ -31,40 +32,18 @@ export function watchOnlineStatus() {
 }
 
 /**
- * After the installation, asks the first administrator to go through the system settings, and at the next login
- * whether to generate demo data
+ * After the installation, shows the first administrator the welcome window with the system settings to go through and
+ * the option to generate demo data
  */
-export async function welcome() {
+export function welcome() {
 	if(client.user.id != "1" || !client.user.isAdmin) {
 		return;
 	}
 
 	const coreMod = modules.get("core", "core");
-	if(!coreMod) {
+	if(!coreMod || coreMod.settings.welcomeShown) {
 		return;
 	}
 
-	if(!coreMod.settings.welcomeShown) {
-		await Window.alert(t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), t("Welcome!"));
-		await moduleDS.update(coreMod.id, {settings: {welcomeShown: true}});
-		void router.goto("systemsettings");
-		return;
-	}
-
-	if(!coreMod.settings.demoDataAsked) {
-		const generate = await Window.confirm(t("Do you want to generate some fake demonstration data? This will take about one or two minutes to generate."), t("Demo"));
-		await moduleDS.update(coreMod.id, {settings: {demoDataAsked: true}});
-
-		if(generate) {
-			root.mask();
-			try {
-				client.raiseNextRequestTimeout(180000);
-				await client.jmap("core/System/demo");
-			} catch(e) {
-				void Window.error(e);
-			} finally {
-				root.unmask();
-			}
-		}
-	}
+	new WelcomeWindow().show();
 }
