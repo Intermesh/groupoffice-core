@@ -273,6 +273,11 @@ export interface Module extends BaseEntity {
 	 */
 	views: string[],
 
+	/**
+	 * URL of the page about the module in the user documentation
+	 */
+	documentationUrl?: string | null
+
 }
 
 export const moduleDS = new JmapDataSource<Module>("Module");

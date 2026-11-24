@@ -38,7 +38,8 @@ import {watchOnlineStatus, welcome} from "./StartupDialogs.js";
 import {Tour} from "./Tour.js";
 
 /**
- * Opened with "Documentation" in the account menu and the last step of the tour
+ * The general documentation. "Documentation" in the account menu opens it when the open module has no page of its own.
+ * The last step of the tour links to it.
  */
 const documentationUrl = "https://www.group-office.com/documentation.html";
 
@@ -157,6 +158,17 @@ class Main extends Component<MainPanelEventMap> {
 	private accountMenu?: Menu;
 
 	/**
+	 * The documentation of the open module, or the general documentation when it has no page of its own
+	 */
+	private getDocumentationUrl(): string {
+		const panel = this.container.activeItemComponent,
+			cfg = panel ? this.panelConfigs[panel.itemId] : undefined;
+
+		// Legacy modules register their panel without a package
+		return (cfg && modules.get(cfg.package || "legacy", cfg.module)?.documentationUrl) || documentationUrl;
+	}
+
+	/**
 	 * Starts the tour at the first login of the user, once per browser
 	 */
 	private startFirstTour() {
@@ -270,7 +282,7 @@ class Main extends Component<MainPanelEventMap> {
 				this.startTour();
 			}),
 			btn({icon: "help", text: t("Documentation")}).on('click',() => {
-				window.open(documentationUrl, "_blank");
+				window.open(this.getDocumentationUrl(), "_blank");
 			}),
 			"-",
 			btn({icon: "exit_to_app", text: t("Logout")}).on('click',() => {
