@@ -13,6 +13,12 @@ body {
 	--fg-text:           rgb(10, 10, 10); // on-surface
 	--fg-secondary-text: #{rgba(1, 4, 10, 0.68)}; // on-surface-variant
 
+	// used in button groups
+	--bg-higher: rgba(0,0,0, .06);
+
+	// currently unused
+	--bg-lower: rgba(255,255,255, .06);
+
 	--bg-lowest: white;
 	--bg-low: #f3f3fa; //#fafafa; // body
 	--bg-mid: #ededF4; //#f1f1f1;
@@ -88,6 +94,12 @@ body.dark {
 	--fg-text:           rgba(255,255,255, 0.89);
 	--fg-secondary-text: rgba(255,255,255, 0.64);
 
+	// used in button groups
+	--bg-higher: rgba(255,255,255, .06);
+
+	// currently unused
+	--bg-lower: rgba(0,0,0, .06);
+
 	--bg-lowest: #191a1d; //#1F1e1e;
 	--bg-low: #1a1c20; // #272727; // body
 	--bg-mid: #232429; //#313035;
@@ -107,6 +119,7 @@ body.dark {
 	//not in GO
 
 	--bg-hover:      rgba(255,255,255, 0.04);
+
 	--bg-pressed:	#{rgba(#cccccc, .25)};
 	--bg-selected: #{rgba(white, .16)}; //#{rgba(140,90,240,0.8)};
 	--fg-selected: 	white;
