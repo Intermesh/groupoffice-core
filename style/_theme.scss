@@ -81,24 +81,24 @@ body {
 }
 body.dark {
 
-	--fg-border:			black; //#1b1b1b;
-	--fg-line:				#{rgba(white, 0.32)};
-	--fg-divider:				#{rgba(white, 0.18)};
+	--fg-border:			#{rgba(white, 0.08)};
+	--fg-line:				#{rgba(white, 0.18)};
+	--fg-divider:				#{rgba(white, 0.06)};
 
 	--fg-text:           rgba(255,255,255, 0.89);
 	--fg-secondary-text: rgba(255,255,255, 0.64);
 
-	--bg-lowest: #0c0e13; //#1F1e1e;
+	--bg-lowest: #191a1d; //#1F1e1e;
 	--bg-low: #1a1c20; // #272727; // body
-	--bg-mid: #1e2025; //#313035;
+	--bg-mid: #232429; //#313035;
 	--bg-high: #282a2f; //#343638; // sidebar
 	--bg-highest: #33353a; // #444648; // header
 
-	--bg-layer: 	#{rgba(#1e2025,.84)}; //#303030;
-	--bg-input: #111318; //	#272727; // bright
+	--bg-layer: 	#191a1d;//{rgba(#1e2025,.84)}; //#303030;
+	--bg-input: #1e2025; //	#272727; // bright
 
 	--bg-bright: var(--bg-highest);
-	--bg-dim: var(--bg-input);
+	--bg-dim: #d9d9df;
 
 	//not in GO
 	--bg-focus: 		rgba(2, 119, 189, 0.16);
@@ -108,9 +108,9 @@ body.dark {
 
 	--bg-hover:      rgba(255,255,255, 0.04);
 	--bg-pressed:	#{rgba(#cccccc, .25)};
-	--bg-selected: #{rgba(white, .08)}; //#{rgba(140,90,240,0.8)};
+	--bg-selected: #{rgba(white, .16)}; //#{rgba(140,90,240,0.8)};
 	--fg-selected: 	white;
-	--bg-selected-inactive: #4a4a60;
+	--bg-selected-inactive: #{rgba(white, .08)};
 
 	--bg-main: #202020;
 	--fg-main: #009BC9;
@@ -138,7 +138,7 @@ body.dark {
 	--hue-yellow: #F57F17;
 	--hue-bluegrey: #546E70;
 
-	--c-header-bg: #111318; // #272727;
+	--c-header-bg: var(--bg-mid); // #272727;
 	--fg-alt:			black;
 	--bg-alt: 			#888;
 	--fg-disabled:       rgba(255,255,255, 0.3);
