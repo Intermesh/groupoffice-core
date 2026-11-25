@@ -374,6 +374,9 @@ $zIndexTour: 39000;
 	z-index: $zIndexTour + 1;
 	border-radius: dp(8);
 	box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .5);
+	.dark & {
+		box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .8);
+	}
 	pointer-events: none;
 	transition: left .2s, top .2s, width .2s, height .2s;
 }
