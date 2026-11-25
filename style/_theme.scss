@@ -94,7 +94,7 @@ body.dark {
 	--bg-high: #282a2f; //#343638; // sidebar
 	--bg-highest: #33353a; // #444648; // header
 
-	--bg-layer: 	#191a1d;//{rgba(#1e2025,.84)}; //#303030;
+	--bg-layer: var(--bg-high);//{rgba(#1e2025,.84)}; //#303030;
 	--bg-input: #1e2025; //	#272727; // bright
 
 	--bg-bright: var(--bg-highest);
