@@ -300,7 +300,14 @@ class Modules {
 
 		await new Promise((resolve, reject) => {
 			const script = document.createElement('script');
-			script.src = "views/goui/legacyscripts.php";
+			// The scripts change on upgrades and module installs and contain the settings, language and modules of the user
+			const cacheKey = [
+				client.session!.version,
+				client.session!.cacheClearedAt,
+				client.user.id,
+				client.user.modifiedAt
+			].join("-");
+			script.src = "views/goui/legacyscripts.php?v=" + encodeURIComponent(cacheKey);
 			script.onload = resolve;
 			script.onerror = reject;
 			document.head.appendChild(script);

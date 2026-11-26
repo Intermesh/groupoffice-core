@@ -12,6 +12,7 @@ export interface User extends AclOwnerEntity {
 	avatarId?:string,
 	mail_reminders: boolean,
 	isAdmin: boolean,
+	modifiedAt: string,
 	// user can be extended dynamically by modules
 	[key:string]: any
 }

@@ -80,6 +80,8 @@ export type UploadResponse = {
 
 export type JmapSession = {
 	version: string
+	// changes when the server cache is rebuilt, for example after an upgrade or module installation
+	cacheClearedAt: number
 	auth: any
 	accounts: any[]
 	capabilities: any
