@@ -196,6 +196,17 @@ export class Notifier extends Observable {
 			sidePanel.hidden ? sidePanel.show() : sidePanel.hide();
 		});
 
+		// Hide the panel on a click outside it. The button toggles the panel itself, and menus opened from a notification
+		// action are rendered outside the panel.
+		const hideOnClickOutside = (ev: MouseEvent) => {
+			const target = ev.target as Element;
+			if(!sidePanel.el.contains(target) && !this.btn.el.contains(target) && !target.closest?.('.goui-dropdown')) {
+				sidePanel.hide();
+			}
+		};
+		sidePanel.on('show', () => window.addEventListener('mousedown', hideOnClickOutside));
+		sidePanel.on('hide', () => window.removeEventListener('mousedown', hideOnClickOutside));
+
 		GOUINotifier.on('notify',({msg})=>{
 
 			// legacy code often doesn't pass a category
