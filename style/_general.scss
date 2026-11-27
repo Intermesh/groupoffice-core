@@ -214,3 +214,21 @@ h4.goui {
 	top: 0.4rem;
 	right: 0.4rem;
 }
+// See MediaWindow
+.goui.media-window {
+	audio, video {
+		display: block;
+		width: 100%;
+	}
+
+	&.audio audio {
+		padding: util.dp(16);
+		box-sizing: border-box;
+	}
+
+	&.video video {
+		flex: 1;
+		min-height: 0;
+		background-color: #000;
+	}
+}

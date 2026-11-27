@@ -14,5 +14,6 @@ export * from './GroupCombo.js';
 export * from './EntityTypeTable.js';
 export * from './links';
 export * from './ExtJSWrapper.js';
+export * from './MediaWindow.js';
 export * from './table/TableTitle.js';
 export * from './GroupChips.js';export * from './EmptyState.js';
