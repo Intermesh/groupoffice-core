@@ -630,22 +630,21 @@ class Modules {
 			if(config.panels) {
 				for(let panelId in config.panels) {
 					const p = config.panels[panelId];
-					main.addPanel(config.package, config.name, {...p, id: panelId, callback: () => new p.cmp});
 
-					// add default panel route
-					router.add(new RegExp(`^${panelId}$`), ()=> {
-						main.getPanelById(panelId).show();
-					})
-
+					// The router runs only the first matching route, so add the panel's own routes before the
+					// "^panelId$" route that main.addPanel() adds. Otherwise a route that also matches the bare
+					// panel ID never runs.
 					if(p.routes) {
 						for(let route in p.routes) {
 
 							router.add(new RegExp(route), (...args) =>{
 								// @ts-ignore
-								p.routes![route].bind(main.getPanelById(panelId) as unknown as T)(...args);
+								return p.routes![route].bind(main.openPanel(panelId) as unknown as T)(...args);
 							});
 						}
 					}
+
+					main.addPanel(config.package, config.name, {...p, id: panelId, callback: () => new p.cmp});
 				}
 			}
 
