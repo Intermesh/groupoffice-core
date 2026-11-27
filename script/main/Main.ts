@@ -379,7 +379,7 @@ class Main extends Component<MainPanelEventMap> {
 
 		this.menu.items.add(hr({itemId: "pinned-splitter", cls: "sortable"}));
 
-		this.openDefaultPanel();
+		// this.openDefaultPanel();
 
 		this.setupRoutes();
 
