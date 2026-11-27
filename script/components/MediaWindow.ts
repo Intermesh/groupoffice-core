@@ -108,8 +108,3 @@ export function viewFile(url: string, name?: string, type?: string): void {
 		window.open(url, "_blank");
 	}
 }
-
-// Let the ExtJS client play media with this window too, see go.util.viewFile()
-if (window.go?.util) {
-	go.util.viewMedia = viewMedia;
-}
