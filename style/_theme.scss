@@ -72,6 +72,8 @@ body {
 	--hue-yellow: #FDD170;
 	--hue-bluegrey: #607D8B;
 
+
+
 	--c-header-bg: 	var(--fg-main);
 
 	--bg-alt: 			#212121;
@@ -91,7 +93,7 @@ body.dark {
 	--fg-line:				#{rgba(white, 0.18)};
 	--fg-divider:				#{rgba(white, 0.06)};
 
-	--fg-text:           rgba(255,255,255, 0.89);
+	--fg-text:           rgba(255,255,255, 0.8);
 	--fg-secondary-text: rgba(255,255,255, 0.64);
 
 	// used in button groups
@@ -100,9 +102,9 @@ body.dark {
 	// currently unused
 	--bg-lower: rgba(0,0,0, .06);
 
-	--bg-lowest: #191a1d; //#1F1e1e;
-	--bg-low: #1a1c20; // #272727; // body
-	--bg-mid: #232429; //#313035;
+	--bg-lowest: #212222FF; //#1F1e1e;
+	--bg-low: #232222; // #272727; // body
+	--bg-mid: #242629; //#313035;
 	--bg-high: #282a2f; //#343638; // sidebar
 	--bg-highest: #33353a; // #444648; // header
 
@@ -127,6 +129,9 @@ body.dark {
 
 	--bg-main: #202020;
 	--fg-main: #009BC9;
+	--c-primary: 	 #1652a1;
+	--c-secondary: rgb(83 54 126);
+	--c-accent: #cd7121;
 
 	--fg-error: #FFEBEE;
 	--border-error: #a43432;
